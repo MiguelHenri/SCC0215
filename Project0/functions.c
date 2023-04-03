@@ -6,9 +6,9 @@
 struct data {
     char removido;
     int idCrime;
-    char dataCrime[10];
+    char *dataCrime;
     int numeroArtigo;
-    char marcaCelular[12];
+    char *marcaCelular;
     char *lugarCrime;
     char *descricaoCrime;
 };
@@ -37,7 +37,7 @@ char *readMember(FILE *input) {
             str = realloc(str, sizeof(char) * size);
         }
 
-        //fazendo as verificacoes de ','
+        //fazendo as verificacoes dos campos dos registros
         if (aux == ',' || aux == EOF || aux == '\n') {
             if (previousChar == ',') {
                 flagMissingData = 1;
@@ -54,16 +54,62 @@ char *readMember(FILE *input) {
         str[n_char++] = aux;
     }
 
-    if (flagMissingData) {
-        free(str);
-        return nullStr;
-    }
-    else {
-        str = realloc(str, n_char);
-        printf("[%d][%s]\n", n_char, str);
+
+    if (flagMissingData || str[0] == '\0') 
+        return NULL;
+    else    
         return str;
+}
+
+Data *readRegister(FILE *input) {
+    Data *tmpRegister = (Data *)malloc(sizeof(Data));
+    if (tmpRegister == NULL) {
+        printf("Erro de alocacao de memoria\n");
+        return NULL;
+    }
+
+    char *tmpData = NULL;
+
+    tmpData = readMember(input);
+    if (tmpData == NULL) return NULL;
+    tmpRegister->idCrime = atoi(tmpData);
+    
+    tmpData = readMember(input);
+    tmpRegister->dataCrime = tmpData;
+
+    tmpData = readMember(input);
+    if (tmpData == NULL) { //dealing with missing data
+        tmpRegister->numeroArtigo = -1;
+    } 
+    else {
+        tmpRegister->numeroArtigo = atoi(tmpData);
+    }
+
+    tmpData = readMember(input);
+    tmpRegister->lugarCrime = tmpData;
+
+    tmpData = readMember(input);
+    tmpRegister->descricaoCrime = tmpData;
+
+    tmpData = readMember(input);
+    tmpRegister->marcaCelular = tmpData;
+
+    tmpRegister->removido = '0';
+
+    return tmpRegister;
+}
+
+//reading and discarding the first row of the csv file
+void readCsvHeader(FILE *input) {
+    char *tmpData = NULL;
+
+    for (int i = 0; i < numCampos; i++) {
+        tmpData = readMember(input);
+        free(tmpData);
     }
 }
+
+
 
 FILE *createTable(FILE *input) {
     char nameOutput[100];
@@ -74,56 +120,20 @@ FILE *createTable(FILE *input) {
         printf("Erro ao abrir o arquivo.\n");
         return NULL;
     }
-    
-    Data *tmpRegister = (Data *)malloc(sizeof(Data));
-    if (tmpRegister == NULL) {
-        printf("Erro de alocacao de memoria\n");
-        return NULL;
-    }
 
     int nReg = 0;
-    char *str_aux = NULL;
-    char *strInt = NULL;
-    char *strTokAux = NULL;
-    char *fileLine = NULL;
-    int aaux;
+    Data *reg = NULL;
 
-
-    //lendo a primeira linha, nao sera utilizado esses dados
-    printf("li a primeira linha\n");
-    for (int i = 0; i < numCampos; i++) {
-        str_aux = readMember(input);
-        free(str_aux);
-    }
-
+    readCsvHeader(input);
     do {
-        printf("-----------------------------------------------\n");
-        str_aux = readMember(input);
-        tmpRegister->idCrime = atoi(str_aux);
-        
-        str_aux = readMember(input);
-        strcpy(tmpRegister->dataCrime, str_aux);
+        reg = readRegister(input);
+        //printf("cidade %s\n", reg->lugarCrime);
+        if (reg == NULL)
+            break;
 
-        str_aux = readMember(input);
-        if (str_aux[0] == '$') { //dealing with missing data
-            tmpRegister->numeroArtigo = -1;
-        } 
-        else {
-            tmpRegister->numeroArtigo = atoi(str_aux);
-        }
-
-        str_aux = readMember(input);
-        tmpRegister->lugarCrime = str_aux;
-
-        str_aux = readMember(input);
-        tmpRegister->descricaoCrime = str_aux;
-
-        str_aux = readMember(input);
-        strcpy(tmpRegister->marcaCelular, str_aux);
-
-        tmpRegister->removido = '0';
-
-        writeRegister(output, tmpRegister);
+        writeRegister(output, reg);
+        nReg++;
+        //freeRegister(&reg);
 
     } while (!feof(input));
 
@@ -132,9 +142,19 @@ FILE *createTable(FILE *input) {
     return output; //returns file (.bin)
 }
 
+void completeSetString(char *str, int lenStr) {
+    if (str == NULL)
+        str = (char *)malloc(sizeof(char) * lenStr);
+
+    for (int i = strlen(str); i < lenStr; i++){
+        str[i] = '$';
+    }
+}
+
 void writeRegister(FILE *output, Data *tmpRegister) {
     char stringDelimiter = '|';
     char registerDelimiter = '#';
+    int writeStrDelimiter = 1;
 
     fwrite(&(tmpRegister->removido), sizeof(char), 1, output);
     fwrite(&(tmpRegister->idCrime), sizeof(int), 1, output);
@@ -144,34 +164,51 @@ void writeRegister(FILE *output, Data *tmpRegister) {
     //se tamanho fixo preenche com $
 
     //verificando dataCrime - tam fixo
+    /*if (tmpRegister->dataCrime == NULL) {
+        tmpRegister->dataCrime = (char *)malloc(sizeof(char) * lenDataCrime);
+    }
     for(int i = strlen(tmpRegister->dataCrime); i<lenDataCrime; i++){
         tmpRegister->dataCrime[i] = '$';
-    }
+    }*/
+    completeSetString(tmpRegister->dataCrime, lenDataCrime);
     fwrite(tmpRegister->dataCrime, lenDataCrime, 1, output);
+    free(tmpRegister->dataCrime);
 
     fwrite(&(tmpRegister->numeroArtigo), sizeof(int), 1, output);
 
     //verificando marcaCelular - tam fixo
+    /*if (tmpRegister->marcaCelular == NULL) {
+        tmpRegister->marcaCelular = (char *)malloc(sizeof(char) * lenMarcaCelular);
+    }
     for(int i = strlen(tmpRegister->marcaCelular); i<lenMarcaCelular; i++){
         tmpRegister->marcaCelular[i] = '$';
-    }
+    }*/
+    //printf("completando %s\n", tmpRegister->marcaCelular);
+    completeSetString(tmpRegister->marcaCelular, lenMarcaCelular);
     fwrite(tmpRegister->marcaCelular, lenMarcaCelular, 1, output);
+    //free(tmpRegister->marcaCelular);
 
     //verificando lugarCrime - tam variavel
-    if(strcmp(tmpRegister->lugarCrime, nulo) == 0){
+    if(tmpRegister->lugarCrime == NULL){
+        writeStrDelimiter = 0;
         tmpRegister->lugarCrime = (char *)malloc(sizeof(char));
         tmpRegister->lugarCrime = "|";
     }
     fwrite(tmpRegister->lugarCrime, strlen(tmpRegister->lugarCrime), 1, output);
-    fwrite(&stringDelimiter, 1, 1, output);
+    if (writeStrDelimiter)
+        fwrite(&stringDelimiter, 1, 1, output);
+    writeStrDelimiter = 1;
 
     //verificando descricaoCrime - tam variavel
-    if(strcmp(tmpRegister->descricaoCrime, nulo) == 0){
+    if(tmpRegister->descricaoCrime == NULL){
         tmpRegister->descricaoCrime = (char *)malloc(sizeof(char));
         tmpRegister->descricaoCrime = "|";
+        writeStrDelimiter = 0;
     }
     fwrite(tmpRegister->descricaoCrime, strlen(tmpRegister->descricaoCrime), 1, output);
-    fwrite(&stringDelimiter, 1, 1, output);
+    if (writeStrDelimiter)
+        fwrite(&stringDelimiter, 1, 1, output);
+    //free(tmpRegister->descricaoCrime);
 
     fwrite(&registerDelimiter, 1, 1, output);
     
