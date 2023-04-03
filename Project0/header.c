@@ -4,7 +4,58 @@
 
 struct header {
     char status;
-    llint proxByteOffset;
+    long long int proxByteOffset;
     int nroRegArq;
     int nroRegRem;
 };
+
+Header *createHeader() {
+    Header *h = (Header *)malloc(sizeof(Header));
+    if (h == NULL) return NULL;
+    
+    h->status = '1';
+    h->proxByteOffset = 0;
+    h->nroRegArq = 0;
+    h->nroRegRem = 0;
+
+    return h;
+}
+
+void add1RegArq(Header *h) {
+    if (h == NULL) return;
+    
+    h->nroRegArq++;
+}
+
+void setNroRegArq(Header *h, int num) {
+    if (h == NULL) return;
+
+    h->nroRegArq = num;
+}
+
+void updateHeaderStatus(Header *h) {
+    if (h == NULL) return;
+    
+    if (h->status == '0')
+        h->status = '1';
+    else    
+        h->status = '0';
+}
+
+void writeHeader(FILE *output, Header *h) {
+    if (output == NULL || h == NULL) return;
+
+    fwrite(&(h->status), sizeof(char), 1, output);
+    fwrite(&(h->proxByteOffset), sizeof(long long int), 1, output);
+    fwrite(&(h->nroRegArq),sizeof(int), 1, output);
+    fwrite(&(h->nroRegRem), sizeof(int), 1, output);
+}
+
+void updateHeader(FILE *output, Header *h) {
+    if (output == NULL || h == NULL) return;
+
+    updateHeaderStatus(h);
+    fseek(output, 0, SEEK_SET);
+    writeHeader(output, h);
+}
+

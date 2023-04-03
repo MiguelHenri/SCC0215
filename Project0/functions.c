@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "functions.h"
+#include "header.h"
 
 struct data {
     char removido;
@@ -109,8 +110,6 @@ void readCsvHeader(FILE *input) {
     }
 }
 
-
-
 FILE *createTable(FILE *input) {
     char nameOutput[100];
     scanf("%s", nameOutput);
@@ -121,21 +120,24 @@ FILE *createTable(FILE *input) {
         return NULL;
     }
 
+    Header *h = createHeader();
+    writeHeader(output, h);
+
     int nReg = 0;
     Data *reg = NULL;
 
     readCsvHeader(input);
     do {
         reg = readRegister(input);
-        //printf("cidade %s\n", reg->lugarCrime);
         if (reg == NULL)
             break;
 
         writeRegister(output, reg);
-        nReg++;
-        //freeRegister(&reg);
+        add1RegArq(h);
 
     } while (!feof(input));
+
+    updateHeader(output, h);
 
     fclose(output);
 
@@ -143,8 +145,12 @@ FILE *createTable(FILE *input) {
 }
 
 void completeSetString(char *str, int lenStr) {
-    if (str == NULL)
+    if (str == NULL) {
         str = (char *)malloc(sizeof(char) * lenStr);
+        if (str == NULL) {
+            fprintf(stderr, "nao aloquei mem\n");
+        }
+    }
 
     for (int i = strlen(str); i < lenStr; i++){
         str[i] = '$';
@@ -159,17 +165,7 @@ void writeRegister(FILE *output, Data *tmpRegister) {
     fwrite(&(tmpRegister->removido), sizeof(char), 1, output);
     fwrite(&(tmpRegister->idCrime), sizeof(int), 1, output);
 
-    //tratar string nula do tipo "$$$"
-    //se tamanho variável recebe pipe |
-    //se tamanho fixo preenche com $
-
     //verificando dataCrime - tam fixo
-    /*if (tmpRegister->dataCrime == NULL) {
-        tmpRegister->dataCrime = (char *)malloc(sizeof(char) * lenDataCrime);
-    }
-    for(int i = strlen(tmpRegister->dataCrime); i<lenDataCrime; i++){
-        tmpRegister->dataCrime[i] = '$';
-    }*/
     completeSetString(tmpRegister->dataCrime, lenDataCrime);
     fwrite(tmpRegister->dataCrime, lenDataCrime, 1, output);
     free(tmpRegister->dataCrime);
@@ -183,10 +179,8 @@ void writeRegister(FILE *output, Data *tmpRegister) {
     for(int i = strlen(tmpRegister->marcaCelular); i<lenMarcaCelular; i++){
         tmpRegister->marcaCelular[i] = '$';
     }*/
-    //printf("completando %s\n", tmpRegister->marcaCelular);
     completeSetString(tmpRegister->marcaCelular, lenMarcaCelular);
     fwrite(tmpRegister->marcaCelular, lenMarcaCelular, 1, output);
-    //free(tmpRegister->marcaCelular);
 
     //verificando lugarCrime - tam variavel
     if(tmpRegister->lugarCrime == NULL){
@@ -208,9 +202,7 @@ void writeRegister(FILE *output, Data *tmpRegister) {
     fwrite(tmpRegister->descricaoCrime, strlen(tmpRegister->descricaoCrime), 1, output);
     if (writeStrDelimiter)
         fwrite(&stringDelimiter, 1, 1, output);
-    //free(tmpRegister->descricaoCrime);
 
     fwrite(&registerDelimiter, 1, 1, output);
     
 }
-
