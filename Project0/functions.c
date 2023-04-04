@@ -110,8 +110,6 @@ void readCsvHeader(FILE *input) {
     }
 }
 
-
-
 FILE *createTable(FILE *input) {
     char nameOutput[100];
     scanf("%s", nameOutput);
@@ -123,8 +121,9 @@ FILE *createTable(FILE *input) {
     }
 
     Header *h = createHeader();
+
     updateHeaderStatus(h); //switching to inconsistent status
-    writeHeader(output, h);
+
 
     int nReg = 0;
     Data *reg = NULL;
@@ -132,15 +131,15 @@ FILE *createTable(FILE *input) {
     readCsvHeader(input);
     do {
         reg = readRegister(input);
-        //printf("cidade %s\n", reg->lugarCrime);
         if (reg == NULL)
             break;
 
         writeRegister(output, reg);
-        nReg++;
-        //freeRegister(&reg);
+        add1RegArq(h);
 
     } while (!feof(input));
+
+    updateHeader(output, h);
 
     fclose(output);
 
@@ -153,6 +152,7 @@ char *completeSetString(char *str, int lenStr) {
     }
     else {
         str = realloc(str, lenStr);
+
     }
 
     for (int i = strlen(str); i < lenStr; i++) {
@@ -179,21 +179,20 @@ void writeRegister(FILE *output, Data *tmpRegister) {
     fwrite(&(tmpRegister->removido), sizeof(char), 1, output);
     fwrite(&(tmpRegister->idCrime), sizeof(int), 1, output);
 
-    //tratar string nula do tipo "$$$"
-    //se tamanho variável recebe pipe |
-    //se tamanho fixo preenche com $
-
     //verificando dataCrime - tam fixo
+
     tmpRegister->dataCrime = completeSetString(tmpRegister->dataCrime, lenDataCrime);
+
     fwrite(tmpRegister->dataCrime, lenDataCrime, 1, output);
     free(tmpRegister->dataCrime);
 
     fwrite(&(tmpRegister->numeroArtigo), sizeof(int), 1, output);
 
     //verificando marcaCelular - tam fixo
+
     tmpRegister->marcaCelular = completeSetString(tmpRegister->marcaCelular, lenMarcaCelular);
+
     fwrite(tmpRegister->marcaCelular, lenMarcaCelular, 1, output);
-    //free(tmpRegister->marcaCelular);
 
     int writeStrDelimiter = 1;
     //verificando lugarCrime - tam variavel
@@ -208,7 +207,8 @@ void writeRegister(FILE *output, Data *tmpRegister) {
     fwrite(tmpRegister->descricaoCrime, strlen(tmpRegister->descricaoCrime), 1, output);
     if (writeStrDelimiter)
         fwrite(&stringDelimiter, 1, 1, output);
-    //free(tmpRegister->descricaoCrime);
 
     fwrite(&registerDelimiter, 1, 1, output);
+
 }
+

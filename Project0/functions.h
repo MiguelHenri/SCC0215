@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include "header.h"
 
 #define delimitadorString |
 #define delimitadorStruct #
