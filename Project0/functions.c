@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "functions.h"
+#include "header.h"
 
 struct data {
     char removido;
@@ -121,6 +122,10 @@ FILE *createTable(FILE *input) {
         return NULL;
     }
 
+    Header *h = createHeader();
+    updateHeaderStatus(h); //switching to inconsistent status
+    writeHeader(output, h);
+
     int nReg = 0;
     Data *reg = NULL;
 
@@ -142,19 +147,34 @@ FILE *createTable(FILE *input) {
     return output; //returns file (.bin)
 }
 
-void completeSetString(char *str, int lenStr) {
-    if (str == NULL)
+char *completeSetString(char *str, int lenStr) {
+    if (str == NULL) {
         str = (char *)malloc(sizeof(char) * lenStr);
+    }
+    else {
+        str = realloc(str, lenStr);
+    }
 
-    for (int i = strlen(str); i < lenStr; i++){
+    for (int i = strlen(str); i < lenStr; i++) {
         str[i] = '$';
     }
+
+    return str;
+}
+
+char *completeUnsetString(char *str, int *flag) {
+    if (str != NULL) return str;
+
+    str = (char *)malloc(sizeof(char));
+    str = "|";
+    *flag = 0;
+
+    return str;
 }
 
 void writeRegister(FILE *output, Data *tmpRegister) {
     char stringDelimiter = '|';
     char registerDelimiter = '#';
-    int writeStrDelimiter = 1;
 
     fwrite(&(tmpRegister->removido), sizeof(char), 1, output);
     fwrite(&(tmpRegister->idCrime), sizeof(int), 1, output);
@@ -164,53 +184,31 @@ void writeRegister(FILE *output, Data *tmpRegister) {
     //se tamanho fixo preenche com $
 
     //verificando dataCrime - tam fixo
-    /*if (tmpRegister->dataCrime == NULL) {
-        tmpRegister->dataCrime = (char *)malloc(sizeof(char) * lenDataCrime);
-    }
-    for(int i = strlen(tmpRegister->dataCrime); i<lenDataCrime; i++){
-        tmpRegister->dataCrime[i] = '$';
-    }*/
-    completeSetString(tmpRegister->dataCrime, lenDataCrime);
+    tmpRegister->dataCrime = completeSetString(tmpRegister->dataCrime, lenDataCrime);
     fwrite(tmpRegister->dataCrime, lenDataCrime, 1, output);
     free(tmpRegister->dataCrime);
 
     fwrite(&(tmpRegister->numeroArtigo), sizeof(int), 1, output);
 
     //verificando marcaCelular - tam fixo
-    /*if (tmpRegister->marcaCelular == NULL) {
-        tmpRegister->marcaCelular = (char *)malloc(sizeof(char) * lenMarcaCelular);
-    }
-    for(int i = strlen(tmpRegister->marcaCelular); i<lenMarcaCelular; i++){
-        tmpRegister->marcaCelular[i] = '$';
-    }*/
-    //printf("completando %s\n", tmpRegister->marcaCelular);
-    completeSetString(tmpRegister->marcaCelular, lenMarcaCelular);
+    tmpRegister->marcaCelular = completeSetString(tmpRegister->marcaCelular, lenMarcaCelular);
     fwrite(tmpRegister->marcaCelular, lenMarcaCelular, 1, output);
     //free(tmpRegister->marcaCelular);
 
+    int writeStrDelimiter = 1;
     //verificando lugarCrime - tam variavel
-    if(tmpRegister->lugarCrime == NULL){
-        writeStrDelimiter = 0;
-        tmpRegister->lugarCrime = (char *)malloc(sizeof(char));
-        tmpRegister->lugarCrime = "|";
-    }
+    tmpRegister->lugarCrime = completeUnsetString(tmpRegister->lugarCrime, &writeStrDelimiter);
     fwrite(tmpRegister->lugarCrime, strlen(tmpRegister->lugarCrime), 1, output);
     if (writeStrDelimiter)
         fwrite(&stringDelimiter, 1, 1, output);
-    writeStrDelimiter = 1;
 
+    writeStrDelimiter = 1;
     //verificando descricaoCrime - tam variavel
-    if(tmpRegister->descricaoCrime == NULL){
-        tmpRegister->descricaoCrime = (char *)malloc(sizeof(char));
-        tmpRegister->descricaoCrime = "|";
-        writeStrDelimiter = 0;
-    }
+    tmpRegister->descricaoCrime = completeUnsetString(tmpRegister->descricaoCrime, &writeStrDelimiter);
     fwrite(tmpRegister->descricaoCrime, strlen(tmpRegister->descricaoCrime), 1, output);
     if (writeStrDelimiter)
         fwrite(&stringDelimiter, 1, 1, output);
     //free(tmpRegister->descricaoCrime);
 
     fwrite(&registerDelimiter, 1, 1, output);
-    
 }
-
