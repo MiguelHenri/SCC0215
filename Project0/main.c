@@ -14,7 +14,7 @@
 int main(){
     char fileName[50];
     // scanf("%s\n", fileName);
-    FILE *arq = fopen("dados1.csv", "r");
+    FILE *arq = fopen("dados2.csv", "r");
     FILE *out = createTable(arq);
     fclose(arq);
 

@@ -59,3 +59,9 @@ void updateHeader(FILE *output, Header *h) {
     writeHeader(output, h);
 }
 
+
+void printNroReg(Header *h) {
+    printf("[%c]\n", h->status);
+}
+
+
