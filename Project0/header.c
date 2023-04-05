@@ -42,13 +42,15 @@ void updateHeaderStatus(Header *h) {
         h->status = '0';
 }
 
-void writeHeader(FILE *output, Header *h) {
-    if (output == NULL || h == NULL) return;
+int writeHeader(FILE *output, Header *h) {
+    if (output == NULL || h == NULL) return 0;
 
     fwrite(&(h->status), sizeof(char), 1, output);
     fwrite(&(h->proxByteOffset), sizeof(long long int), 1, output);
     fwrite(&(h->nroRegArq),sizeof(int), 1, output);
     fwrite(&(h->nroRegRem), sizeof(int), 1, output);
+
+    return 17;
 }
 
 void updateHeader(FILE *output, Header *h) {
@@ -59,9 +61,10 @@ void updateHeader(FILE *output, Header *h) {
     writeHeader(output, h);
 }
 
-
 void printNroReg(Header *h) {
     printf("[%c]\n", h->status);
 }
 
-
+void addByteOffset(Header *h, int n) {
+    h->proxByteOffset += n;
+}
