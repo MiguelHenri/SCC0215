@@ -13,9 +13,10 @@
 
 int main(){
     char fileName[50];
-    // scanf("%s\n", fileName);
-    FILE *arq = fopen("dados2.csv", "r");
-    FILE *out = createTable(arq);
+    scanf("%s\n", fileName);
+    FILE *arq = fopen("binario5.bin", "rb");
+    //FILE *out = createTable(arq);
+    selectFrom(arq);
     fclose(arq);
 
     return 0;

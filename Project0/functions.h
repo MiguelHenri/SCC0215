@@ -8,17 +8,18 @@
 #define delimitadorString |
 #define delimitadorStruct #
 #define numCampos 6
-#define nulo "$$$"
 #define lenDataCrime 10
 #define lenMarcaCelular 12
+#define bytesFixedMember 32
 
 
 
 typedef struct data Data;
 
-char *readMember(FILE *input);
+char *readMember(FILE *input, char delimiter);
 FILE *createTable(FILE *input);
-void writeRegister(FILE *output, Data *tmpRegister);
+int writeRegister(FILE *output, Data *tmpRegister);
+void selectFrom(FILE *from);
 
 
 #endif
