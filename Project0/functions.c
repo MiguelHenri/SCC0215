@@ -111,10 +111,7 @@ void readCsvHeader(FILE *input) {
     }
 }
 
-FILE *createTable(FILE *input) {
-    char nameOutput[100];
-    scanf("%s", nameOutput);
-    
+FILE *createTable(FILE *input, char *nameOutput) {
     FILE *output = fopen(nameOutput, "wb");
     if (output == NULL) {
         printf("Erro ao abrir o arquivo.\n");

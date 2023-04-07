@@ -12,12 +12,10 @@
 #define lenMarcaCelular 12
 #define bytesFixedMember 32
 
-
-
 typedef struct data Data;
 
 char *readMember(FILE *input, char delimiter);
-FILE *createTable(FILE *input);
+FILE *createTable(FILE *input, char *nameOutput);
 int writeRegister(FILE *output, Data *tmpRegister);
 void selectFrom(FILE *from);
 

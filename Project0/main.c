@@ -4,20 +4,26 @@
 #include "functions.h"
 #include "funcoesFornecidas.c"
 
-/*TODO
-    funcao para printar no arquivo, cabecalho e data
-    funcao de mensagem de erro
-    funcao SELECT
+int main() {
+    int operacao;
+    char fileNameInput[50];
+    char fileNameOutput[50];
     
-*/
+    scanf("%d %s", &operacao, fileNameInput);
 
-int main(){
-    char fileName[50];
-    scanf("%s\n", fileName);
-    FILE *arq = fopen("binario5.bin", "rb");
-    //FILE *out = createTable(arq);
-    selectFrom(arq);
-    fclose(arq);
+    if (operacao == 1) {
+        scanf("%s", fileNameOutput);
+
+        FILE *input = fopen(fileNameInput, "r");
+        FILE *output = createTable(input, fileNameOutput);
+
+        binarioNaTela(fileNameOutput);
+    }
+    else if (operacao == 2) {
+        FILE *input = fopen(fileNameInput, "rb");
+        selectFrom(input);
+        fclose(input);
+    }
 
     return 0;
 }
