@@ -66,6 +66,46 @@ char *readMember(FILE *input, char delimiter) {
     else    // returns the member 
         return str;
 }
+/*
+* Function employed to complete strings, that have fixed lenght, with '$'
+* It returns a pointer to the new string
+*/
+char *completeSetString(char *str, int lenStr) {
+    if (str == NULL) 
+        str = (char *)malloc(sizeof(char) * lenStr);
+        if (str == NULL) {
+            MEM_ERROR;
+            return NULL;
+        }
+    else 
+        str = realloc(str, lenStr);
+
+    for (int i = strlen(str); i < lenStr; i++) 
+        str[i] = '$';
+    
+
+    return str;
+}
+
+/*
+* Function utilized to either replace a null string with a "|" or
+* do nothing in case its not null
+* It returns a pointer to "|" or to the same string
+*/
+char *completeUnsetString(char *str, int *flag) {
+    if (str != NULL) return str;
+
+    str = (char *)malloc(sizeof(char));
+    if (str == NULL) {
+        MEM_ERROR;
+        return NULL;
+    }
+
+    str = "|";
+    *flag = 0;
+
+    return str;
+}
 
 /*
 * Function used to read one register 
@@ -127,91 +167,6 @@ void readCsvHeader(FILE *input) {
 }
 
 /*
-* This function creates a table (group of registers) and returns data collected from a
-* .csv file 'input' in a .bin file output named 'outputName'
-*/
-FILE *createTable(FILE *input, char *outputName) {
-    if (input == NULL || outputName == NULL) 
-        return NULL;
-
-    // opens .bin output file
-    FILE *output = fopen(nameOutput, "wb");
-    if (output == NULL) {
-        printf("Opening file error\n");
-        return NULL;
-    }
-
-    Header *h = createHeader(); // creates table's header
-    
-    // switching to inconsistent status
-    updateHeaderStatus(h);
-    // writes header data and sums its size to header->nextByteOffset
-    addByteOffset(h, writeHeader(output, h));
-
-    int nReg = 0; // number of registers
-    Data *reg = NULL; // auxiliar register variable
-
-    readCsvHeader(input); // discards .csv first row
-    do {
-        reg = readRegister(input);
-        if (reg == NULL)
-            break;
-
-        addByteOffset(h, writeRegister(output, reg) + bytesFixedMember); // updates header->nextByteOffset
-
-        add1FileReg(h); // sums 1 to header->number(of)Registers
-
-    } while (!feof(input));
-
-    updateHeader(output, h); 
-
-    fclose(output);
-
-    return output; // returns file (.bin)
-}
-
-/*
-* Function employed to complete strings, that have fixed lenght, with '$'
-* It returns a pointer to the new string
-*/
-char *completeSetString(char *str, int lenStr) {
-    if (str == NULL) 
-        str = (char *)malloc(sizeof(char) * lenStr);
-        if (str == NULL) {
-            MEM_ERROR;
-            return NULL;
-        }
-    else 
-        str = realloc(str, lenStr);
-
-    for (int i = strlen(str); i < lenStr; i++) 
-        str[i] = '$';
-    
-
-    return str;
-}
-
-/*
-* Function utilized to either replace a null string with a "|" or
-* do nothing in case its not null
-* It returns a pointer to "|" or to the same string
-*/
-char *completeUnsetString(char *str, int *flag) {
-    if (str != NULL) return str;
-
-    str = (char *)malloc(sizeof(char));
-    if (str == NULL) {
-        MEM_ERROR;
-        return NULL;
-    }
-
-    str = "|";
-    *flag = 0;
-
-    return str;
-}
-
-/*
 * Function that writes in a file, passed by parameter, the members of 
 * a data register, also passed by parameter.
 * It returns the amount of bytes written of the unset size members
@@ -267,6 +222,51 @@ int writeRegister(FILE *output, Data *tmpRegister) {
     fwrite(&registerDelimiter, 1, 1, output);
 
     return variableSize; 
+}
+
+
+/*
+* This function creates a table (group of registers) and returns data collected from a
+* .csv file 'input' in a .bin file output named 'outputName'
+*/
+FILE *createTable(FILE *input, char *outputName) {
+    if (input == NULL || outputName == NULL) 
+        return NULL;
+
+    // opens .bin output file
+    FILE *output = fopen(outputName, "wb");
+    if (output == NULL) {
+        printf("Opening file error\n");
+        return NULL;
+    }
+
+    Header *h = createHeader(); // creates table's header
+    
+    // switching to inconsistent status
+    updateHeaderStatus(h);
+    // writes header data and sums its size to header->nextByteOffset
+    addByteOffset(h, writeHeader(output, h));
+
+    int nReg = 0; // number of registers
+    Data *reg = NULL; // auxiliar register variable
+
+    readCsvHeader(input); // discards .csv first row
+    do {
+        reg = readRegister(input);
+        if (reg == NULL)
+            break;
+
+        addByteOffset(h, writeRegister(output, reg) + bytesFixedMember); // updates header->nextByteOffset
+
+        add1FileReg(h); // sums 1 to header->number(of)Registers
+
+    } while (!feof(input));
+
+    updateHeader(output, h); 
+
+    fclose(output);
+
+    return output; // returns file (.bin)
 }
 
 /*
