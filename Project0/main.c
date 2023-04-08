@@ -15,12 +15,20 @@ int main() {
         scanf("%s", fileNameOutput);
 
         FILE *input = fopen(fileNameInput, "r");
+        if (input == NULL) {
+            FILE_ERROR;
+            return 0;
+        }
         FILE *output = createTable(input, fileNameOutput);
 
         binarioNaTela(fileNameOutput);
     }
     else if (operacao == 2) {
         FILE *input = fopen(fileNameInput, "rb");
+        if (input == NULL) {
+            FILE_ERROR;
+            return 0;
+        }
         selectFrom(input);
         fclose(input);
     }

@@ -4,8 +4,8 @@
 typedef struct header Header;
 
 #define bytesHeader 17
-#define REGISTER_ERROR printf("Non-existent register.\n")
-#define FILE_ERROR printf("File processing failed.\n")
+#define REGISTER_ERROR printf("Registro inexistente.\n")
+#define FILE_ERROR printf("Falha no processamento do arquivo.\n")
 
 Header *createHeader();
 void add1FileReg(Header *h);
