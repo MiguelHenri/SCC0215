@@ -5,19 +5,15 @@
 #include <stdlib.h>
 #include "header.h"
 
-#define delimitadorString |
-#define delimitadorStruct #
-#define numCampos 6
-#define lenDataCrime 10
-#define lenMarcaCelular 12
+#define numMembers 6
+#define crimeDateLen 10
+#define telephoneBrandLen 12
 #define bytesFixedMember 32
+#define MEM_ERROR printf("MEM allocation error\n")
 
 typedef struct data Data;
 
-char *readMember(FILE *input, char delimiter);
-FILE *createTable(FILE *input, char *nameOutput);
-int writeRegister(FILE *output, Data *tmpRegister);
+FILE *createTable(FILE *input, char *outputName);
 void selectFrom(FILE *from);
-
 
 #endif
