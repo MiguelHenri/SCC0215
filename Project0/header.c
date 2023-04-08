@@ -4,35 +4,35 @@
 
 struct header {
     char status;
-    long long int proxByteOffset;
-    int nroRegArq;
-    int nroRegRem;
+    long long int nextByteOffset;
+    int numFileRegisters;
+    int numRemovedRegisters;
 };
 
+/*
+* Creates a header struct, initialize it with default values and returns its pointer
+*/
 Header *createHeader() {
     Header *h = (Header *)malloc(sizeof(Header));
     if (h == NULL) return NULL;
     
     h->status = '1';
-    h->proxByteOffset = 0;
-    h->nroRegArq = 0;
-    h->nroRegRem = 0;
+    h->nextByteOffset = 0;
+    h->numFileRegisters = 0;
+    h->numRemovedRegisters = 0;
 
     return h;
 }
 
-void add1RegArq(Header *h) {
+void add1FileReg(Header *h) {
     if (h == NULL) return;
     
-    h->nroRegArq++;
+    h->numFileRegisters++;
 }
 
-void setNroRegArq(Header *h, int num) {
-    if (h == NULL) return;
-
-    h->nroRegArq = num;
-}
-
+/*
+* This function swaps the value of the header status from 1 to 0 and vice versa
+*/
 void updateHeaderStatus(Header *h) {
     if (h == NULL) return;
     
@@ -42,17 +42,24 @@ void updateHeaderStatus(Header *h) {
         h->status = '0';
 }
 
+/*
+* Function utilized to write every member of the header struct into a file
+* It returns the amount of bytes written
+*/
 int writeHeader(FILE *output, Header *h) {
     if (output == NULL || h == NULL) return 0;
 
     fwrite(&(h->status), sizeof(char), 1, output);
-    fwrite(&(h->proxByteOffset), sizeof(long long int), 1, output);
-    fwrite(&(h->nroRegArq),sizeof(int), 1, output);
-    fwrite(&(h->nroRegRem), sizeof(int), 1, output);
+    fwrite(&(h->nextByteOffset), sizeof(long long int), 1, output);
+    fwrite(&(h->numFileRegisters),sizeof(int), 1, output);
+    fwrite(&(h->numRemovedRegisters), sizeof(int), 1, output);
 
-    return 17;
+    return bytesHeader;
 }
 
+/*
+* Function utilized to overwrite the header struct in a given file
+*/
 void updateHeader(FILE *output, Header *h) {
     if (output == NULL || h == NULL) return;
 
@@ -61,10 +68,37 @@ void updateHeader(FILE *output, Header *h) {
     writeHeader(output, h);
 }
 
-void printNroReg(Header *h) {
-    printf("[%c]\n", h->status);
+void addByteOffset(Header *h, int n) {
+    h->nextByteOffset += n;
 }
 
-void addByteOffset(Header *h, int n) {
-    h->proxByteOffset += n;
+/*
+* Function utilized to read the header struct from a given file and deal 
+* with exception cases
+* It returns 1 if everything is fine and 0 if there is a problem
+*/
+int readHeaderBinary(FILE *input) {
+    if (input == NULL) return 0;
+    
+    char charAux;
+    long long int llintAux;
+    int intAux;
+
+    fread(&charAux, sizeof(char), 1, input);
+    if (charAux == '0') {
+        FILE_ERROR;
+        return 0;
+    }
+
+    fread(&llintAux, sizeof(long long int), 1, input);
+
+    fread(&intAux, sizeof(int), 1, input);
+    if (intAux == 0) {
+        REGISTER_ERROR;
+        return 0;
+    }
+
+    fread(&intAux, sizeof(int), 1, input);
+
+    return 1;
 }
