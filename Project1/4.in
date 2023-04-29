@@ -1,0 +1,8 @@
+4 binario4.bin numeroArtigo inteiro indice4.bin 6
+1 numeroArtigo 151
+2 lugarCrime "SAO PAULO" numeroArtigo 171
+2 numeroArtigo 157 idCrime 1193
+1 dataCrime "28/02/2024"
+2 numeroArtigo 155 dataCrime "29/08/2020"
+1 numeroArtigo 21
+

@@ -1,8 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "header.h"
+#include "registers.h"
 #include "functions.h"
-#include "funcoesFornecidas.c"
+#include "utils.h"
+#include "funcoesFornecidas.h"
 
 int main() {
     int operacao;
@@ -30,6 +32,11 @@ int main() {
             return 0;
         }
         selectFrom(input);
+        fclose(input);
+    }
+    else if (operacao == 4) {
+        FILE *input = fopen(fileNameInput, "rb");
+        searchInBinaryFile(input);
         fclose(input);
     }
 
