@@ -12,6 +12,7 @@ char *readMember(FILE *input, char delimiter);
 char *completeSetString(char *str, int lenStr);
 char *completeUnsetString(char *str, int *flag);
 void readCsvHeader(FILE *input);
+int stringLenght(char *str);
 
 
 #endif

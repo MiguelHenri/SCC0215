@@ -81,12 +81,24 @@ void searchInBinaryFile(FILE *input) {
         int lenArrByteOffset;
         Search *s = createSearchArr(input, &pairs);
 
-        int *arrByteOffset = search(input, s, pairs, &lenArrByteOffset);
-        /*for (int j = 0; j < lenArrByteOffset; j++) {
-            fseek(input, arrByteOffset[j], SEEK_SET);
-            Data *d = readBinaryRegister(input);
-            printData(d);
-        }*/
+        long long int *arrByteOffset = search2(input, s, pairs, &lenArrByteOffset);
+        
+        printf("Resultado para a busca %d\n", i+1);
+        
+        if (lenArrByteOffset == 0) {
+            printf("Registro inexistente.\n");
+        }
+        else {
+            for (int j = 0; j < lenArrByteOffset; j++) {
+
+                //ta faltando 7 wtfffffff
+                fseek(input, arrByteOffset[j]+7, SEEK_SET);
+                Data *d = readBinaryRegister(input);
+                printData(d);
+            }
+        }
+
+        fseek(input, 0, SEEK_SET);
     }
 
 }
