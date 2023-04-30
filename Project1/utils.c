@@ -106,3 +106,15 @@ void readCsvHeader(FILE *input) {
     }
 }
 
+int stringLenght(char *str) {
+    if (str == NULL) return 0;
+
+    int count = 0;
+    while (*str) {
+        count++;
+        *str++;
+    }
+
+    return count;
+}
+
