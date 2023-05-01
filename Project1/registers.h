@@ -22,5 +22,7 @@ void printData(Data *d);
 Search *createSearchArr(FILE *input, int *numberPairs);
 int *search(FILE *input, Search *wanted, int numberPairs, int *sizeArrByte);
 long long int *search2(FILE *input, Search *wanted, int numberPairs, int *sizeArrByte);
+int strMemberCompare(char *searchMember, char *searchKey , Data *reg);
+
 
 #endif

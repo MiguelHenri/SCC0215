@@ -245,41 +245,58 @@ int stringCompareWithLen(char *str1, char *str2, int len) {
     return 0;
 }
 
-int intMemberCompare(char *searchMember, int searchKey , Data *currentRegister) {
-    int lenSearchMember = stringLenght(searchMember);
-    //printf("tamanho de id crime no wanted: %d\n", lenSearchMember);
+int intMemberCompare(char *searchMember, int searchKey, Data *reg) {
 
-    if (strncmp(searchMember, "idCrime", lenSearchMember) == 0 &&
-    searchKey == currentRegister->crimeID) {
+    if (strncmp(searchMember, "idCrime", 7) == 0 &&
+    searchKey == reg->crimeID) {
         return 1;
     }
-    else if (strncmp(searchMember, "numeroArtigo", lenSearchMember) == 0 &&
-        searchKey == currentRegister->articleNumber) {
+    else if (strncmp(searchMember, "numeroArtigo", 12) == 0 &&
+        searchKey == reg->articleNumber) {
         return 1;
     }
 
     return 0;
 }
 
-int strMemberCompare(char *searchMember, char *searchKey , Data *currentRegister) {
-   int lenKey = stringLenght(searchKey);
-   int lenSearchMember = stringLenght(searchMember);
+int strMemberCompare(char *searchMember, char *searchKey, Data *reg) {
+    int lenKey = strlen(searchKey);
 
-    if(strncmp(searchMember, "dataCrime", lenSearchMember) == 0 && 
-        stringCompareWithLen(searchKey, currentRegister->crimeDate, lenKey) == 0) {
-        return 1;
+    if(strncmp(searchMember, "dataCrime", 9) == 0) {
+        //stringCompareWithLen(searchKey, reg->crimeDate, lenKey) == 0) {
+        if (reg->crimeDate == NULL) return 0;
+
+        //printf("comparando reg: %s[%d] wanted: %s[%d]\n", 
+        //reg->crimeDate, (int)strlen(reg->crimeDate), searchKey, lenKey);
+        
+        return strncmp(reg->crimeDate, searchKey, lenKey) == 0;
     }
-    else if(strncmp(searchMember, "lugarCrime", lenSearchMember) == 0 && 
-        stringCompareWithLen(searchKey, currentRegister->crimePlace, lenKey) == 0) {
-        return 1;
+    else if(strncmp(searchMember, "lugarCrime", 10) == 0) { 
+        //stringCompareWithLen(searchKey, reg->crimePlace, lenKey) == 0) {
+        if (reg->crimePlace == NULL) return 0;
+        
+        //printf("comparando reg: %s[%d] wanted: %s[%d]\n", 
+        //reg->crimePlace, (int)strlen(reg->crimePlace), searchKey, lenKey);
+        
+        return strncmp(reg->crimePlace, searchKey, lenKey) == 0;
     }
-    else if(strncmp(searchMember, "marcaCelular", lenSearchMember) == 0 && 
-        stringCompareWithLen(searchKey, currentRegister->telephoneBrand, lenKey) == 0) {
-        return 1;
+    else if(strncmp(searchMember, "marcaCelular", 12) == 0) { 
+        //stringCompareWithLen(searchKey, reg->telephoneBrand, lenKey) == 0) {
+        if (reg->telephoneBrand == NULL) return 0;
+
+        //printf("comparando reg: %s[%d] wanted: %s[%d]\n", 
+        //reg->telephoneBrand, (int)strlen(reg->telephoneBrand), searchKey, lenKey);
+
+        return strncmp(reg->telephoneBrand, searchKey, lenKey) == 0;
     }
-    else if(strncmp(searchMember, "descricaoCrime", lenSearchMember) == 0 && 
-        stringCompareWithLen(searchKey, currentRegister->crimeDescription, lenKey) == 0) {
-        return 1;
+    else if(strncmp(searchMember, "descricaoCrime", 14) == 0) { 
+        //stringCompareWithLen(searchKey, reg->crimeDescription, lenKey) == 0) {
+        if (reg->crimeDescription == NULL) return 0;
+        
+        //printf("comparando reg: %s[%d] wanted: %s[%d]\n", 
+        //reg->crimeDescription, (int)strlen(reg->crimeDescription), searchKey, lenKey);
+        
+        return strncmp(reg->crimeDescription, searchKey, lenKey) == 0;
     }
 
     return 0;
@@ -292,21 +309,18 @@ Search *createSearchArr(FILE *input, int *numberPairs) {
     Search *tmp = (Search *)malloc(sizeof(Search) * arrLen);
     if (tmp == NULL) return NULL;
 
-    char intMembers[][20] = {"idCrime", "numeroArtigo"};
-
     for (int i = 0; i < arrLen; i++) {
         getc(stdin);
         tmp[i].memberName = readMember(stdin, ' '); //reading the member name
-        //printf("nome do campo %s\n", tmp[i].memberName);
+        
         // its an int type member, reads value using %d
-        if (strcmp(tmp[i].memberName, intMembers[0]) == 0 ||
-            strcmp(tmp[i].memberName, intMembers[1]) == 0) {
+        if (isIntegerMember(tmp[i].memberName)) {
             int aux;
             fscanf(stdin, "%d", &aux);
             tmp[i].intMember = aux;
         } 
         else { // its a string type member, reads value as string
-            char strAux[50];
+            char *strAux = (char *)malloc(sizeof(char) * 50);
             scan_quote_string(strAux);
             tmp[i].strMember = strAux;
         }
@@ -317,6 +331,8 @@ Search *createSearchArr(FILE *input, int *numberPairs) {
 }
 
 long long int *search2(FILE *input, Search *wanted, int numberPairs, int *sizeArrByte) {
+    if (!readHeaderBinary(input)) return NULL;
+    
     long long int byteOffset = bytesHeader;
     long long int *arrByteOffset = NULL;
     int lenArrByteOffset = 0;
@@ -328,24 +344,23 @@ long long int *search2(FILE *input, Search *wanted, int numberPairs, int *sizeAr
         int bytesCurrentReg = bytesFixedMember;
 
         for (int i = 0; i < numberPairs; i++) {
-            char *wantedMember = wanted[i].memberName;
 
             //man n apaga essa linha nem fodendo
             //simplesmente da pau e para de funfar a funcao inteira
-            int lenWantedMember = (int)strlen(wantedMember);
+            //int lenWantedMember = (int)strlen(wantedMember);
 
-            if (isIntegerMember(wantedMember)) {
-                requirements += intMemberCompare(wantedMember, wanted[i].intMember, aux);
+            if (!isIntegerMember(wanted[i].memberName)) {
+                requirements += strMemberCompare(wanted[i].memberName, wanted[i].strMember, aux);
             }
             else {
-                requirements += strMemberCompare(wantedMember, wanted[i].strMember, aux);
+                requirements += intMemberCompare(wanted[i].memberName, wanted[i].intMember, aux);
             }
 
         }
 
         bytesCurrentReg += (stringLenght(aux->crimePlace) + stringLenght(aux->crimeDescription) + 2);
         
-        if (requirements == numberPairs) { //achou um registro compativel
+        if (requirements == numberPairs && aux->removed == '0') { //achou um registro compativel
             lenArrByteOffset++;
             arrByteOffset = (long long int *)realloc(arrByteOffset, sizeof(long long int) * lenArrByteOffset);
 

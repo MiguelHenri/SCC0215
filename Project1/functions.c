@@ -58,10 +58,10 @@ void selectFrom(FILE *from) {
     int flagError;
 
     flagError = readHeaderBinary(from);
-    if (flagError == 0)
+    if (flagError == 0) // inconsistent file
         return;
     
-    while (!feof(from)) {
+    while (!feof(from)) { // reads registers one by one
         reg = readBinaryRegister(from);
         printData(reg);
     }
@@ -83,21 +83,21 @@ void searchInBinaryFile(FILE *input) {
 
         long long int *arrByteOffset = search2(input, s, pairs, &lenArrByteOffset);
         
-        printf("Resultado para a busca %d\n", i+1);
+        printf("Resposta para a busca %d\n", i+1);
         
-        if (lenArrByteOffset == 0) {
+        if (arrByteOffset == NULL || lenArrByteOffset == 0) {
             printf("Registro inexistente.\n");
         }
         else {
             for (int j = 0; j < lenArrByteOffset; j++) {
-
                 //ta faltando 7 wtfffffff
-                fseek(input, arrByteOffset[j]+7, SEEK_SET);
+                fseek(input, arrByteOffset[j], SEEK_SET);
                 Data *d = readBinaryRegister(input);
                 printData(d);
             }
         }
 
+        //returning file pointer to the beggining
         fseek(input, 0, SEEK_SET);
     }
 

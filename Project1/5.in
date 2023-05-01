@@ -1,0 +1,8 @@
+4 binario5.bin lugarCrime string indice5.bin 6
+1 lugarCrime "SAO PAULO"
+1 numeroArtigo 171
+2 lugarCrime "SOROCABA" descricaoCrime "FURTO (ART. 155) - OUTROS"
+2 idCrime 125 lugarCrime "ITATIBA"
+1 marcaCelular "SAMSUNG"
+1 lugarCrime "BELO HORIZONTE"
+

@@ -73,6 +73,7 @@ void addByteOffset(Header *h, int n) {
 }
 
 /*
+* ARRUMAR ESSA FUNCAO !!! 
 * Function utilized to read the header struct from a given file and deal 
 * with exception cases
 * It returns 1 if everything is fine and 0 if there is a problem
@@ -101,4 +102,8 @@ int readHeaderBinary(FILE *input) {
     fread(&intAux, sizeof(int), 1, input);
 
     return 1;
+}
+
+int verifyFileIntegrity(Header *h) {
+    return h->status == '1';
 }

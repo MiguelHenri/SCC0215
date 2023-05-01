@@ -14,6 +14,7 @@ int writeHeader(FILE *input, Header *h);
 void updateHeader(FILE *output, Header *h);
 void addByteOffset(Header *h, int n);
 int readHeaderBinary(FILE *input);
+int verifyFileIntegrity(Header *h);
 
 
 #endif
