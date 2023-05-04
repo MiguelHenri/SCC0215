@@ -5,6 +5,7 @@
 #include "functions.h"
 #include "utils.h"
 #include "funcoesFornecidas.h"
+#include "index.h"
 
 int main() {
     int operacao;
@@ -33,6 +34,14 @@ int main() {
         }
         selectFrom(input);
         fclose(input);
+    }
+    else if (operacao == 3) {
+        FILE *input = fopen(fileNameInput, "rb");
+        if (input == NULL) {
+            FILE_ERROR;
+            return 0;
+        }
+        createIndexFile(input);
     }
     else if (operacao == 4) {
         FILE *input = fopen(fileNameInput, "rb");

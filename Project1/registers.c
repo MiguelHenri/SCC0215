@@ -181,8 +181,7 @@ Data *readBinaryRegister(FILE *input) {
 * This function is used to print one register data in the terminal
 */
 void printData(Data *d) {
-    if (d == NULL) return;
-    if (d->crimeDate[0] == '\0') return; // missing data
+    if (regMissingData(d) == 1) return; // missing data
     if (d->removed == '1') return; // data was removed (not meant to be printed)
 
     printf("%d, ", d->crimeID);
@@ -374,4 +373,36 @@ long long int *search2(FILE *input, Search *wanted, int numberPairs, int *sizeAr
     
     *sizeArrByte = lenArrByteOffset;
     return arrByteOffset;
+}
+
+char getDataRemoved(Data *d) {
+    return d->removed;
+}
+
+int getDataCrimeId(Data *d) {
+    return d->crimeID;
+}
+
+char *getDataCrimeDate(Data *d) {
+    return d->crimeDate;
+}
+
+int getDataArticleNumber(Data *d) {
+    return d->articleNumber;
+}
+
+char *getDataTelephoneBrand(Data *d) {
+    return d->telephoneBrand;
+}
+
+char *getDataCrimePlace(Data *d) {
+    return d->crimePlace;
+}
+
+char *getDataCrimeDescription(Data *d) {
+    return d->crimeDescription;
+}
+
+int regMissingData(Data *d) {
+    return d == NULL || d->crimeDate[0] == '\0';
 }

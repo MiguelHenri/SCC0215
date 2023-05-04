@@ -67,12 +67,31 @@ void selectFrom(FILE *from) {
     }
 }
 
-//funcionaliade 4
+// funcionalidade 3
+void createIndexFile(FILE *input) {
+    getc(stdin);
+    char *memberName = readMember(stdin, ' ');
+    char *indexType = readMember(stdin, ' ');
+    char *nameIndexFile = readMember(stdin, ' ');
+
+    FILE *index = fopen(nameIndexFile, "wb");
+
+    IndexHeader *h;
+    IndexData *arr = createIndexArr(input, h, indexType, memberName);
+
+    writeFileIndex(index, arr, h, memberName);
+
+    binarioNaTela(nameIndexFile);
+    
+    fclose(index);
+}
+
+// funcionaliade 4
 void searchInBinaryFile(FILE *input) {
     getc(stdin);
-    char *indexMember = readMember(stdin, ' ');
-    char *dataTypeIndexMember = readMember(stdin, ' ');
-    char *binaryFileIndex = readMember(stdin, ' ');
+    char *memberName = readMember(stdin, ' ');
+    char *indexType = readMember(stdin, ' ');
+    char *nameIndexFile = readMember(stdin, ' ');
     int numberSearches;
     scanf(" %d", &numberSearches);
 
@@ -90,7 +109,6 @@ void searchInBinaryFile(FILE *input) {
         }
         else {
             for (int j = 0; j < lenArrByteOffset; j++) {
-                //ta faltando 7 wtfffffff
                 fseek(input, arrByteOffset[j], SEEK_SET);
                 Data *d = readBinaryRegister(input);
                 printData(d);

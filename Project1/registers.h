@@ -23,6 +23,14 @@ Search *createSearchArr(FILE *input, int *numberPairs);
 int *search(FILE *input, Search *wanted, int numberPairs, int *sizeArrByte);
 long long int *search2(FILE *input, Search *wanted, int numberPairs, int *sizeArrByte);
 int strMemberCompare(char *searchMember, char *searchKey , Data *reg);
-
+char getDataRemoved(Data *d);
+int getDataCrimeId(Data *d);
+char *getDataCrimeDate(Data *d);
+int getDataArticleNumber(Data *d);
+char *getDataTelephoneBrand(Data *d);
+char *getDataCrimePlace(Data *d);
+char *getDataCrimeDescription(Data *d);
+int regMissingData(Data *d);
+int isIntegerMember(char *memberName);
 
 #endif

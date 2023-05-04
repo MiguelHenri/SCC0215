@@ -117,3 +117,19 @@ int stringLenght(char *str) {
 
     return count;
 }
+
+char *superStringCopy(char *origin, int maxLen) {
+    int i = 0;
+    char *copy = (char *)malloc(sizeof(char) * maxLen);
+    
+    while (origin[i] != '\0' && i < maxLen) {
+        copy[i] = origin[i];
+        i++;
+    }
+
+    for (; i < maxLen; i++) {
+        copy[i] = '$';
+    }
+
+    return copy;
+}
