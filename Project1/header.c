@@ -78,32 +78,46 @@ void addByteOffset(Header *h, int n) {
 * with exception cases
 * It returns 1 if everything is fine and 0 if there is a problem
 */
-int readHeaderBinary(FILE *input) {
+Header *readHeaderBinary(FILE *input) {
     if (input == NULL) return 0;
     
     char charAux;
     long long int llintAux;
     int intAux;
 
+    Header *h = createHeader();
+
+    //reading status
     fread(&charAux, sizeof(char), 1, input);
     if (charAux == '0') {
         FILE_ERROR;
         return 0;
     }
+    h->status = charAux;
 
+    //reading byteoffset
     fread(&llintAux, sizeof(long long int), 1, input);
+    h->nextByteOffset = llintAux;
 
+    //reading the num of reg
     fread(&intAux, sizeof(int), 1, input);
     if (intAux == 0) {
         REGISTER_ERROR;
         return 0;
     }
+    h->numFileRegisters = intAux;
 
+    //reading the num of removed red
     fread(&intAux, sizeof(int), 1, input);
+    h->numRemovedRegisters = intAux;
 
-    return 1;
+    return h;
 }
 
 int verifyFileIntegrity(Header *h) {
     return h->status == '1';
+}
+
+int getNumFileRegisters(Header *h) {
+    return h == NULL ? 0:h->numFileRegisters; 
 }

@@ -76,7 +76,7 @@ void createIndexFile(FILE *input) {
 
     FILE *index = fopen(nameIndexFile, "wb");
 
-    IndexHeader *h;
+    IndexHeader *h = createIndexHeader();
     IndexData *arr = createIndexArr(input, h, indexType, memberName);
 
     writeFileIndex(index, arr, h, memberName);

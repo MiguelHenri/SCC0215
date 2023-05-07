@@ -14,21 +14,31 @@ struct indexData {
     };
 };
 
+IndexHeader *createIndexHeader() {
+    IndexHeader *h = (IndexHeader *)malloc(sizeof(IndexHeader));
+
+    h->numberOfRegisters -1;
+    h->status = '0';
+
+    return h;
+}
+
 // input == binary data file
 IndexData *createIndexArr(FILE *input, IndexHeader *h, char *indexType, char *memberName) {
 
     long long int byteOffset = bytesHeader;
     IndexData *arr = NULL;
     int lenArrIndex = 0;
+    Header *headerFile = readHeaderBinary(input);
 
-
-    while(!feof(input)) {
+    for (int i = 0; i < getNumFileRegisters(headerFile); i++) {
         Data *reg = readBinaryRegister(input);
 
         int currentOffset = byteOffset;
 
         // updating byteOffSet
-        byteOffset += (stringLenght(getDataCrimePlace(reg)) + stringLenght(getDataCrimeDescription(reg)) + 2);
+        printf("crime place: %s || len: %d\n",getDataCrimePlace(reg), stringLenght(getDataCrimePlace(reg)));
+        byteOffset += (stringLenght(getDataCrimePlace(reg)) + stringLenght(getDataCrimeDescription(reg)) + 34);
 
         if (getDataRemoved(reg) == '1') continue;
 
@@ -91,6 +101,7 @@ IndexData *createIndexArr(FILE *input, IndexHeader *h, char *indexType, char *me
     }
 
     h->numberOfRegisters = lenArrIndex;
+    printf("tem %d registros\n", h->numberOfRegisters);
     return arr;
 }
 
@@ -151,6 +162,7 @@ void writeFileIndex(FILE *index, IndexData *arr, IndexHeader *h, char *memberNam
     if (arr == NULL || h == NULL) return;
 
     int arrLen = h->numberOfRegisters;
+    h->status = '1';
     fwrite(&(h->status), sizeof(char), 1, index);
     fwrite(&(h->numberOfRegisters), sizeof(int), 1, index);
 
@@ -165,8 +177,9 @@ void writeFileIndex(FILE *index, IndexData *arr, IndexHeader *h, char *memberNam
     else {
         sortIndexArrString(arr, arrLen, strncmp(memberName, "dataCrime", 9) == 0);
         for (int i = 0; i < arrLen; i++) {
+            for (int j = 0; j < 12; j++)
+                fwrite(&(arr[i].searchKeyStr[j]), sizeof(char), 1, index);
             fwrite (&(arr[i].byteOffset), sizeof(long long int), 1, index);
-            fwrite(&(arr[i].searchKeyStr), sizeof(char) * 12, 1, index);
         }
     }
 

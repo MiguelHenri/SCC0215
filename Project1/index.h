@@ -11,5 +11,6 @@ typedef struct indexHeader IndexHeader;
 
 IndexData *createIndexArr(FILE *input, IndexHeader *h, char *indexType, char *memberName);
 void writeFileIndex(FILE *index, IndexData *arr, IndexHeader *h, char *memberName);
+IndexHeader *createIndexHeader();
 
 #endif
