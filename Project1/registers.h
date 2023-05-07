@@ -32,5 +32,8 @@ char *getDataCrimePlace(Data *d);
 char *getDataCrimeDescription(Data *d);
 int regMissingData(Data *d);
 int isIntegerMember(char *memberName);
+int isMemberInIndex(Search *wanted, int iteration, char *memberNameIndex);
+char *getSearchStrKey(Search *s, int position);
+int getSearchIntKey(Search *s, int position);
 
 #endif

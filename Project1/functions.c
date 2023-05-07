@@ -57,7 +57,7 @@ void selectFrom(FILE *from) {
     Data *reg = NULL;
     int flagError;
 
-    flagError = readHeaderBinary(from);
+    Header *h = readHeaderBinary(from);
     if (flagError == 0) // inconsistent file
         return;
     
@@ -80,29 +80,49 @@ void createIndexFile(FILE *input) {
     IndexData *arr = createIndexArr(input, h, indexType, memberName);
 
     writeFileIndex(index, arr, h, memberName);
+    fclose(index);
 
     binarioNaTela(nameIndexFile);
     
-    fclose(index);
 }
 
 // funcionaliade 4
-void searchInBinaryFile(FILE *input) {
-    getc(stdin);
-    char *memberName = readMember(stdin, ' ');
-    char *indexType = readMember(stdin, ' ');
-    char *nameIndexFile = readMember(stdin, ' ');
-    int numberSearches;
-    scanf(" %d", &numberSearches);
+void searchInBinaryFile(FILE *input, char *memberName, char *indexType, char *nameIndexFile, int numberSearches) {
+
+    FILE *indexFile = fopen(nameIndexFile, "rb");
+
+    // reading header data
+    // verificar no futuro o status e atribuir erro ou nao
+    IndexHeader *indexHeader = createIndexHeader();
+    int intAux; char charAux;
+    
+    fread(&charAux, sizeof(char), 1, indexFile);
+    setIndexHeaderStatus(indexHeader, charAux);
+
+    fread(&intAux, sizeof(int), 1, indexFile);
+    setIndexHeaderNumReg(indexHeader, intAux);
+
+    // reading index file data
+    IndexData *indexDataArr = readFileIndex(indexFile, memberName, indexHeader);
 
     for (int i = 0; i < numberSearches; i++) {
         int pairs;
         int lenArrByteOffset;
         Search *s = createSearchArr(input, &pairs);
 
-        long long int *arrByteOffset = search2(input, s, pairs, &lenArrByteOffset);
+        //check if will be search by index or linear search
+        long long int *arrByteOffset = NULL;
+        if (isMemberInIndex(s, i, memberName)) {
+            arrByteOffset = searchInIndexArr(indexDataArr, indexHeader, s, i, memberName, &lenArrByteOffset);
+        }
+        else {
+            arrByteOffset = search2(input, s, pairs, &lenArrByteOffset);
+        }
+
         
         printf("Resposta para a busca %d\n", i+1);
+
+        //printf("len arr byte off : %d", lenArrByteOffset);
         
         if (arrByteOffset == NULL || lenArrByteOffset == 0) {
             printf("Registro inexistente.\n");

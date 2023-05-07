@@ -45,7 +45,19 @@ int main() {
     }
     else if (operacao == 4) {
         FILE *input = fopen(fileNameInput, "rb");
-        searchInBinaryFile(input);
+        if (input == NULL) {
+            FILE_ERROR;
+            return 0;
+        }
+
+        getc(stdin);
+        char *memberName = readMember(stdin, ' ');
+        char *indexType = readMember(stdin, ' ');
+        char *nameIndexFile = readMember(stdin, ' ');
+        int numberSearches;
+        scanf(" %d", &numberSearches);
+
+        searchInBinaryFile(input, memberName, indexType, nameIndexFile, numberSearches);
         fclose(input);
     }
 

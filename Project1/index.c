@@ -37,7 +37,7 @@ IndexData *createIndexArr(FILE *input, IndexHeader *h, char *indexType, char *me
         int currentOffset = byteOffset;
 
         // updating byteOffSet
-        printf("crime place: %s || len: %d\n",getDataCrimePlace(reg), stringLenght(getDataCrimePlace(reg)));
+        //printf("crime place: %s || len: %d\n",getDataCrimePlace(reg), stringLenght(getDataCrimePlace(reg)));
         byteOffset += (stringLenght(getDataCrimePlace(reg)) + stringLenght(getDataCrimeDescription(reg)) + 34);
 
         if (getDataRemoved(reg) == '1') continue;
@@ -101,7 +101,6 @@ IndexData *createIndexArr(FILE *input, IndexHeader *h, char *indexType, char *me
     }
 
     h->numberOfRegisters = lenArrIndex;
-    printf("tem %d registros\n", h->numberOfRegisters);
     return arr;
 }
 
@@ -182,5 +181,102 @@ void writeFileIndex(FILE *index, IndexData *arr, IndexHeader *h, char *memberNam
             fwrite (&(arr[i].byteOffset), sizeof(long long int), 1, index);
         }
     }
-
 } 
+
+IndexData *readFileIndex(FILE *indexFile, char *memberName, IndexHeader *header) {
+    char charAux;
+    int intAux;
+    long long int llintAux;
+
+    IndexData *array = (IndexData *)malloc(sizeof(IndexData) * header->numberOfRegisters);
+
+    for (int i = 0; i < header->numberOfRegisters; i++) {
+        // reading data
+        if (isIntegerMember(memberName)) {
+            fread(&intAux, sizeof(int), 1, indexFile);
+            array[i].searchKeyInt = intAux;
+        }
+        else {
+            char *strAux = (char *)malloc(sizeof(char) * maxLenStr);
+            for (int j = 0; j < maxLenStr; j++)
+                fread(&strAux[j], sizeof(char), 1, indexFile);
+
+            array[i].searchKeyStr = strAux;
+        }
+
+        // reading byteOffset
+        fread(&llintAux, sizeof(long long int), 1, indexFile);
+        array[i].byteOffset = llintAux;
+    }
+    
+    return array;
+}
+
+void setIndexHeaderStatus(IndexHeader *h, char status) {
+    if (h == NULL) return;
+    h->status = status;
+}
+
+void setIndexHeaderNumReg(IndexHeader *h, int numReg) {
+    if (h == NULL) return;
+    h->numberOfRegisters = numReg;
+}
+
+long long int *searchInIndexArr(IndexData *arr, IndexHeader *h, Search *wanted, int iteration, char *memberName, int *sizeArrByte) {
+    int lenArrByteOff = 0;
+    long long int *arrByteOff = NULL;
+    
+    int begin = 0;
+    int end = h->numberOfRegisters - 1;
+
+    while (end <= begin) {
+        int mid = (begin + end) / 2;
+        if (isIntegerMember(memberName)) {
+            if (arr[mid].searchKeyInt == getSearchIntKey(wanted, iteration)) { // found
+                arrByteOff = (long long int *)realloc(arrByteOff, sizeof(long long int) * (++lenArrByteOff));
+                arrByteOff[lenArrByteOff-1] = arr[mid].byteOffset;
+                int midAux = mid;
+
+                //going to the end of the array searching for others registers
+                while (arr[++mid].searchKeyInt == getSearchIntKey(wanted, iteration)) {
+                    arrByteOff = (long long int *)realloc(arrByteOff, sizeof(long long int) * (++lenArrByteOff));
+                    arrByteOff[lenArrByteOff-1] = arr[mid].byteOffset;
+                }
+                while (arr[--mid].searchKeyInt == getSearchIntKey(wanted, iteration)) {
+                    arrByteOff = (long long int *)realloc(arrByteOff, sizeof(long long int) * (++lenArrByteOff));
+                    arrByteOff[lenArrByteOff-1] = arr[mid].byteOffset;
+                }
+            }
+            else { // keep searching
+                if (arr[mid].searchKeyInt > getSearchIntKey(wanted, iteration)) end = mid-1;
+                else begin = mid+1;
+            }
+        }
+        else { //looking for a string in index array
+            if (strcmp(arr[mid].searchKeyStr, getSearchStrKey(wanted, iteration)) == 0) { // found
+                arrByteOff = (long long int *)realloc(arrByteOff, sizeof(long long int) * (++lenArrByteOff));
+                arrByteOff[lenArrByteOff-1] = arr[mid].byteOffset;
+                int midAux = mid;
+
+                while (strcmp(arr[++mid].searchKeyStr, getSearchStrKey(wanted, iteration)) == 0) {
+                    arrByteOff = (long long int *)realloc(arrByteOff, sizeof(long long int) * (++lenArrByteOff));
+                    arrByteOff[lenArrByteOff-1] = arr[mid].byteOffset;
+                }
+
+                while (strcmp(arr[--midAux].searchKeyStr, getSearchStrKey(wanted, iteration)) == 0) {
+                    arrByteOff = (long long int *)realloc(arrByteOff, sizeof(long long int) * (++lenArrByteOff));
+                    arrByteOff[lenArrByteOff-1] = arr[mid].byteOffset;
+                }
+            }
+            else {
+                if (strcmp(arr[mid].searchKeyStr, getSearchStrKey(wanted, iteration)) > 0) end = mid-1;
+                else begin = mid+1;
+            }
+        
+        }
+    
+    }
+
+    *sizeArrByte = lenArrByteOff;
+    return arrByteOff;
+}

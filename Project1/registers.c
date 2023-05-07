@@ -5,9 +5,12 @@
 
 /*
     [ TO-DO ]
-    Fazer um strlen q lide com null(funcao search)
-    Fazer um strcmp que lide com os '$'(")
-    ambos em utils
+    fazer uma função que compara string em geral (ex: data)
+    modularizar
+
+    fazer a funcao de inserir no vetor de byteoffset
+
+    testar para pairs
 */
 
 struct data {
@@ -344,10 +347,6 @@ long long int *search2(FILE *input, Search *wanted, int numberPairs, int *sizeAr
 
         for (int i = 0; i < numberPairs; i++) {
 
-            //man n apaga essa linha nem fodendo
-            //simplesmente da pau e para de funfar a funcao inteira
-            //int lenWantedMember = (int)strlen(wantedMember);
-
             if (!isIntegerMember(wanted[i].memberName)) {
                 requirements += strMemberCompare(wanted[i].memberName, wanted[i].strMember, aux);
             }
@@ -405,4 +404,16 @@ char *getDataCrimeDescription(Data *d) {
 
 int regMissingData(Data *d) {
     return d == NULL || d->crimeDate[0] == '\0';
+}
+
+int isMemberInIndex(Search *wanted, int iteration, char *memberNameIndex) {
+    return (strcmp(wanted[iteration].memberName, memberNameIndex) == 0);
+}
+
+int getSearchIntKey(Search *s, int position) {
+    return s[position].intMember;
+}
+
+char *getSearchStrKey(Search *s, int position) {
+    return s[position].strMember;
 }
