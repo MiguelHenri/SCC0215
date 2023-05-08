@@ -68,13 +68,12 @@ void selectFrom(FILE *from) {
 }
 
 // funcionalidade 3
-void createIndexFile(FILE *input) {
-    getc(stdin);
-    char *memberName = readMember(stdin, ' ');
-    char *indexType = readMember(stdin, ' ');
-    char *nameIndexFile = readMember(stdin, ' ');
-
+void createIndexFile(FILE *input, char *memberName, char *indexType, char *nameIndexFile) {
     FILE *index = fopen(nameIndexFile, "wb");
+    if (index == NULL) {
+        FILE_ERROR;
+        return;
+    }
 
     IndexHeader *h = createIndexHeader();
     IndexData *arr = createIndexArr(input, h, indexType, memberName);
@@ -95,7 +94,7 @@ void searchInBinaryFile(FILE *input, char *memberName, char *indexType, char *na
     // verificar no futuro o status e atribuir erro ou nao
     IndexHeader *indexHeader = createIndexHeader();
     int intAux; char charAux;
-    
+
     fread(&charAux, sizeof(char), 1, indexFile);
     setIndexHeaderStatus(indexHeader, charAux);
 
@@ -104,6 +103,7 @@ void searchInBinaryFile(FILE *input, char *memberName, char *indexType, char *na
 
     // reading index file data
     IndexData *indexDataArr = readFileIndex(indexFile, memberName, indexHeader);
+    //printIndex(indexDataArr, indexHeader);
 
     for (int i = 0; i < numberSearches; i++) {
         int pairs;

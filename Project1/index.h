@@ -17,5 +17,5 @@ void setIndexHeaderStatus(IndexHeader *h, char status);
 void setIndexHeaderNumReg(IndexHeader *h, int numReg);
 IndexData *readFileIndex(FILE *indexFile, char *memberName, IndexHeader *header);
 long long int *searchInIndexArr(IndexData *arr, IndexHeader *h, Search *wanted, int iteration, char *memberName, int *sizeArrByte);
-
+void printIndex(IndexData *arr, IndexHeader *h);
 #endif

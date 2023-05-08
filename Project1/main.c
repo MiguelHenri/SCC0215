@@ -41,7 +41,13 @@ int main() {
             FILE_ERROR;
             return 0;
         }
-        createIndexFile(input);
+
+        getc(stdin);
+        char *memberName = readMember(stdin, ' ');
+        char *indexType = readMember(stdin, ' ');
+        char *nameIndexFile = readMember(stdin, ' ');
+
+        createIndexFile(input, memberName, indexType, nameIndexFile);
     }
     else if (operacao == 4) {
         FILE *input = fopen(fileNameInput, "rb");

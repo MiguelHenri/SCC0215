@@ -10,6 +10,8 @@
 
     fazer a funcao de inserir no vetor de byteoffset
 
+    quando vou criar o arq index, ao ler, escrever cabecelho com status inconsistente e dps escreveer consistente ?
+
     testar para pairs
 */
 
