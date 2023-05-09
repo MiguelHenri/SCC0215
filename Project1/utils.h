@@ -14,6 +14,7 @@ char *completeUnsetString(char *str, int *flag);
 void readCsvHeader(FILE *input);
 int stringLenght(char *str);
 char *superStringCopy(char *origin, int maxLen);
+long long int *byteOffsetArrAppend(long long int *arr, int len, long long int byteOffset);
 
 
 #endif

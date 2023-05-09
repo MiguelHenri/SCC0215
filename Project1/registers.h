@@ -35,5 +35,8 @@ int isIntegerMember(char *memberName);
 int isMemberInIndex(Search *wanted, int iteration, char *memberNameIndex);
 char *getSearchStrKey(Search *s, int position);
 int getSearchIntKey(Search *s, int position);
+long long int *verifyingRegRequirements(FILE *input, long long int *byteOffArr, Search *wanted, int numRequirements, int *lenArr);
+void insertRegisterInBinFile(FILE *binFile, Data *reg, Header *h);
+Data *readRegisterStdin();
 
 #endif

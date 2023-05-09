@@ -119,5 +119,9 @@ int verifyFileIntegrity(Header *h) {
 }
 
 int getNumFileRegisters(Header *h) {
-    return h == NULL ? 0:h->numFileRegisters; 
+    return h == NULL ? 0 : h->numFileRegisters; 
+}
+
+long long int getNexByteOffset(Header *h) {
+    return h->nextByteOffset;
 }

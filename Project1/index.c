@@ -1,5 +1,6 @@
 #include "index.h"
 #include "registers.h"
+#include "utils.h"
 
 struct indexHeader {
     char status;
@@ -21,6 +22,18 @@ IndexHeader *createIndexHeader() {
     h->status = '0';
 
     return h;
+}
+
+void readIndexHeader(FILE *indexFile, IndexHeader *indexHeader) {
+    if (indexHeader == NULL) return;
+
+    char charAux; int intAux;
+
+    fread(&charAux, sizeof(char), 1, indexFile);
+    setIndexHeaderStatus(indexHeader, charAux);
+
+    fread(&intAux, sizeof(int), 1, indexFile);
+    setIndexHeaderNumReg(indexHeader, intAux);
 }
 
 IndexData *indexArrayAppend(IndexData *arr, int *len, int intKey, char *strKey, long long int byteoffset) {
@@ -116,6 +129,7 @@ IndexData *createIndexArr(FILE *input, IndexHeader *h, char *indexType, char *me
     }
 
     h->numberOfRegisters = lenArrIndex;
+    printf("o arq indice na ram tem len %d\n", lenArrIndex);
     return arr;
 }
 
@@ -136,35 +150,11 @@ void sortIndexArrInt(IndexData *arr, int len) {
 
 }
 
-int countDate(char *dateStr) {
-    int days = 0;
-    
-    char delimiter[] = "/";
-    char *tokAux = NULL;
-
-    tokAux = strtok(dateStr, delimiter);
-    days += atoi(tokAux);
-
-    tokAux = strtok(NULL, delimiter);
-    days += atoi(tokAux) * 30;
-
-    tokAux = strtok(NULL, "");
-    days += atoi(tokAux) * 365;
-
-    return days;
-}
 
 void sortIndexArrString(IndexData *arr, int len, int isDate) {
     for (int i = 0; i < len; i++) {
         for (int j = 0; j < len-i-1; j++) {
-            if (isDate == 1) {
-                int days0 = countDate(arr[j].searchKeyStr);
-                int days1 = countDate(arr[j+1].searchKeyStr);
-                if (days0 > days1) {
-                    swap(arr, j, j+1);
-                }
-            }
-            else if (strncmp(arr[j].searchKeyStr, arr[j+1].searchKeyStr, 12) > 0) {
+            if (strncmp(arr[j].searchKeyStr, arr[j+1].searchKeyStr, 12) > 0) {
                 swap(arr, j, j+1);
             }
             
@@ -215,12 +205,20 @@ IndexData *readFileIndex(FILE *indexFile, char *memberName, IndexHeader *header)
     long long int llintAux;
 
     IndexData *array = (IndexData *)malloc(sizeof(IndexData) * header->numberOfRegisters);
+    
+    // char name[] = "arquivoleo.bin";
+    // FILE *f = fopen(name, "wb");
+    // char status = '1';
+
+    // fwrite(&status, sizeof(char), 1, f);
+    // fwrite(&(header->numberOfRegisters), sizeof(int), 1, f);
 
     for (int i = 0; i < header->numberOfRegisters; i++) {
         // reading data
         if (isIntegerMember(memberName)) {
             fread(&intAux, sizeof(int), 1, indexFile);
             array[i].searchKeyInt = intAux;
+            // fwrite(&(array[i].searchKeyInt), sizeof(int), 1, f);
         }
         else {
             char *strAux = (char *)malloc(sizeof(char) * maxLenStr);
@@ -228,13 +226,16 @@ IndexData *readFileIndex(FILE *indexFile, char *memberName, IndexHeader *header)
                 fread(&strAux[j], sizeof(char), 1, indexFile);
 
             array[i].searchKeyStr = strAux;
+            //printf("string no arr %s\n", array[i].searchKeyStr);
         }
 
         // reading byteOffset
         fread(&llintAux, sizeof(long long int), 1, indexFile);
         array[i].byteOffset = llintAux;
+        // fwrite(&(array[i].byteOffset), sizeof(long long int), 1, f);
     }
     
+    // fclose(f);
     return array;
 }
 
@@ -248,12 +249,6 @@ void setIndexHeaderNumReg(IndexHeader *h, int numReg) {
     h->numberOfRegisters = numReg; 
 }
 
-long long int *byteOffsetArrAppend(long long int *arr, int *len, long long int byteOffset) {
-    arr = (long long int *)realloc(arr, sizeof(long long int) * (++(*len)));
-    arr[*len - 1] = byteOffset;
-
-    return arr;
-}
 
 long long int *searchInIndexArr(IndexData *arr, IndexHeader *h, Search *wanted, int iteration, char *memberName, int *sizeArrByte) {
     int lenArrByteOff = 0;
@@ -262,25 +257,34 @@ long long int *searchInIndexArr(IndexData *arr, IndexHeader *h, Search *wanted, 
     int begin = 0;
     int end = h->numberOfRegisters - 1;
 
+
     while (end >= begin) {
         int mid = (begin + end) / 2;
+
         if (isIntegerMember(memberName)) {
             if (arr[mid].searchKeyInt == getSearchIntKey(wanted, iteration)) { // found
                 // arrByteOff = (long long int *)realloc(arrByteOff, sizeof(long long int) * (++lenArrByteOff));
                 // arrByteOff[lenArrByteOff-1] = arr[mid].byteOffset;
-                arrByteOff = byteOffsetArrAppend(arrByteOff, &lenArrByteOff, arr[mid].byteOffset);
+        
                 int midAux = mid;
+                // printf("achei o art com byte %lld\n", arr[mid].byteOffset);
+
+                while (arr[--midAux].searchKeyInt == getSearchIntKey(wanted, iteration)) {
+                    // arrByteOff = (long long int *)realloc(arrByteOff, sizeof(long long int) * (++lenArrByteOff));
+                    // arrByteOff[lenArrByteOff-1] = arr[mid].byteOffset;
+                    arrByteOff = byteOffsetArrAppend(arrByteOff, ++lenArrByteOff, arr[midAux].byteOffset);
+                    // printf("achei o art descendo com byte %lld\n", arr[midAux].byteOffset);
+                }
+
+                arrByteOff = byteOffsetArrAppend(arrByteOff, ++lenArrByteOff, arr[mid].byteOffset);
 
                 //going to the end of the array searching for others registers
                 while (arr[++mid].searchKeyInt == getSearchIntKey(wanted, iteration)) {
                     // arrByteOff = (long long int *)realloc(arrByteOff, sizeof(long long int) * (++lenArrByteOff));
                     // arrByteOff[lenArrByteOff-1] = arr[mid].byteOffset;
-                    arrByteOff = byteOffsetArrAppend(arrByteOff, &lenArrByteOff, arr[mid].byteOffset);
-                }
-                while (arr[--midAux].searchKeyInt == getSearchIntKey(wanted, iteration)) {
-                    // arrByteOff = (long long int *)realloc(arrByteOff, sizeof(long long int) * (++lenArrByteOff));
-                    // arrByteOff[lenArrByteOff-1] = arr[mid].byteOffset;
-                    arrByteOff = byteOffsetArrAppend(arrByteOff, &lenArrByteOff, arr[midAux].byteOffset);
+                    arrByteOff = byteOffsetArrAppend(arrByteOff, ++lenArrByteOff, arr[mid].byteOffset);
+                    // printf("achei o art subindo com byte %lld\n", arr[mid].byteOffset);
+
                 }
 
                 break;
@@ -291,30 +295,32 @@ long long int *searchInIndexArr(IndexData *arr, IndexHeader *h, Search *wanted, 
             }
         }
         else { //looking for a string in index array
-            if (strcmp(arr[mid].searchKeyStr, getSearchStrKey(wanted, iteration)) == 0) { // found
-                // arrByteOff = (long long int *)realloc(arrByteOff, sizeof(long long int) * (++lenArrByteOff));
-                // arrByteOff[lenArrByteOff-1] = arr[mid].byteOffset;
-                arrByteOff = byteOffsetArrAppend(arrByteOff, &lenArrByteOff, arr[mid].byteOffset);
+            // printf("na pos %d tem %s\n", mid, getSearchStrKey(wanted, iteration));
+            int cmpResult = strncmp(arr[mid].searchKeyStr, superStringCopy(getSearchStrKey(wanted, iteration), maxLenStr) , maxLenStr);
+            if (cmpResult == 0) { // found
+    
                 int midAux = mid;
 
-                while (strcmp(arr[++mid].searchKeyStr, getSearchStrKey(wanted, iteration)) == 0) {
+                while (strncmp(arr[--midAux].searchKeyStr, superStringCopy(getSearchStrKey(wanted, iteration), maxLenStr), 12) == 0) {
                     // arrByteOff = (long long int *)realloc(arrByteOff, sizeof(long long int) * (++lenArrByteOff));
                     // arrByteOff[lenArrByteOff-1] = arr[mid].byteOffset;
-                    arrByteOff = byteOffsetArrAppend(arrByteOff, &lenArrByteOff, arr[mid].byteOffset);
+                    arrByteOff = byteOffsetArrAppend(arrByteOff, ++lenArrByteOff, arr[midAux].byteOffset);
                 }
 
-                while (strcmp(arr[--midAux].searchKeyStr, getSearchStrKey(wanted, iteration)) == 0) {
+                arrByteOff = byteOffsetArrAppend(arrByteOff, ++lenArrByteOff, arr[mid].byteOffset);
+
+                while (strncmp(arr[++mid].searchKeyStr, superStringCopy(getSearchStrKey(wanted, iteration), maxLenStr), 12) == 0) {
                     // arrByteOff = (long long int *)realloc(arrByteOff, sizeof(long long int) * (++lenArrByteOff));
                     // arrByteOff[lenArrByteOff-1] = arr[mid].byteOffset;
-                    arrByteOff = byteOffsetArrAppend(arrByteOff, &lenArrByteOff, arr[midAux].byteOffset);
+                    arrByteOff = byteOffsetArrAppend(arrByteOff, ++lenArrByteOff, arr[mid].byteOffset);
                 }
+
+                break;
             }
             else {
-                if (strcmp(arr[mid].searchKeyStr, getSearchStrKey(wanted, iteration)) > 0) end = mid-1;
+                if (cmpResult > 0) end = mid-1;
                 else begin = mid+1;
             }
-
-            break;
         
         }
     
