@@ -41,7 +41,13 @@ int main() {
             FILE_ERROR;
             return 0;
         }
-        createIndexFile(input);
+
+        getc(stdin);
+        char *memberName = readMember(stdin, ' ');
+        char *indexType = readMember(stdin, ' ');
+        char *nameIndexFile = readMember(stdin, ' ');
+
+        createIndexFile(input, memberName, indexType, nameIndexFile);
     }
     else if (operacao == 4) {
         FILE *input = fopen(fileNameInput, "rb");
@@ -59,6 +65,26 @@ int main() {
 
         searchInBinaryFile(input, memberName, indexType, nameIndexFile, numberSearches);
         fclose(input);
+    }
+    else if (operacao == 6) {
+        FILE *input = fopen(fileNameInput, "rb");
+        if (input == NULL) {
+            FILE_ERROR;
+            return 0;
+        }
+
+        getc(stdin);
+        char *memberName = readMember(stdin, ' ');
+        char *indexType = readMember(stdin, ' ');
+        char *nameIndexFile = readMember(stdin, ' ');
+        int numberInsertions;
+        scanf(" %d", &numberInsertions);
+
+
+
+        insertRegister(input, memberName, indexType, nameIndexFile, numberInsertions);
+        fclose(input);
+        binarioNaTela(fileNameInput);
     }
 
     return 0;

@@ -10,6 +10,8 @@
 
     fazer a funcao de inserir no vetor de byteoffset
 
+    quando vou criar o arq index, ao ler, escrever cabecelho com status inconsistente e dps escreveer consistente ?
+
     testar para pairs
 */
 
@@ -416,4 +418,112 @@ int getSearchIntKey(Search *s, int position) {
 
 char *getSearchStrKey(Search *s, int position) {
     return s[position].strMember;
+}
+
+long long int *verifyingRegRequirements(FILE *input, long long int *byteOffArr, Search *wanted, int numRequirements, int *lenArr) {
+    int newLenArr = 0;
+    long long int *newArrByteOff = NULL;
+    int lenAux = *lenArr;
+
+    for (int i = 0; i < lenAux; i++) {
+        int requirementsFufilled = 0;
+        // printf("indo para o byteoffset %lld\n", byteOffArr[i]);
+        fseek(input, byteOffArr[i], SEEK_SET);
+        Data *reg = readBinaryRegister(input);
+        //printData(reg);
+        // printf("verifying len: %d\n", *lenArr);
+        
+        for (int j = 0; j < numRequirements; j++) {
+
+            if (!isIntegerMember(wanted[j].memberName)) {
+                requirementsFufilled += strMemberCompare(wanted[j].memberName, wanted[j].strMember, reg);
+            }
+            else {
+                requirementsFufilled += intMemberCompare(wanted[j].memberName, wanted[j].intMember, reg);
+            }
+
+        }
+
+        if (requirementsFufilled == numRequirements) {
+            newLenArr++;
+            newArrByteOff = (long long int *)realloc(newArrByteOff, sizeof(long long int) * newLenArr);
+            newArrByteOff[newLenArr-1] = byteOffArr[i];
+        }
+    }
+
+    *lenArr = newLenArr;
+    //printf("novo len ref: %d || novo len func: %d\n", *lenArr, newLenArr);
+    return newArrByteOff;
+}
+
+void insertRegisterInBinFile(FILE *binFile, Data *reg, Header *h) {
+    //changing the status to inconsistent
+    updateHeader(binFile, h);
+
+    //calculating the byteoffset and setting the file to the end
+    long long int currentOffset = getNexByteOffset(h);
+    fseek(binFile, currentOffset, SEEK_SET);
+
+    //adding the byteoffset to the header
+    currentOffset += writeRegister(binFile, reg) + bytesFixedMember;
+    addByteOffset(h, currentOffset);
+
+    //upfating the header 
+    updateHeader(binFile, h);
+}
+
+Data *readRegisterStdin() {
+    Data *d = (Data *)malloc(sizeof(Data));
+
+    int intAux;
+
+    fscanf(stdin, "%d ", &intAux);
+    d->crimeID = intAux;
+    // fprintf(stderr, "crime id: %d ", d->crimeID);
+
+    char *strAux = (char *)malloc(sizeof(char) * crimeDateLen);
+    scan_quote_string(strAux);
+    if (strncmp(strAux, "NULO", 4) == 0)
+        d->crimeDate = NULL;
+    else
+        d->crimeDate = completeSetString(strAux, crimeDateLen);
+    // fprintf(stderr, "crime date: %s ", d->crimeDate);
+    
+    getc(stdin);
+    strAux = readMember(stdin, ' ');
+    // fprintf(stderr, "[%s] ", strAux);
+    if (strncmp(strAux, "NULO", 4) == 0)
+        d->articleNumber = -1;
+    else
+        d->articleNumber = atoi(strAux);
+    // fprintf(stderr, "artiho: %d ", d->articleNumber);
+    
+
+    strAux = (char *)malloc(sizeof(char) * 50);
+    scan_quote_string(strAux);
+    if (strncmp(strAux, "NULO", 4) == 0)
+        d->crimePlace = NULL;
+    else
+        d->crimePlace = strAux;
+    // fprintf(stderr, "crime place: %s ", d->crimePlace);
+    
+
+    strAux = (char *)malloc(sizeof(char) * 50);
+    scan_quote_string(strAux);
+    if (strncmp(strAux, "NULO", 4) == 0)
+        d->crimeDescription = NULL;
+    else
+        d->crimeDescription = strAux;
+    // fprintf(stderr, "crime desc: %s ", d->crimeDescription);
+
+
+    strAux = (char *)malloc(sizeof(char) * telephoneBrandLen);
+    scan_quote_string(strAux);
+    if (strncmp(strAux, "NULO", 4) == 0)
+        d->telephoneBrand = NULL;
+    else
+        d->telephoneBrand = completeSetString(strAux, telephoneBrandLen);
+    // fprintf(stderr, "cellphone: %s\n", d->telephoneBrand);
+
+    return d;
 }

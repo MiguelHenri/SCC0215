@@ -16,5 +16,6 @@ void addByteOffset(Header *h, int n);
 Header *readHeaderBinary(FILE *input);
 int verifyFileIntegrity(Header *h);
 int getNumFileRegisters(Header *h);
+long long int getNexByteOffset(Header *h);
 
 #endif

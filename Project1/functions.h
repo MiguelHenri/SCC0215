@@ -9,8 +9,8 @@
 
 FILE *createTable(FILE *input, char *outputName);
 void selectFrom(FILE *from);
-void createIndexFile(FILE *input); 
+void createIndexFile(FILE *input, char *memberName, char *indexType, char *nameIndexFile);
 void searchInBinaryFile(FILE *input, char *memberName, char *indexType, char *nameIndexFile, int numberSearches);
-
+void insertRegister(FILE *input, char *memberName, char *indexType, char *nameIndexFile, int numberInsert);
 
 #endif

@@ -68,13 +68,12 @@ void selectFrom(FILE *from) {
 }
 
 // funcionalidade 3
-void createIndexFile(FILE *input) {
-    getc(stdin);
-    char *memberName = readMember(stdin, ' ');
-    char *indexType = readMember(stdin, ' ');
-    char *nameIndexFile = readMember(stdin, ' ');
-
+void createIndexFile(FILE *input, char *memberName, char *indexType, char *nameIndexFile) {
     FILE *index = fopen(nameIndexFile, "wb");
+    if (index == NULL) {
+        FILE_ERROR;
+        return;
+    }
 
     IndexHeader *h = createIndexHeader();
     IndexData *arr = createIndexArr(input, h, indexType, memberName);
@@ -95,34 +94,37 @@ void searchInBinaryFile(FILE *input, char *memberName, char *indexType, char *na
     // verificar no futuro o status e atribuir erro ou nao
     IndexHeader *indexHeader = createIndexHeader();
     int intAux; char charAux;
-    
-    fread(&charAux, sizeof(char), 1, indexFile);
-    setIndexHeaderStatus(indexHeader, charAux);
 
-    fread(&intAux, sizeof(int), 1, indexFile);
-    setIndexHeaderNumReg(indexHeader, intAux);
+    readIndexHeader(indexFile, indexHeader);
 
     // reading index file data
     IndexData *indexDataArr = readFileIndex(indexFile, memberName, indexHeader);
+    fclose(indexFile);
+    //printIndex(indexDataArr, indexHeader);
 
     for (int i = 0; i < numberSearches; i++) {
+        //printf("iteracao %d\n", i);
         int pairs;
         int lenArrByteOffset;
         Search *s = createSearchArr(input, &pairs);
+        //printf("crieir arr de wanted\n");
 
         //check if will be search by index or linear search
         long long int *arrByteOffset = NULL;
-        if (isMemberInIndex(s, i, memberName)) {
-            arrByteOffset = searchInIndexArr(indexDataArr, indexHeader, s, i, memberName, &lenArrByteOffset);
+        long long int *test = NULL;
+        if (isMemberInIndex(s, 0, memberName)) {
+            //printf("entrei aui\n");
+            arrByteOffset = searchInIndexArr(indexDataArr, indexHeader, s, 0, memberName, &lenArrByteOffset);
+
+            //funcionando atq aqui
+            arrByteOffset = verifyingRegRequirements(input, arrByteOffset, s, pairs, &lenArrByteOffset);
         }
         else {
             arrByteOffset = search2(input, s, pairs, &lenArrByteOffset);
         }
 
         
-        printf("Resposta para a busca %d\n", i+1);
-
-        //printf("len arr byte off : %d", lenArrByteOffset);
+        fprintf(stderr, "Resposta para a busca %d\n", i+1);
         
         if (arrByteOffset == NULL || lenArrByteOffset == 0) {
             printf("Registro inexistente.\n");
@@ -137,6 +139,32 @@ void searchInBinaryFile(FILE *input, char *memberName, char *indexType, char *na
 
         //returning file pointer to the beggining
         fseek(input, 0, SEEK_SET);
+    }
+
+}
+
+void insertRegister(FILE *input, char *memberName, char *indexType, char *nameIndexFile, int numberInsert) {
+    
+    
+    FILE *indexFile = fopen(nameIndexFile, "rb");
+
+    // reading header data
+    // verificar no futuro o status e atribuir erro ou nao
+    IndexHeader *indexHeader = createIndexHeader();
+    int intAux; char charAux;
+
+    readIndexHeader(indexFile, indexHeader);
+
+    // reading index file data
+    IndexData *indexDataArr = readFileIndex(indexFile, memberName, indexHeader);
+    fclose(indexFile);
+
+    Header *h = readHeaderBinary(input);
+
+    for (int i = 0; i < numberInsert; i++) {
+        Data *reg = readRegisterStdin();
+        //printData(reg);
+        insertRegisterInBinFile(input, reg, h);
     }
 
 }
