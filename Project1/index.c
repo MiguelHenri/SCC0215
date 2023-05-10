@@ -15,6 +15,20 @@ struct indexData {
     };
 };
 
+struct result {
+    long long int *arrByteOff;
+    int *arrPos;
+    int length;
+};
+
+struct search {
+    char *memberName;
+    union {
+        char *strMember;
+        int intMember;
+    };
+};
+
 IndexHeader *createIndexHeader() {
     IndexHeader *h = (IndexHeader *)malloc(sizeof(IndexHeader));
 
@@ -129,7 +143,6 @@ IndexData *createIndexArr(FILE *input, IndexHeader *h, char *indexType, char *me
     }
 
     h->numberOfRegisters = lenArrIndex;
-    printf("o arq indice na ram tem len %d\n", lenArrIndex);
     return arr;
 }
 
@@ -249,70 +262,73 @@ void setIndexHeaderNumReg(IndexHeader *h, int numReg) {
     h->numberOfRegisters = numReg; 
 }
 
+int *posArrAppend(int *arr, int len, int pos) {
+    arr = (int *)realloc(arr, sizeof(int) * len);
+    arr[len-1] = pos; 
 
-long long int *searchInIndexArr(IndexData *arr, IndexHeader *h, Search *wanted, int iteration, char *memberName, int *sizeArrByte) {
+    return arr;
+}
+
+
+Result *searchInIndexArr(IndexData *arr, IndexHeader *h, Search *wanted, int iteration, char *memberName) {
     int lenArrByteOff = 0;
-    long long int *arrByteOff = NULL;
+    Result *r = (Result *)malloc(sizeof(Result));
+    r->arrByteOff = NULL;
+    r->arrPos = NULL;
     
     int begin = 0;
     int end = h->numberOfRegisters - 1;
 
+    //printIndex(arr, h);
 
     while (end >= begin) {
         int mid = (begin + end) / 2;
 
         if (isIntegerMember(memberName)) {
-            if (arr[mid].searchKeyInt == getSearchIntKey(wanted, iteration)) { // found
-                // arrByteOff = (long long int *)realloc(arrByteOff, sizeof(long long int) * (++lenArrByteOff));
-                // arrByteOff[lenArrByteOff-1] = arr[mid].byteOffset;
-        
+            if (arr[mid].searchKeyInt == wanted[iteration].intMember) { // found
+                // printf("encontrei\n");
                 int midAux = mid;
-                // printf("achei o art com byte %lld\n", arr[mid].byteOffset);
 
-                while (arr[--midAux].searchKeyInt == getSearchIntKey(wanted, iteration)) {
-                    // arrByteOff = (long long int *)realloc(arrByteOff, sizeof(long long int) * (++lenArrByteOff));
-                    // arrByteOff[lenArrByteOff-1] = arr[mid].byteOffset;
-                    arrByteOff = byteOffsetArrAppend(arrByteOff, ++lenArrByteOff, arr[midAux].byteOffset);
-                    // printf("achei o art descendo com byte %lld\n", arr[midAux].byteOffset);
+                while (arr[--midAux].searchKeyInt == wanted[iteration].intMember) {
+                    r->arrByteOff = byteOffsetArrAppend(r->arrByteOff, ++lenArrByteOff, arr[midAux].byteOffset);
+                    r->arrPos = posArrAppend(r->arrPos, lenArrByteOff, midAux);
+                    //printf("midaux vale %d\n", midAux);
                 }
 
-                arrByteOff = byteOffsetArrAppend(arrByteOff, ++lenArrByteOff, arr[mid].byteOffset);
+                
 
                 //going to the end of the array searching for others registers
-                while (arr[++mid].searchKeyInt == getSearchIntKey(wanted, iteration)) {
-                    // arrByteOff = (long long int *)realloc(arrByteOff, sizeof(long long int) * (++lenArrByteOff));
-                    // arrByteOff[lenArrByteOff-1] = arr[mid].byteOffset;
-                    arrByteOff = byteOffsetArrAppend(arrByteOff, ++lenArrByteOff, arr[mid].byteOffset);
-                    // printf("achei o art subindo com byte %lld\n", arr[mid].byteOffset);
-
+                
+                while (arr[mid].searchKeyInt == wanted[iteration].intMember) {
+                    r->arrByteOff = byteOffsetArrAppend(r->arrByteOff, ++lenArrByteOff, arr[mid].byteOffset);
+                    r->arrPos = posArrAppend(r->arrPos, lenArrByteOff, mid);
+                    mid++;
                 }
 
                 break;
             }
             else { // keep searching
-                if (arr[mid].searchKeyInt > getSearchIntKey(wanted, iteration)) end = mid-1;
+                if (arr[mid].searchKeyInt > wanted[iteration].intMember) end = mid-1;
                 else begin = mid+1;
             }
         }
         else { //looking for a string in index array
             // printf("na pos %d tem %s\n", mid, getSearchStrKey(wanted, iteration));
-            int cmpResult = strncmp(arr[mid].searchKeyStr, superStringCopy(getSearchStrKey(wanted, iteration), maxLenStr) , maxLenStr);
+            int cmpResult = strncmp(arr[mid].searchKeyStr, superStringCopy(wanted[iteration].strMember, maxLenStr), maxLenStr);
             if (cmpResult == 0) { // found
     
                 int midAux = mid;
 
-                while (strncmp(arr[--midAux].searchKeyStr, superStringCopy(getSearchStrKey(wanted, iteration), maxLenStr), 12) == 0) {
-                    // arrByteOff = (long long int *)realloc(arrByteOff, sizeof(long long int) * (++lenArrByteOff));
-                    // arrByteOff[lenArrByteOff-1] = arr[mid].byteOffset;
-                    arrByteOff = byteOffsetArrAppend(arrByteOff, ++lenArrByteOff, arr[midAux].byteOffset);
+                while (strncmp(arr[--midAux].searchKeyStr, superStringCopy(wanted[iteration].strMember, maxLenStr), maxLenStr) == 0) {
+                    r->arrByteOff = byteOffsetArrAppend(r->arrByteOff, ++lenArrByteOff, arr[midAux].byteOffset);
+                    r->arrPos = posArrAppend(r->arrPos, lenArrByteOff, midAux);
                 }
 
-                arrByteOff = byteOffsetArrAppend(arrByteOff, ++lenArrByteOff, arr[mid].byteOffset);
 
-                while (strncmp(arr[++mid].searchKeyStr, superStringCopy(getSearchStrKey(wanted, iteration), maxLenStr), 12) == 0) {
-                    // arrByteOff = (long long int *)realloc(arrByteOff, sizeof(long long int) * (++lenArrByteOff));
-                    // arrByteOff[lenArrByteOff-1] = arr[mid].byteOffset;
-                    arrByteOff = byteOffsetArrAppend(arrByteOff, ++lenArrByteOff, arr[mid].byteOffset);
+                while (strncmp(arr[mid].searchKeyStr, superStringCopy(wanted[iteration].strMember, maxLenStr), 12) == 0) {
+                    r->arrByteOff = byteOffsetArrAppend(r->arrByteOff, ++lenArrByteOff, arr[mid].byteOffset);
+                    r->arrPos = posArrAppend(r->arrPos, lenArrByteOff, mid);
+                    mid++;
                 }
 
                 break;
@@ -326,9 +342,127 @@ long long int *searchInIndexArr(IndexData *arr, IndexHeader *h, Search *wanted, 
     
     }
 
-    *sizeArrByte = lenArrByteOff;
-    return arrByteOff;
+    r->length = lenArrByteOff;
+    return r;
 }
+
+void verifyingRegRequirements(FILE *input, Result *indexResArray, Search *wanted, int numRequirements) {
+    int newLenArr = 0;
+    long long int *newArrByteOff = NULL;
+    int lenAux = indexResArray->length;
+
+    for (int i = 0; i < lenAux; i++) {
+        int requirementsFufilled = 0;
+        
+        // fseek para o registro encontrado no arquivo de dados
+        fseek(input, indexResArray->arrByteOff[i], SEEK_SET);
+        // lendo o registro
+        Data *reg = readBinaryRegister(input);
+
+        for (int j = 0; j < numRequirements; j++) {
+
+            // verificando se o registro esta dentro dos parametros de busca
+            if (!isIntegerMember(wanted[j].memberName)) { // string type
+                requirementsFufilled += strMemberCompare(wanted[j].memberName, wanted[j].strMember, reg);
+            }
+            else { // int type
+                requirementsFufilled += intMemberCompare(wanted[j].memberName, wanted[j].intMember, reg);
+            }
+        }
+
+        //se todos requisitos foram cumpridos, adiciona no vetor final de byteoffset
+        if (requirementsFufilled == numRequirements) {
+            newLenArr++;
+            indexResArray->arrByteOff = (long long int *)realloc(newArrByteOff, sizeof(long long int) * newLenArr);
+            indexResArray->arrPos = (int *)realloc(indexResArray->arrPos, sizeof(int) * newLenArr);
+            
+            indexResArray->arrByteOff[newLenArr-1] = indexResArray->arrByteOff[i];
+            indexResArray->arrPos[newLenArr-1] = indexResArray->arrPos[i];
+        }
+    }
+
+    indexResArray->length = newLenArr;
+    return;
+}
+
+int isMemberInIndex(Search *wanted, int iteration, char *memberNameIndex) {
+    return (strcmp(wanted[iteration].memberName, memberNameIndex) == 0);
+}
+
+
+Search *createSearchArr(FILE *input, int *numberPairs) {
+    int arrLen;
+    fscanf(stdin, "%d", &arrLen); //reading the size of the array
+
+    Search *tmp = (Search *)malloc(sizeof(Search) * arrLen);
+    if (tmp == NULL) return NULL;
+
+    for (int i = 0; i < arrLen; i++) {
+        getc(stdin);
+        tmp[i].memberName = readMember(stdin, ' '); //reading the member name
+        
+        // its an int type member, reads value using %d
+        if (isIntegerMember(tmp[i].memberName)) {
+            int aux;
+            fscanf(stdin, "%d", &aux);
+            tmp[i].intMember = aux;
+        } 
+        else { // its a string type member, reads value as string
+            char *strAux = (char *)malloc(sizeof(char) * 50);
+            scan_quote_string(strAux);
+            tmp[i].strMember = strAux;
+        }
+    }
+
+    *numberPairs = arrLen;
+    return tmp;
+}
+
+Result *sequentialSearch(FILE *input, Search *wanted, int numberPairs) {
+    if (!readHeaderBinary(input)) return NULL;
+    
+    long long int byteOffset = bytesHeader;
+    int lenArrByteOffset = 0;
+    
+    Result *r = (Result *)malloc(sizeof(Result));
+    r->arrByteOff = NULL;
+    r->arrPos = NULL;
+
+    while (!feof(input)) {
+        Data *aux = readBinaryRegister(input);
+
+        int requirements = 0;
+        int bytesCurrentReg = bytesFixedMember;
+
+        for (int i = 0; i < numberPairs; i++) {
+
+            if (!isIntegerMember(wanted[i].memberName)) {
+                requirements += strMemberCompare(wanted[i].memberName, wanted[i].strMember, aux);
+            }
+            else {
+                requirements += intMemberCompare(wanted[i].memberName, wanted[i].intMember, aux);
+            }
+
+        }
+
+        bytesCurrentReg += (stringLenght(getDataCrimePlace(aux)) + stringLenght(getDataCrimeDescription(aux)) + 2);
+        
+        if (requirements == numberPairs && getDataRemoved(aux) == '0') { //achou um registro compativel
+            lenArrByteOffset++;
+            r->arrByteOff = (long long int *)realloc(r->arrByteOff, sizeof(long long int) * lenArrByteOffset);
+
+            //adding the byteoffset of the current register in the array
+            r->arrByteOff[lenArrByteOffset-1] = byteOffset;
+        }
+
+        //adding the size of the current register in the file byteoffset counter
+        byteOffset += bytesCurrentReg;
+    }
+    
+    r->length = lenArrByteOffset;
+    return r; 
+}
+
 
 void printIndex(IndexData *arr, IndexHeader *h) {
     if (arr == NULL) {
@@ -336,10 +470,36 @@ void printIndex(IndexData *arr, IndexHeader *h) {
         return;
     }
 
-
     for (int i = 0; i < h->numberOfRegisters; i++) {
         printf("Valor: %d || byteoff: %d\n", arr[i].searchKeyInt, arr[i].byteOffset);
     }
 
     printf("tem %d reg no arq indice\n", h->numberOfRegisters);
+}
+
+Result *superSearch(FILE *input, char *memberName, IndexData *arrIndex, IndexHeader *header, Search *s, int pairs) {
+    // variable that stores byte offset array length
+
+    //check if will be search by index or linear search
+    Result *indexSearchResult = NULL;
+    if (isMemberInIndex(s, 0, memberName)) {
+        // fazendo a busca binaria no arquivo de indice
+        indexSearchResult = searchInIndexArr(arrIndex, header, s, 0, memberName);
+
+        // checking registers found by index due to other search requirements
+        verifyingRegRequirements(input, indexSearchResult, s, pairs);
+    }
+    else {
+        indexSearchResult = sequentialSearch(input, s, pairs);
+    }
+    
+    return indexSearchResult;
+}
+
+int getResLenght(Result *r) {
+    return r->length;
+}
+
+long long int getResByteOffset(Result *r, int pos) {
+    return r->arrByteOff[pos];
 }
