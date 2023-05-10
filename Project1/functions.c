@@ -87,7 +87,6 @@ void createIndexFile(FILE *input, char *memberName, char *indexType, char *nameI
 
 // funcionaliade 4
 void searchInBinaryFile(FILE *input, char *memberName, char *indexType, char *nameIndexFile, int numberSearches) {
-
     FILE *indexFile = fopen(nameIndexFile, "rb");
 
     // reading header data
@@ -100,38 +99,22 @@ void searchInBinaryFile(FILE *input, char *memberName, char *indexType, char *na
     // reading index file data
     IndexData *indexDataArr = readFileIndex(indexFile, memberName, indexHeader);
     fclose(indexFile);
-    //printIndex(indexDataArr, indexHeader);
+    //printf("consegui criar arr de indice\n");
 
     for (int i = 0; i < numberSearches; i++) {
-        //printf("iteracao %d\n", i);
         int pairs;
-        int lenArrByteOffset;
         Search *s = createSearchArr(input, &pairs);
-        //printf("crieir arr de wanted\n");
-
-        //check if will be search by index or linear search
-        long long int *arrByteOffset = NULL;
-        long long int *test = NULL;
-        if (isMemberInIndex(s, 0, memberName)) {
-            //printf("entrei aui\n");
-            arrByteOffset = searchInIndexArr(indexDataArr, indexHeader, s, 0, memberName, &lenArrByteOffset);
-
-            //funcionando atq aqui
-            arrByteOffset = verifyingRegRequirements(input, arrByteOffset, s, pairs, &lenArrByteOffset);
-        }
-        else {
-            arrByteOffset = search2(input, s, pairs, &lenArrByteOffset);
-        }
-
+        Result *res = superSearch(input, memberName, indexDataArr, indexHeader, s, pairs);
         
-        fprintf(stderr, "Resposta para a busca %d\n", i+1);
+        printf("Resposta para a busca %d\n", i+1);
         
-        if (arrByteOffset == NULL || lenArrByteOffset == 0) {
+        if (res == NULL || getResLenght(res) == 0) {
             printf("Registro inexistente.\n");
         }
-        else {
-            for (int j = 0; j < lenArrByteOffset; j++) {
-                fseek(input, arrByteOffset[j], SEEK_SET);
+        
+        else { //arrByteOffset != NULL
+            for (int j = 0; j < getResLenght(res); j++) {
+                fseek(input, getResByteOffset(res, j), SEEK_SET);
                 Data *d = readBinaryRegister(input);
                 printData(d);
             }
@@ -145,7 +128,7 @@ void searchInBinaryFile(FILE *input, char *memberName, char *indexType, char *na
 
 void insertRegister(FILE *input, char *memberName, char *indexType, char *nameIndexFile, int numberInsert) {
     
-    
+    // opening index file .bin
     FILE *indexFile = fopen(nameIndexFile, "rb");
 
     // reading header data
@@ -160,11 +143,13 @@ void insertRegister(FILE *input, char *memberName, char *indexType, char *nameIn
     fclose(indexFile);
 
     Header *h = readHeaderBinary(input);
-
+    updateHeader(input, h);
     for (int i = 0; i < numberInsert; i++) {
         Data *reg = readRegisterStdin();
-        //printData(reg);
+        printData(reg);
         insertRegisterInBinFile(input, reg, h);
+        free(reg);
     }
+    updateHeader(input, h);
 
 }

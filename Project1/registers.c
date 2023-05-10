@@ -25,14 +25,6 @@ struct data {
     char *crimeDescription;
 };
 
-struct search {
-    char *memberName;
-    union {
-        char *strMember;
-        int intMember;
-    };
-};
-
 /*
 * Function used to read one register 
 */
@@ -306,76 +298,6 @@ int strMemberCompare(char *searchMember, char *searchKey, Data *reg) {
     return 0;
 }
 
-Search *createSearchArr(FILE *input, int *numberPairs) {
-    int arrLen;
-    fscanf(stdin, "%d", &arrLen); //reading the size of the array
-
-    Search *tmp = (Search *)malloc(sizeof(Search) * arrLen);
-    if (tmp == NULL) return NULL;
-
-    for (int i = 0; i < arrLen; i++) {
-        getc(stdin);
-        tmp[i].memberName = readMember(stdin, ' '); //reading the member name
-        
-        // its an int type member, reads value using %d
-        if (isIntegerMember(tmp[i].memberName)) {
-            int aux;
-            fscanf(stdin, "%d", &aux);
-            tmp[i].intMember = aux;
-        } 
-        else { // its a string type member, reads value as string
-            char *strAux = (char *)malloc(sizeof(char) * 50);
-            scan_quote_string(strAux);
-            tmp[i].strMember = strAux;
-        }
-    }
-
-    *numberPairs = arrLen;
-    return tmp;
-}
-
-long long int *search2(FILE *input, Search *wanted, int numberPairs, int *sizeArrByte) {
-    if (!readHeaderBinary(input)) return NULL;
-    
-    long long int byteOffset = bytesHeader;
-    long long int *arrByteOffset = NULL;
-    int lenArrByteOffset = 0;
-
-    while (!feof(input)) {
-        Data *aux = readBinaryRegister(input);
-
-        int requirements = 0;
-        int bytesCurrentReg = bytesFixedMember;
-
-        for (int i = 0; i < numberPairs; i++) {
-
-            if (!isIntegerMember(wanted[i].memberName)) {
-                requirements += strMemberCompare(wanted[i].memberName, wanted[i].strMember, aux);
-            }
-            else {
-                requirements += intMemberCompare(wanted[i].memberName, wanted[i].intMember, aux);
-            }
-
-        }
-
-        bytesCurrentReg += (stringLenght(aux->crimePlace) + stringLenght(aux->crimeDescription) + 2);
-        
-        if (requirements == numberPairs && aux->removed == '0') { //achou um registro compativel
-            lenArrByteOffset++;
-            arrByteOffset = (long long int *)realloc(arrByteOffset, sizeof(long long int) * lenArrByteOffset);
-
-            //adding the byteoffset of the current register in the array
-            arrByteOffset[lenArrByteOffset-1] = byteOffset;
-        }
-
-        //adding the size of the current register in the file byteoffset counter
-        byteOffset += bytesCurrentReg;
-    }
-    
-    *sizeArrByte = lenArrByteOffset;
-    return arrByteOffset;
-}
-
 char getDataRemoved(Data *d) {
     return d->removed;
 }
@@ -408,58 +330,9 @@ int regMissingData(Data *d) {
     return d == NULL || d->crimeDate[0] == '\0';
 }
 
-int isMemberInIndex(Search *wanted, int iteration, char *memberNameIndex) {
-    return (strcmp(wanted[iteration].memberName, memberNameIndex) == 0);
-}
-
-int getSearchIntKey(Search *s, int position) {
-    return s[position].intMember;
-}
-
-char *getSearchStrKey(Search *s, int position) {
-    return s[position].strMember;
-}
-
-long long int *verifyingRegRequirements(FILE *input, long long int *byteOffArr, Search *wanted, int numRequirements, int *lenArr) {
-    int newLenArr = 0;
-    long long int *newArrByteOff = NULL;
-    int lenAux = *lenArr;
-
-    for (int i = 0; i < lenAux; i++) {
-        int requirementsFufilled = 0;
-        // printf("indo para o byteoffset %lld\n", byteOffArr[i]);
-        fseek(input, byteOffArr[i], SEEK_SET);
-        Data *reg = readBinaryRegister(input);
-        //printData(reg);
-        // printf("verifying len: %d\n", *lenArr);
-        
-        for (int j = 0; j < numRequirements; j++) {
-
-            if (!isIntegerMember(wanted[j].memberName)) {
-                requirementsFufilled += strMemberCompare(wanted[j].memberName, wanted[j].strMember, reg);
-            }
-            else {
-                requirementsFufilled += intMemberCompare(wanted[j].memberName, wanted[j].intMember, reg);
-            }
-
-        }
-
-        if (requirementsFufilled == numRequirements) {
-            newLenArr++;
-            newArrByteOff = (long long int *)realloc(newArrByteOff, sizeof(long long int) * newLenArr);
-            newArrByteOff[newLenArr-1] = byteOffArr[i];
-        }
-    }
-
-    *lenArr = newLenArr;
-    //printf("novo len ref: %d || novo len func: %d\n", *lenArr, newLenArr);
-    return newArrByteOff;
-}
 
 void insertRegisterInBinFile(FILE *binFile, Data *reg, Header *h) {
-    //changing the status to inconsistent
-    updateHeader(binFile, h);
-
+    
     //calculating the byteoffset and setting the file to the end
     long long int currentOffset = getNexByteOffset(h);
     fseek(binFile, currentOffset, SEEK_SET);
@@ -467,15 +340,15 @@ void insertRegisterInBinFile(FILE *binFile, Data *reg, Header *h) {
     //adding the byteoffset to the header
     currentOffset += writeRegister(binFile, reg) + bytesFixedMember;
     addByteOffset(h, currentOffset);
-
-    //upfating the header 
-    updateHeader(binFile, h);
+    add1FileReg(h);
 }
 
 Data *readRegisterStdin() {
     Data *d = (Data *)malloc(sizeof(Data));
 
     int intAux;
+
+    d->removed = '0';
 
     fscanf(stdin, "%d ", &intAux);
     d->crimeID = intAux;

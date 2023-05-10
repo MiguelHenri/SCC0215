@@ -28,6 +28,7 @@ void add1FileReg(Header *h) {
     if (h == NULL) return;
     
     h->numFileRegisters++;
+    printf("tem %d reg\n", h->numFileRegisters);
 }
 
 /*

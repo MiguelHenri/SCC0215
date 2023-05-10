@@ -67,7 +67,7 @@ int main() {
         fclose(input);
     }
     else if (operacao == 6) {
-        FILE *input = fopen(fileNameInput, "rb");
+        FILE *input = fopen(fileNameInput, "rb+");
         if (input == NULL) {
             FILE_ERROR;
             return 0;

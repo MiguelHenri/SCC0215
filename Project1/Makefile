@@ -14,10 +14,10 @@ main.o: main.c functions.h header.h registers.h utils.h funcoesFornecidas.h inde
 functions.o: functions.c functions.h
 	gcc -c functions.c
 
-header.o: header.c header.h
+header.o: header.c header.h 
 	gcc -c header.c
 
-registers.o: registers.c registers.h
+registers.o: registers.c registers.h index.h
 	gcc -c registers.c
 
 utils.o: utils.c utils.h
