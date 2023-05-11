@@ -1,5 +1,5 @@
 all: main.o functions.o header.o registers.o utils.o funcoesFornecidas.o index.o
-	gcc -o programaTrab *.o -g
+	gcc -o programaTrab *.o
 
 run:
 	./programaTrab
@@ -9,22 +9,22 @@ clean:
 	clear
 
 main.o: main.c functions.h header.h registers.h utils.h funcoesFornecidas.h index.h
-	gcc -c main.c -g
+	gcc -c main.c 
 
 functions.o: functions.c functions.h
-	gcc -c functions.c -g
+	gcc -c functions.c
 
 header.o: header.c header.h 
-	gcc -c header.c -g
+	gcc -c header.c
 
 registers.o: registers.c registers.h index.h
-	gcc -c registers.c -g
+	gcc -c registers.c
 
 utils.o: utils.c utils.h
-	gcc -c utils.c -g
+	gcc -c utils.c
 
 funcoesFornecidas.o: funcoesFornecidas.c funcoesFornecidas.h
-	gcc -c funcoesFornecidas.c -g
+	gcc -c funcoesFornecidas.c
 
 index.o: index.c index.h
-	gcc -c index.c -g
+	gcc -c index.c

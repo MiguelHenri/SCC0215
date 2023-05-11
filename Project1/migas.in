@@ -1,2 +1,5 @@
-4 binario5.bin lugarCrime string indice5.bin 1
-1 numeroArtigo 155
+5 binario7mig.bin dataCrime string indice7mig.bin 4
+1 lugarCrime "SAO PAULO"
+1 marcaCelular "SAMSUNG"
+3 idCrime 137 dataCrime "12/01/2018" descricaoCrime "FURTO (ART. 155) - INTERIOR ESTABELECIMENTO"
+1 dataCrime "01/01/2020"

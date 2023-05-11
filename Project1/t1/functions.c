@@ -98,7 +98,6 @@ void searchInBinaryFile(FILE *input, char *memberName, char *indexType, char *na
 
     // reading index file data
     IndexData *indexDataArr = readFileIndex(indexFile, memberName, indexHeader);
-    // printIndex(indexDataArr, indexHeader);
     fclose(indexFile);
     //printf("consegui criar arr de indice\n");
 
@@ -112,6 +111,7 @@ void searchInBinaryFile(FILE *input, char *memberName, char *indexType, char *na
         if (res == NULL || getResLenght(res) == 0) {
             printf("Registro inexistente.\n");
         }
+        
         else { //arrByteOffset != NULL
             for (int j = 0; j < getResLenght(res); j++) {
                 fseek(input, getResByteOffset(res, j), SEEK_SET);
@@ -126,7 +126,9 @@ void searchInBinaryFile(FILE *input, char *memberName, char *indexType, char *na
 
 }
 
-void deleteRegister(FILE *input, char *memberName, char *indexType, char *nameIndexFile, int numberDeletions) {
+void insertRegister(FILE *input, char *memberName, char *indexType, char *nameIndexFile, int numberInsert) {
+    
+    // opening index file .bin
     FILE *indexFile = fopen(nameIndexFile, "rb");
 
     // reading header data
@@ -140,64 +142,14 @@ void deleteRegister(FILE *input, char *memberName, char *indexType, char *nameIn
     IndexData *indexDataArr = readFileIndex(indexFile, memberName, indexHeader);
     fclose(indexFile);
 
-    for(int i=0; i<numberDeletions; i++) {
-        int pairs;
-        Search *s = createSearchArr(input, &pairs);
-        // finding registers to be deleted and its offset
-        Result *res = superSearch(input, memberName, indexDataArr, indexHeader, s, pairs);
-
-        //dando merda aqui
-        superDelete(input, indexFile, res, indexDataArr, indexHeader, memberName);
-    }
-    
-}
-
-
-
-void insertRegister(FILE *input, char *memberName, char *indexType, char *nameIndexFile, int numberInsert) {
-    
-    // opening index file .bin
-    FILE *indexFile = fopen(nameIndexFile, "rb+");
-
-    // reading header data
-    // verificar no futuro o status e atribuir erro ou nao
-    IndexHeader *indexHeader = createIndexHeader();
-    int intAux; char charAux;
-
-    readIndexHeader(indexFile, indexHeader);
-    // printIndexHeader(indexHeader);
-
-    // reading index file data
-    IndexData *indexDataArr = readFileIndex(indexFile, memberName, indexHeader);
-    fclose(indexFile);
-
     Header *h = readHeaderBinary(input);
     updateHeader(input, h);
     for (int i = 0; i < numberInsert; i++) {
         Data *reg = readRegisterStdin2();
         //printData(reg);
-        
-        long long int currentByteOff = insertRegisterInBinFile(input, reg, h);
-        if (isIntegerMember(memberName)) {
-
-            indexDataArr = appendIndexArray(indexDataArr, indexHeader, memberName, selectIntegerMember(memberName, reg), NULL, currentByteOff);
-        }
-        else {
-            indexDataArr = appendIndexArray(indexDataArr, indexHeader, memberName, -1, selectStrMember(memberName, reg), currentByteOff);
-        }
+        //insertRegisterInBinFile(input, reg, h);
+        // free(reg);
     }
-    
-    // if (isIntegerMember(memberName)) {
-    //     sortIndexArrInt(indexDataArr, getIndexArrLen(indexHeader));
-    // }
-    // else {
-    //     sortIndexArrString(indexDataArr, getIndexArrLen(indexHeader));
-    // }
-
     updateHeader(input, h);
-    indexFile = fopen(nameIndexFile, "wb");
-    writeFileIndex(indexFile, indexDataArr, indexHeader, memberName);
-    // printIndexHeader(indexHeader);
-    // printIndex(indexDataArr, indexHeader);
-    fclose(indexFile);
+
 }

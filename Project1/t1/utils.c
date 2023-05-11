@@ -143,15 +143,3 @@ long long int *byteOffsetArrAppend(long long int *arr, int len, long long int by
     // printf("len vale %d\n", *len);
     return arr;
 }
-
-void sortIntArr(int *arr, int len) {
-    for (int i = 0; i < len; i++) {
-        for (int j = 0; j < len-i-1; j++) {
-            if (arr[j] <= arr[j+1]) {
-                int aux = arr[j];
-                arr[j] = arr[j+1];
-                arr[j+1] = aux;
-            }         
-        }
-    }
-}

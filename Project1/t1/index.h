@@ -21,18 +21,11 @@ IndexData *readFileIndex(FILE *indexFile, char *memberName, IndexHeader *header)
 Result *searchInIndexArr(IndexData *arr, IndexHeader *h, Search *wanted, int iteration, char *memberName);
 void printIndex(IndexData *arr, IndexHeader *h);
 void readIndexHeader(FILE *indexFile, IndexHeader *indexHeader);
-Result *verifyingRegRequirements(FILE *input, Result *indexResArray, Search *wanted, int numRequirements);
+void verifyingRegRequirements(FILE *input, Result *indexResArray, Search *wanted, int numRequirements);
 int isMemberInIndex(Search *wanted, int iteration, char *memberNameIndex);
 Result *superSearch(FILE *input, char *memberName, IndexData *arrIndex, IndexHeader *header, Search *s, int pairs);
 int getResLenght(Result *r);
 long long int getResByteOffset(Result *r, int pos);
 Search *createSearchArr(FILE *input, int *numberPairs);
-IndexData *appendIndexArray(IndexData *arr, IndexHeader *h, char *memberName, int intKey, char *strKey, long long int byteOff);
-void superDelete(FILE *input, FILE *index, Result *toDelete, IndexData *indexDataArr, IndexHeader *indexHd, char *memberName);
-void sortIndexArrString(IndexData *arr, int len);
-void sortIndexArrInt(IndexData *arr, int len);
-int getIndexArrLen(IndexHeader *h);
-void printIndexHeader(IndexHeader *h);
-// IndexData *indexArrayAppend(IndexData *arr, int *len, int intKey, char *strKey, long long int byteoffset);
 
 #endif
