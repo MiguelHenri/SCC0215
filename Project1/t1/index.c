@@ -51,10 +51,6 @@ void readIndexHeader(FILE *indexFile, IndexHeader *indexHeader) {
 }
 
 IndexData *indexArrayAppend(IndexData *arr, int *len, int intKey, char *strKey, long long int byteoffset) {
-    //dont append because this register have null values
-    if (intKey == -1 && strKey == NULL) 
-        return arr;
-        
     arr = (IndexData *)realloc(arr, sizeof(IndexData) * (++(*len)));
 
     if (strKey != NULL) { //appending a string in the index array
@@ -65,39 +61,6 @@ IndexData *indexArrayAppend(IndexData *arr, int *len, int intKey, char *strKey, 
     }
 
     arr[*len - 1].byteOffset = byteoffset;
-
-    return arr;
-}
-
-void printIndexHeader(IndexHeader *h) {
-    printf("tem %d registros no indice\n", h->numberOfRegisters);
-}
-
-
-IndexData *appendIndexArray(IndexData *arr, IndexHeader *h, char *memberName, int intKey, char *strKey, long long int byteOff)  {
-    //dont append because this register have null values
-    if (intKey == -1 && strKey == NULL) 
-        return arr;
-
-    int newLen = h->numberOfRegisters + 1;
-
-
-    if (isIntegerMember(memberName)) {
-        if (intKey == -1) return arr;
-
-        arr = (IndexData *)realloc(arr, sizeof(IndexData) * newLen);
-        arr[newLen-1].searchKeyInt = intKey;
-        // printf("inseri %lld no vetor\n", arr[newLen-1].byteOffset);
-    }
-    else {
-        if (strKey == NULL) return arr; 
-
-        arr = (IndexData *)realloc(arr, sizeof(IndexData) * newLen);
-        arr[newLen-1].searchKeyStr = strKey;
-    }
-
-    arr[newLen-1].byteOffset = byteOff;
-    h->numberOfRegisters++;
 
     return arr;
 }
@@ -195,17 +158,13 @@ void sortIndexArrInt(IndexData *arr, int len) {
             if (arr[j].searchKeyInt > arr[j+1].searchKeyInt) {
                 swap(arr, j, j+1);
             }
-            if (arr[j].searchKeyInt == arr[j+1].searchKeyInt &&
-                arr[j].byteOffset > arr[j+1].byteOffset) {
-                swap(arr, j, j+1);
-            }
         }
     }
 
 }
 
 
-void sortIndexArrString(IndexData *arr, int len) {
+void sortIndexArrString(IndexData *arr, int len, int isDate) {
     for (int i = 0; i < len; i++) {
         for (int j = 0; j < len-i-1; j++) {
             if (strncmp(arr[j].searchKeyStr, arr[j+1].searchKeyStr, 12) > 0) {
@@ -238,7 +197,8 @@ void writeFileIndex(FILE *index, IndexData *arr, IndexHeader *h, char *memberNam
         }
     }
     else {
-        sortIndexArrString(arr, arrLen);
+        int isMemberDate = strncmp(memberName, "dataCrime", 9) == 0;
+        sortIndexArrString(arr, arrLen, isMemberDate);
 
         for (int i = 0; i < arrLen; i++) {
 
@@ -257,36 +217,38 @@ IndexData *readFileIndex(FILE *indexFile, char *memberName, IndexHeader *header)
     int intAux;
     long long int llintAux;
 
-    // alocatting the array of our index data
     IndexData *array = (IndexData *)malloc(sizeof(IndexData) * header->numberOfRegisters);
     
+    // char name[] = "arquivoleo.bin";
+    // FILE *f = fopen(name, "wb");
+    // char status = '1';
 
-    // reading data
+    // fwrite(&status, sizeof(char), 1, f);
+    // fwrite(&(header->numberOfRegisters), sizeof(int), 1, f);
+
     for (int i = 0; i < header->numberOfRegisters; i++) {
-
-        //verifying if we will have to read a integer or string
+        // reading data
         if (isIntegerMember(memberName)) {
             fread(&intAux, sizeof(int), 1, indexFile);
-
-            // inserting in the array
             array[i].searchKeyInt = intAux;
+            // fwrite(&(array[i].searchKeyInt), sizeof(int), 1, f);
         }
         else {
             char *strAux = (char *)malloc(sizeof(char) * maxLenStr);
-
-            // reading the string byte per byte
             for (int j = 0; j < maxLenStr; j++)
                 fread(&strAux[j], sizeof(char), 1, indexFile);
 
-            // inserting in the array
             array[i].searchKeyStr = strAux;
+            //printf("string no arr %s\n", array[i].searchKeyStr);
         }
 
-        // reading byteOffset and inserting it
+        // reading byteOffset
         fread(&llintAux, sizeof(long long int), 1, indexFile);
         array[i].byteOffset = llintAux;
+        // fwrite(&(array[i].byteOffset), sizeof(long long int), 1, f);
     }
     
+    // fclose(f);
     return array;
 }
 
@@ -313,34 +275,41 @@ Result *searchInIndexArr(IndexData *arr, IndexHeader *h, Search *wanted, int ite
     Result *r = (Result *)malloc(sizeof(Result));
     r->arrByteOff = NULL;
     r->arrPos = NULL;
-    r->length = 0;
     
     int begin = 0;
     int end = h->numberOfRegisters - 1;
 
     //printIndex(arr, h);
 
-    while (end > begin) {
+    while (end >= begin) {
         int mid = (begin + end) / 2;
 
         if (isIntegerMember(memberName)) {
             if (arr[mid].searchKeyInt == wanted[iteration].intMember) { // found
-                // printf("encontrei %d\n");
-                int verifyPrevious = mid;
-                while (arr[--verifyPrevious].searchKeyInt == wanted[iteration].intMember) 
+                // printf("encontrei\n");
+                int midAux = mid;
 
-                mid = verifyPrevious + 1;
+                while (arr[--midAux].searchKeyInt == wanted[iteration].intMember) {
+                    r->arrByteOff = byteOffsetArrAppend(r->arrByteOff, ++lenArrByteOff, arr[midAux].byteOffset);
+                    r->arrPos = posArrAppend(r->arrPos, lenArrByteOff, midAux);
+                    //printf("midaux vale %d\n", midAux);
+                }
+
+                
+
+                //going to the end of the array searching for others registers
+                
                 while (arr[mid].searchKeyInt == wanted[iteration].intMember) {
                     r->arrByteOff = byteOffsetArrAppend(r->arrByteOff, ++lenArrByteOff, arr[mid].byteOffset);
                     r->arrPos = posArrAppend(r->arrPos, lenArrByteOff, mid);
                     mid++;
                 }
-            
+
                 break;
             }
             else { // keep searching
-                if (arr[mid].searchKeyInt > wanted[iteration].intMember) end = mid;
-                else begin = mid;
+                if (arr[mid].searchKeyInt > wanted[iteration].intMember) end = mid-1;
+                else begin = mid+1;
             }
         }
         else { //looking for a string in index array
@@ -350,27 +319,22 @@ Result *searchInIndexArr(IndexData *arr, IndexHeader *h, Search *wanted, int ite
     
                 int midAux = mid;
 
-                r->arrByteOff = byteOffsetArrAppend(r->arrByteOff, ++lenArrByteOff, arr[mid].byteOffset);
-                r->arrPos = posArrAppend(r->arrPos, lenArrByteOff, mid);
-
-
                 while (strncmp(arr[--midAux].searchKeyStr, superStringCopy(wanted[iteration].strMember, maxLenStr), maxLenStr) == 0) {
                     r->arrByteOff = byteOffsetArrAppend(r->arrByteOff, ++lenArrByteOff, arr[midAux].byteOffset);
                     r->arrPos = posArrAppend(r->arrPos, lenArrByteOff, midAux);
-
                 }
-                while (strncmp(arr[++mid].searchKeyStr, superStringCopy(wanted[iteration].strMember, maxLenStr), 12) == 0) {
+
+
+                while (strncmp(arr[mid].searchKeyStr, superStringCopy(wanted[iteration].strMember, maxLenStr), 12) == 0) {
                     r->arrByteOff = byteOffsetArrAppend(r->arrByteOff, ++lenArrByteOff, arr[mid].byteOffset);
                     r->arrPos = posArrAppend(r->arrPos, lenArrByteOff, mid);
-
+                    mid++;
                 }
-
-
 
                 break;
             }
             else {
-                if (cmpResult > 0) end = mid;
+                if (cmpResult > 0) end = mid-1;
                 else begin = mid+1;
             }
         
@@ -382,16 +346,12 @@ Result *searchInIndexArr(IndexData *arr, IndexHeader *h, Search *wanted, int ite
     return r;
 }
 
-Result *verifyingRegRequirements(FILE *input, Result *indexResArray, Search *wanted, int numRequirements) {
-
+void verifyingRegRequirements(FILE *input, Result *indexResArray, Search *wanted, int numRequirements) {
     int newLenArr = 0;
     long long int *newArrByteOff = NULL;
-    int *newArrPos = NULL;
     int lenAux = indexResArray->length;
 
-    //printf("\n [verifying] \n", lenAux);
-
-    for (int i=0; i < lenAux; i++) {
+    for (int i = 0; i < lenAux; i++) {
         int requirementsFufilled = 0;
         
         // fseek para o registro encontrado no arquivo de dados
@@ -413,20 +373,16 @@ Result *verifyingRegRequirements(FILE *input, Result *indexResArray, Search *wan
         //se todos requisitos foram cumpridos, adiciona no vetor final de byteoffset
         if (requirementsFufilled == numRequirements) {
             newLenArr++;
-            newArrByteOff = (long long int *)realloc(newArrByteOff, sizeof(long long int) * newLenArr);
-            newArrPos = (int *)realloc(newArrPos, sizeof(int) * newLenArr);
+            indexResArray->arrByteOff = (long long int *)realloc(newArrByteOff, sizeof(long long int) * newLenArr);
+            indexResArray->arrPos = (int *)realloc(indexResArray->arrPos, sizeof(int) * newLenArr);
             
-            newArrByteOff[newLenArr-1] = indexResArray->arrByteOff[i];
-            newArrPos[newLenArr-1] = indexResArray->arrPos[i];
-
-            // printf("inserindo o byte %lld\n", );
+            indexResArray->arrByteOff[newLenArr-1] = indexResArray->arrByteOff[i];
+            indexResArray->arrPos[newLenArr-1] = indexResArray->arrPos[i];
         }
     }
 
     indexResArray->length = newLenArr;
-    indexResArray->arrByteOff = newArrByteOff;
-    indexResArray->arrPos = newArrPos;
-    return indexResArray;
+    return;
 }
 
 int isMemberInIndex(Search *wanted, int iteration, char *memberNameIndex) {
@@ -436,7 +392,7 @@ int isMemberInIndex(Search *wanted, int iteration, char *memberNameIndex) {
 
 Search *createSearchArr(FILE *input, int *numberPairs) {
     int arrLen;
-    fscanf(stdin, "%d", &arrLen); //the number of searches/size of search array
+    fscanf(stdin, "%d", &arrLen); //reading the size of the array
 
     Search *tmp = (Search *)malloc(sizeof(Search) * arrLen);
     if (tmp == NULL) return NULL;
@@ -518,6 +474,7 @@ void printIndex(IndexData *arr, IndexHeader *h) {
         printf("Valor: %d || byteoff: %lld\n", arr[i].searchKeyInt, arr[i].byteOffset);
     }
 
+    printf("tem %d reg no arq indice\n", h->numberOfRegisters);
 }
 
 Result *superSearch(FILE *input, char *memberName, IndexData *arrIndex, IndexHeader *header, Search *s, int pairs) {
@@ -530,7 +487,7 @@ Result *superSearch(FILE *input, char *memberName, IndexData *arrIndex, IndexHea
         indexSearchResult = searchInIndexArr(arrIndex, header, s, 0, memberName);
 
         // checking registers found by index due to other search requirements
-        indexSearchResult = verifyingRegRequirements(input, indexSearchResult, s, pairs);
+        verifyingRegRequirements(input, indexSearchResult, s, pairs);
     }
     else {
         indexSearchResult = sequentialSearch(input, s, pairs);
@@ -546,43 +503,3 @@ int getResLenght(Result *r) {
 long long int getResByteOffset(Result *r, int pos) {
     return r->arrByteOff[pos];
 }
-
-int getIndexArrLen(IndexHeader *h) {
-    return h->numberOfRegisters;
-}
-
-void superDelete(FILE *input, FILE *index, Result *toDelete, IndexData *indexDataArr, IndexHeader *indexHd, char *memberName) {
-    // number of deletions
-    int lenAux = toDelete->length;
-
-    // sorting positions array
-    sortIntArr(toDelete->arrPos, lenAux);
-
-    for(int i=0; i<lenAux; i++) {
-        printf("[%d]", toDelete->arrPos[i]);
-    }
-
-    // running toDelete vector and deleting data
-    for(int i=0; i<lenAux; i++) {
-        // deleting in input (data) file 
-        // fseek to register position in input (data) file
-        long long int byteOff = toDelete->arrByteOff[i];
-        fseek(input, byteOff, SEEK_SET);
-
-        // overwrites data->removed to '1'
-        char removed = '1';
-        fwrite(&removed, sizeof(char), 1, input);
-
-        // deleting in index file
-        int position = toDelete->arrPos[i] - i; // position to be deleted
-        for(int i=position; i<indexHd->numberOfRegisters; i++) {
-
-        }
-
-        // subtracts register removed
-        indexHd->numberOfRegisters = indexHd->numberOfRegisters - 1;
-    }
-
-    //writeFileIndex(index, indexDataArr, indexHd, )
-}
-

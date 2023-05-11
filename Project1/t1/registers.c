@@ -148,31 +148,24 @@ Data *readBinaryRegister(FILE *input) {
     int intAux;
     char delimiter = '|';
 
-    // reading the removed status
     fread(&charAux, sizeof(char), 1, input);
     tmp->removed = charAux;
 
-    // reading the crime id
     fread(&intAux, sizeof(int), 1, input);
     tmp->crimeID = intAux;
 
-    // reading the crime date
     fread(strAux2, sizeof(char) * crimeDateLen, 1, input);
     tmp->crimeDate = strAux2;
 
-    // reading the article number
     fread(&intAux, sizeof(int), 1, input);
     tmp->articleNumber = intAux;
 
-    // reading the telephone brand
     fread(strAux1, sizeof(char) * telephoneBrandLen, 1, input);
     tmp->telephoneBrand = strAux1;
 
-    // reading the crime place
     strAux1 = readMember(input, delimiter);
     tmp->crimePlace = strAux1;
 
-    // reading the crime description
     strAux1 = readMember(input, delimiter);
     tmp->crimeDescription = strAux1;
 
@@ -225,10 +218,6 @@ void printData(Data *d) {
     printf("\n");
 }
 
-/*
-* Auxliary function that given a string, verifies if its a name from an integer member 
-* from the data struct
-*/
 int isIntegerMember(char *memberName) {
     char intMembers[][20] = {"idCrime", "numeroArtigo"};
 
@@ -252,17 +241,10 @@ int stringCompareWithLen(char *str1, char *str2, int len) {
     return 0;
 }
 
-/*
-* Function that is used for comparing a member from the data struct and its value to
-* a register that was read
-*/
 int intMemberCompare(char *searchMember, int searchKey, Data *reg) {
-    
-    // finding the member that we want to compare. Using hard coded numbers to avoid
-    // getting errors because of the \0 missing. So, we compare the string until the \0
-    // because we are comparing integers, we dont have to deal with null pointers
+
     if (strncmp(searchMember, "idCrime", 7) == 0 &&
-        searchKey == reg->crimeID) {
+    searchKey == reg->crimeID) {
         return 1;
     }
     else if (strncmp(searchMember, "numeroArtigo", 12) == 0 &&
@@ -270,58 +252,49 @@ int intMemberCompare(char *searchMember, int searchKey, Data *reg) {
         return 1;
     }
 
-    //returning 0 if the comparisson fails
     return 0;
 }
 
-/*
-* Function that is used for comparing a member from the data struct and its value to
-* a register that was read
-*/
 int strMemberCompare(char *searchMember, char *searchKey, Data *reg) {
-
-    // auxiliary variable use for the strncmp, needed because of the \0 missing
-    // in the end of the string
     int lenKey = strlen(searchKey);
 
-    // finding the member that we want to compare. Using hard coded numbers to avoid
-    // getting errors because of the \0 missing. So, we compare the string until the \0
     if(strncmp(searchMember, "dataCrime", 9) == 0) {
-
-        // if the string is null, we dont use strncmp because we will get en error
-        // so we assume that our key will not be null, thusfore the comparisson will
-        // return 0 always
+        //stringCompareWithLen(searchKey, reg->crimeDate, lenKey) == 0) {
         if (reg->crimeDate == NULL) return 0;
+
+        //printf("comparando reg: %s[%d] wanted: %s[%d]\n", 
+        //reg->crimeDate, (int)strlen(reg->crimeDate), searchKey, lenKey);
         
-        //returning the result of the comparisson of the key and register member value
         return strncmp(reg->crimeDate, searchKey, lenKey) == 0;
     }
     else if(strncmp(searchMember, "lugarCrime", 10) == 0) { 
-
-        // same logic from above
+        //stringCompareWithLen(searchKey, reg->crimePlace, lenKey) == 0) {
         if (reg->crimePlace == NULL) return 0;
-
-        //returning the result of the comparisson of the key and register member value
+        
+        //printf("comparando reg: %s[%d] wanted: %s[%d]\n", 
+        //reg->crimePlace, (int)strlen(reg->crimePlace), searchKey, lenKey);
+        
         return strncmp(reg->crimePlace, searchKey, lenKey) == 0;
     }
     else if(strncmp(searchMember, "marcaCelular", 12) == 0) { 
-
-        // same logic from above
+        //stringCompareWithLen(searchKey, reg->telephoneBrand, lenKey) == 0) {
         if (reg->telephoneBrand == NULL) return 0;
 
-        //returning the result of the comparisson of the key and register member value
+        //printf("comparando reg: %s[%d] wanted: %s[%d]\n", 
+        //reg->telephoneBrand, (int)strlen(reg->telephoneBrand), searchKey, lenKey);
+
         return strncmp(reg->telephoneBrand, searchKey, lenKey) == 0;
     }
     else if(strncmp(searchMember, "descricaoCrime", 14) == 0) { 
-        
-        // same logic from above
+        //stringCompareWithLen(searchKey, reg->crimeDescription, lenKey) == 0) {
         if (reg->crimeDescription == NULL) return 0;
-
-        //returning the result of the comparisson of the key and register member value
+        
+        //printf("comparando reg: %s[%d] wanted: %s[%d]\n", 
+        //reg->crimeDescription, (int)strlen(reg->crimeDescription), searchKey, lenKey);
+        
         return strncmp(reg->crimeDescription, searchKey, lenKey) == 0;
     }
 
-    // returning 0 if theres an error
     return 0;
 }
 
@@ -357,159 +330,161 @@ int regMissingData(Data *d) {
     return d == NULL || d->crimeDate[0] == '\0';
 }
 
-/*
-* Function that inserts a register in a binary file,
-* updates the header of the binary file
-* and returns the byteoffset of the inserted register
-*/
-int insertRegisterInBinFile(FILE *binFile, Data *reg, Header *h) {
+
+void insertRegisterInBinFile(FILE *binFile, Data *reg, Header *h) {
     
     //calculating the byteoffset and setting the file to the end
     long long int currentOffset = getNexByteOffset(h);
     fseek(binFile, currentOffset, SEEK_SET);
 
     //adding the byteoffset to the header
-    int nextOffset = (writeRegister(binFile, reg) + bytesFixedMember);
-    addByteOffset(h, nextOffset);
-
-    // adding one more register in the header struct
+    currentOffset = (writeRegister(binFile, reg) + bytesFixedMember);
+    addByteOffset(h, currentOffset);
     add1FileReg(h);
-
-    return currentOffset;
 }
 
-/*
-* Function that reads the specifications of the register that will be inserted
-* it returns a pointer to a data register
-*/
 Data *readRegisterStdin2() {
     Data *d = (Data *)malloc(sizeof(Data));
     char isQuote;
     char quote = '"';
+    char lixo;
     int intAux;
-    char *strAux = NULL;
 
     d->removed = '0';
 
-    // reading the crime id, always non NULL
     fscanf(stdin, "%d ", &intAux);
     d->crimeID = intAux;
 
-    // reading crime date
-    // if it is a quote, that means we have to use quote string and its not a null value 
+    char *strAux = (char *)malloc(sizeof(char) * 50);
     isQuote = getc(stdin);
-    if (isQuote == quote) { 
-        strAux = (char *)malloc(sizeof(char) * 50);
+    printf( "[%c]", isQuote);
 
-        // now that the verification is over, i have to return the quote in order
-        // ir order to use the scan_quote_string function
-        ungetc(isQuote, stdin); 
+    //reading
+    if (isQuote == quote) {
+        ungetc(isQuote, stdin);
         scan_quote_string(strAux);
-
         d->crimeDate = completeSetString(strAux, crimeDateLen);
-        getc(stdin); // reading the space character
+        printf("%s\n", strAux);
+        getc(stdin);
     }
-    else { // string read == NULO
+    else {
         d->crimeDate = NULL;
-        char garbage[60];
-        scanf("%s", garbage);
-        getc(stdin); // reading the space character
+        readMember(stdin, ' ');
     }
 
-    // reading article
-    // its never goint to have quote, thusfore we can use a simple string compare
+    isQuote = getc(stdin);
+    printf( "[%c]", isQuote);
+    if (isQuote == quote) {
+        ungetc(isQuote, stdin);
+        scan_quote_string(strAux);
+        d->crimeDate = completeSetString(strAux, crimeDateLen);
+        printf("%s\n", strAux);
+        getc(stdin);
+    }
+    else {
+        d->crimeDate = NULL;
+        readMember(stdin, ' ');
+    }
+
+    printf("acabei\n");
+}
+
+Data *readRegisterStdin() {
+    Data *d = (Data *)malloc(sizeof(Data));
+
+    int intAux;
+    char isQuote;
+    char quote = '"';
+    char lixo;
+
+    d->removed = '0';
+
+    fscanf(stdin, "%d ", &intAux);
+    d->crimeID = intAux;
+    fprintf(stderr, "id %d || ", d->crimeID);
+    // fprintf(stderr, "crime id: %d ", d->crimeID);
+
+
+    char *strAux = (char *)malloc(sizeof(char) * crimeDateLen);
+    isQuote = getc(stdin);
+    fprintf(stderr, "[%c]", isQuote);
+    if (isQuote == quote) {
+        ungetc(isQuote, stdin);
+        scan_quote_string(strAux);
+        d->crimeDate = completeSetString(strAux, crimeDateLen);
+        printf("%s\n", strAux);
+    }
+    else {
+        d->crimeDate = NULL;
+        readMember(stdin, ' ');
+    }
+
+
+    if (d->crimeDate != NULL)printf("data nula\n");
+    // fprintf(stderr, "crime date: %s ", d->crimeDate);
+    
+    lixo = getc(stdin);
+    fprintf(stderr,"lixo [%c]", lixo);
+
     strAux = readMember(stdin, ' ');
     if (strncmp(strAux, "NULO", 4) == 0)
         d->articleNumber = -1;
     else
         d->articleNumber = atoi(strAux);
+    fprintf(stderr, "num artigp %d || ", d->articleNumber);
+    // fprintf(stderr, "artiho: %d ", d->articleNumber);
 
 
-    // reading crime place
-    // using the logic of scanquote from before
+    strAux = (char *)malloc(sizeof(char) * 50);
     isQuote = getc(stdin);
+    fprintf(stderr, "[%c]", isQuote);
     if (isQuote == quote) {
-        strAux = (char *)malloc(sizeof(char) * 50);
-
         ungetc(isQuote, stdin);
         scan_quote_string(strAux);
-
         d->crimePlace = strAux;
-        getc(stdin);
     }
-    else { // string read == NULO
-        d->crimePlace = NULL;
-        char garbage[60];
-        scanf("%s", garbage);
-        getc(stdin);
+    else {
+        d->crimeDate = NULL;
+        char *idk = readMember(stdin, ' ');
+        fprintf(stderr, "%s\n", idk);
     }
+    // if (d->crimePlace != NULL)printf("lugar %s || ", d->crimePlace);
+    
+    // fprintf(stderr, "crime place: %s ", d->crimePlace);
+    lixo = getc(stdin);
+    fprintf(stderr, "lixo [%c]", lixo);
 
-    //reading description
-    // using the logic of scanquote from before
+    strAux = (char *)malloc(sizeof(char) * 50);
     isQuote = getc(stdin);
     if (isQuote == quote) {
-        strAux = (char *)malloc(sizeof(char) * 50);
-
         ungetc(isQuote, stdin);
         scan_quote_string(strAux);
-
         d->crimeDescription = strAux;
-        getc(stdin);
     }
-    else { // string read == NULO
-        d->crimeDescription = NULL;
-        char garbage[60];
-        scanf("%s", garbage);
-        getc(stdin);
+    else {
+        d->crimeDate = NULL;
+        char *idk = readMember(stdin, ' ');
     }
+    // if (d->crimeDescription != NULL)printf("descricao %s ||", d->crimeDescription);
+    // fprintf(stderr, "crime desc: %s ", d->crimeDescription);
 
-    //reading telephone brand
-    // using the logic of scanquote from before
+    lixo = getc(stdin);
+    printf("lixo [%c]", lixo);
+
+    strAux = (char *)malloc(sizeof(char) * telephoneBrandLen);
     isQuote = getc(stdin);
     if (isQuote == quote) {
-        strAux = (char *)malloc(sizeof(char) * 50);
-
         ungetc(isQuote, stdin);
         scan_quote_string(strAux);
-
         d->telephoneBrand = completeSetString(strAux, telephoneBrandLen);
-        getc(stdin);
     }
-    else { // string read == NULO
-        d->telephoneBrand = NULL;
-        char *garbage = readMember(stdin, '\n');
-        free(garbage);
+    else {
+        d->crimeDate = NULL;
+        readMember(stdin, ' ');
     }
-
+    // if (d->telephoneBrand != NULL)printf("celular %s", d->telephoneBrand);
+    // fprintf(stderr, "cellphone: %s\n", d->telephoneBrand);
+    getc(stdin);
+    printf("\n");
     return d;
-}
-
-/*
-* Function that given a name of a member of data register
-* returns the int value of that field
-*/
-int selectIntegerMember(char *memberName, Data *reg) {
-    if (strncmp("idCrime", memberName, 7) == 0)
-        return reg->crimeID;
-    else
-        return reg->articleNumber;
-}
-
-/*
-* Function that given a name of a member of data register
-* returns the string  of that field 
-*/
-char *selectStrMember(char *memberName, Data *reg) {
-    if(strncmp(memberName, "dataCrime", 9) == 0) {
-        return reg->crimeDate;
-    }
-    else if(strncmp(memberName, "lugarCrime", 10) == 0) { 
-        return reg->crimePlace;
-    }
-    else if(strncmp(memberName, "marcaCelular", 12) == 0) { 
-        return reg->telephoneBrand;
-    }
-    else {//(strncmp(memberName, "descricaoCrime", 14) == 0) 
-        return reg->crimeDescription;
-    }
 }

@@ -28,6 +28,7 @@ void add1FileReg(Header *h) {
     if (h == NULL) return;
     
     h->numFileRegisters++;
+    printf("tem %d reg\n", h->numFileRegisters);
 }
 
 /*
@@ -70,7 +71,6 @@ void updateHeader(FILE *output, Header *h) {
 
 void addByteOffset(Header *h, int n) {
     h->nextByteOffset += n;
-    // printf("novo prox byre off %lld", h->nextByteOffset);
 }
 
 /*

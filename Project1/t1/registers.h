@@ -29,12 +29,10 @@ char *getDataCrimePlace(Data *d);
 char *getDataCrimeDescription(Data *d);
 int regMissingData(Data *d);
 int isIntegerMember(char *memberName);
-int insertRegisterInBinFile(FILE *binFile, Data *reg, Header *h);
+void insertRegisterInBinFile(FILE *binFile, Data *reg, Header *h);
 Data *readRegisterStdin();
 int intMemberCompare(char *searchMember, int searchKey, Data *reg);
 int strMemberCompare(char *searchMember, char *searchKey, Data *reg);
 Data *readRegisterStdin2();
-int selectIntegerMember(char *memberName, Data *reg);
-char *selectStrMember(char *memberName, Data *reg);
 
 #endif

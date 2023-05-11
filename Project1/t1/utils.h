@@ -15,7 +15,6 @@ void readCsvHeader(FILE *input);
 int stringLenght(char *str);
 char *superStringCopy(char *origin, int maxLen);
 long long int *byteOffsetArrAppend(long long int *arr, int len, long long int byteOffset);
-void sortIntArr(int *arr, int len);
 
 
 #endif
