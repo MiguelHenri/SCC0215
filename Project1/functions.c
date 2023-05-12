@@ -87,6 +87,9 @@ void createIndexFile(FILE *input, char *memberName, char *indexType, char *nameI
 
 // funcionaliade 4
 void searchInBinaryFile(FILE *input, char *memberName, char *indexType, char *nameIndexFile, int numberSearches) {
+    Header *h = readHeaderBinary(input);
+    if (!h) return;
+
     FILE *indexFile = fopen(nameIndexFile, "rb");
 
     // reading header data
@@ -105,7 +108,7 @@ void searchInBinaryFile(FILE *input, char *memberName, char *indexType, char *na
     for (int i = 0; i < numberSearches; i++) {
         int pairs;
         Search *s = createSearchArr(input, &pairs);
-        Result *res = superSearch(input, memberName, indexDataArr, indexHeader, s, pairs);
+        Result *res = superSearch(input, memberName, indexDataArr, indexHeader, s, pairs, h);
         
         printf("Resposta para a busca %d\n", i+1);
         
@@ -119,14 +122,19 @@ void searchInBinaryFile(FILE *input, char *memberName, char *indexType, char *na
                 printData(d);
             }
         }
-
+        // printf("\n\n");
         //returning file pointer to the beggining
         fseek(input, 0, SEEK_SET);
     }
 
 }
 
+// funcionalidade 5
 void deleteRegister(FILE *input, char *memberName, char *indexType, char *nameIndexFile, int numberDeletions) {
+    // reading data header
+    Header *h = readHeaderBinary(input);
+    if (!h) return;
+
     FILE *indexFile = fopen(nameIndexFile, "rb");
 
     // reading header data
@@ -138,17 +146,31 @@ void deleteRegister(FILE *input, char *memberName, char *indexType, char *nameIn
 
     // reading index file data
     IndexData *indexDataArr = readFileIndex(indexFile, memberName, indexHeader);
+    // printIndex(indexDataArr, indexHeader);
     fclose(indexFile);
 
     for(int i=0; i<numberDeletions; i++) {
+        // printf("delecao de numero: %d\n", i+1);
         int pairs;
         Search *s = createSearchArr(input, &pairs);
         // finding registers to be deleted and its offset
-        Result *res = superSearch(input, memberName, indexDataArr, indexHeader, s, pairs);
 
-        //dando merda aqui
-        superDelete(input, indexFile, res, indexDataArr, indexHeader, memberName);
+        // fprintf(stderr, "crirei vetor de seacr\n");
+        Result *res = superSearch(input, memberName, indexDataArr, indexHeader, s, pairs, h);
+
+        // deleting registers found
+        indexDataArr = superDelete(input, indexFile, res, indexDataArr, indexHeader, memberName, h);
     }
+
+    // updating index file
+    indexFile = fopen(nameIndexFile, "wb");
+    writeFileIndex(indexFile, indexDataArr, indexHeader, memberName);
+    fclose(indexFile);
+
+    // printf("tem %d no indice\n", getIndexArrLen(indexHeader));
+    // updating header in data file
+    fseek(input, 0, SEEK_SET);
+    writeHeader(input, h);
     
 }
 

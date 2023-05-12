@@ -401,7 +401,7 @@ Data *readRegisterStdin2() {
     if (isQuote == quote) { 
         strAux = (char *)malloc(sizeof(char) * 50);
 
-        // now that the verification is over, i have to return the quote in order
+        // now that the verification is over, i have to return the quote
         // ir order to use the scan_quote_string function
         ungetc(isQuote, stdin); 
         scan_quote_string(strAux);

@@ -136,7 +136,7 @@ char *superStringCopy(char *origin, int maxLen) {
 
 long long int *byteOffsetArrAppend(long long int *arr, int len, long long int byteOffset) {
     arr = (long long int *)realloc(arr, sizeof(long long int) * len);
-    arr[len - 1] = byteOffset;
+    arr[len-1] = byteOffset;
 
     // printf("append com mbyteoff %lld\n", byteOffset);
 

@@ -24,10 +24,22 @@ Header *createHeader() {
     return h;
 }
 
+void sub1FileReg(Header *h) {
+    if (h == NULL) return;
+    
+    h->numFileRegisters--;
+}
+
 void add1FileReg(Header *h) {
     if (h == NULL) return;
     
     h->numFileRegisters++;
+}
+
+void add1FileRemReg(Header *h) {
+    if (h == NULL) return;
+    
+    h->numRemovedRegisters++;
 }
 
 /*

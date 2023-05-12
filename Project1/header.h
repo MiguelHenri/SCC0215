@@ -8,7 +8,9 @@ typedef struct header Header;
 #define FILE_ERROR printf("Falha no processamento do arquivo.\n")
 
 Header *createHeader();
+void sub1FileReg(Header *h);
 void add1FileReg(Header *h);
+void add1FileRemReg(Header *h);
 void updateHeaderStatus(Header *h);
 int writeHeader(FILE *input, Header *h);
 void updateHeader(FILE *output, Header *h);

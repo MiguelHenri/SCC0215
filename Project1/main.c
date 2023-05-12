@@ -67,6 +67,7 @@ int main() {
         fclose(input);
     }
     else if (operacao == 5) {
+        // binarioNaTela(fileNameInput);
         FILE *input = fopen(fileNameInput, "rb+");
         if (input == NULL) {
             FILE_ERROR;
@@ -77,6 +78,7 @@ int main() {
         char *memberName = readMember(stdin, ' ');
         char *indexType = readMember(stdin, ' ');
         char *nameIndexFile = readMember(stdin, ' ');
+        // printf("nome do arq bin");
         int numberDeletions;
         scanf(" %d", &numberDeletions);
 
