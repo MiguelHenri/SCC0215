@@ -516,6 +516,8 @@ char *selectStrMember(char *memberName, Data *reg) {
 
 // return the difference beetween the old and new size
 int sizeTest(Data *reg, char *memberName, char *newStr, int newInt) {
+    if (newStr == 0) return 0;
+
     if (strncmp(newStr, "NULO", 4) == 0) {
         newStr = NULL;
     }

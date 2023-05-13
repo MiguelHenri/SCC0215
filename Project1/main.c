@@ -118,13 +118,14 @@ int main() {
             return 0;
         }
 
+
         getc(stdin);
         char *memberName = readMember(stdin, ' ');
         char *indexType = readMember(stdin, ' ');
         char *nameIndexFile = readMember(stdin, ' ');
         int numberUpdates;
         scanf(" %d", &numberUpdates);
-
+    
         updateRegister(input, memberName, indexType, nameIndexFile, numberUpdates);
         fclose(input);
         binarioNaTela(fileNameInput);

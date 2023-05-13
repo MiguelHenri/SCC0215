@@ -154,7 +154,7 @@ void deleteRegister(FILE *input, char *memberName, char *indexType, char *nameIn
         Search *s = createSearchArr(input, &pairs);
         // finding registers to be deleted and its offset
 
-        // fprintf(stderr, "crirei vetor de seacr\n");
+        //fprintf(stderr, "crirei vetor de seacr\n");
         Result *res = superSearch(input, memberName, indexDataArr, indexHeader, s, pairs, h);
 
         // deleting registers found
@@ -230,6 +230,8 @@ void updateRegister(FILE *input, char *memberName, char *indexType, char *nameIn
     // reading index file data
     IndexData *indexDataArr = readFileIndex(indexFile, memberName, indexHeader);
     fclose(indexFile);
+    //printf("criei arr indice\n");
+
 
     for (int i = 0; i < numUpdates; i++) {
         int pairsSearch;
@@ -248,7 +250,7 @@ void updateRegister(FILE *input, char *memberName, char *indexType, char *nameIn
         //printf("pairs update %d\n", pairsUpdate);
         //printSearchArray(update);
         
-        //indexDataArr = superUpdate(input, update, res, indexDataArr, indexHeader, h, memberName);
+        indexDataArr = superUpdate(input, update, res, indexDataArr, indexHeader, h, memberName);
     }
 
     // updating index file
