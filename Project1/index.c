@@ -27,6 +27,7 @@ struct search {
         char *strMember;
         int intMember;
     };
+    int len;
 };
 
 IndexHeader *createIndexHeader() {
@@ -329,7 +330,7 @@ Result *searchInIndexArr(IndexData *arr, IndexHeader *h, Search *wanted, int ite
             if (arr[mid].searchKeyInt == wanted[iteration].intMember) { // found
                 // printf("encontrei %d\n");
                 int verifyPrevious = mid;
-                while (arr[verifyPrevious].searchKeyInt == wanted[iteration].intMember)
+                while (verifyPrevious >= 0 && arr[verifyPrevious].searchKeyInt == wanted[iteration].intMember)
                     verifyPrevious -= 1;
 
                 mid = verifyPrevious + 1;
@@ -347,25 +348,23 @@ Result *searchInIndexArr(IndexData *arr, IndexHeader *h, Search *wanted, int ite
             }
         }
         else { //looking for a string in index array
-            // printf("na pos %d tem %s\n", mid, getSearchStrKey(wanted, iteration));
+            // printf("na pos %d tem %s\n", mid, arr[mid].searchKeyStr);
             int cmpResult = strncmp(arr[mid].searchKeyStr, superStringCopy(wanted[iteration].strMember, maxLenStr), maxLenStr);
+            // printf("resultado da comparacao %d\n", cmpResult);
             if (cmpResult == 0) { // found
-    
-                int verifyPrevious = mid -1;
-                while (strncmp(arr[verifyPrevious].searchKeyStr, superStringCopy(wanted[iteration].strMember, maxLenStr), 12) == 0) {
+
+                int verifyPrevious = mid;
+                while (verifyPrevious >= 0 && strncmp(arr[verifyPrevious].searchKeyStr, superStringCopy(wanted[iteration].strMember, maxLenStr), maxLenStr) == 0) {
                     // printf("string encontrada no arr indice %s\n", arr[verifyPrevious].searchKeyStr);
                     verifyPrevious--;
                 }
                 // printf("string encontrada no arr indice %s\n", arr[verifyPrevious].searchKeyStr);
 
                 mid = verifyPrevious + 1;
-                int count = 0;
-                while (strncmp(arr[mid].searchKeyStr, superStringCopy(wanted[iteration].strMember, maxLenStr), 12) == 0) {
+                while (strncmp(arr[mid].searchKeyStr, superStringCopy(wanted[iteration].strMember, maxLenStr), maxLenStr) == 0) {
                     r->arrByteOff = byteOffsetArrAppend(r->arrByteOff, ++lenArrByteOff, arr[mid].byteOffset);
                     r->arrPos = posArrAppend(r->arrPos, lenArrByteOff, mid);
                     mid++;
-                    // printf("iterei %d vezes\n", count);
-                    count++;
                 }
 
                 break;
@@ -443,26 +442,27 @@ Search *createSearchArr(FILE *input, int *numberPairs) {
     Search *tmp = (Search *)malloc(sizeof(Search) * arrLen);
     if (tmp == NULL) return NULL;
 
+    getc(stdin);
     for (int i = 0; i < arrLen; i++) {
-        getc(stdin);
         tmp[i].memberName = readMember(stdin, ' '); //reading the member name
         // fprintf(stderr, "nome do campo do reg a ser procurado %s||len %d\n", tmp[i].memberName, stringLenght(tmp[i].memberName));
         // its an int type member, reads value using %d
         if (isIntegerMember(tmp[i].memberName)) {
-            int aux;
-            fscanf(stdin, "%d", &aux);
-            tmp[i].intMember = aux;
+            char *aux = readMember(stdin, ' ');
+            tmp[i].intMember = atoi(aux);
             // fprintf(stderr, "int a ser procurado %d\n", tmp[i].intMember);
         } 
         else { // its a string type member, reads value as string
             char *strAux = (char *)malloc(sizeof(char) * 50);
             scan_quote_string(strAux);
             tmp[i].strMember = strAux;
-            // fprintf(stderr, "str a ser procurado %s\n", tmp[i].strMember);
+            getc(stdin);    
+            //fprintf(stderr, "str a ser procurado %s\n", tmp[i].strMember);
         }
     }
 
     *numberPairs = arrLen;
+    tmp->len = arrLen;
     return tmp;
 }
 
@@ -598,7 +598,7 @@ IndexData *remIndexDataArr(IndexData *indexDataArr, int len, int pos) {
 }
 
 
-IndexData *superDelete(FILE *input, FILE *index, Result *toDelete, IndexData *indexDataArr, IndexHeader *indexHd, char *memberName, Header *h) {
+IndexData *superDelete(FILE *input, Result *toDelete, IndexData *indexDataArr, IndexHeader *indexHd, Header *h) {
     // no registers found
     if(toDelete == NULL || toDelete->arrByteOff == NULL || toDelete->length <= 0) {
         //printf("nenhum registro encontrado\n");
@@ -609,34 +609,27 @@ IndexData *superDelete(FILE *input, FILE *index, Result *toDelete, IndexData *in
     int lenToDelete = toDelete->length;
     // number of register in index file
     int num = indexHd->numberOfRegisters;
-    printf("quero deletar %d registros\n", lenToDelete);
-    printf("tenho %d registros\n", num);
     // registers not found at index file (will not be deleted from index file)
     int notFound = 0;
-
-    for(int i=0; i<lenToDelete; i++) {
-        fprintf(stderr, "arrPos[%d] = %d\n", i, toDelete->arrPos[i]);
-    }
 
     char removed = '1';
     // running toDelete vector and deleting data
     for(int i=0; i<lenToDelete; i++) {
         // deleting in input (data) file 
-        // fseek to register position in input (data) file
         long long int byteOff = toDelete->arrByteOff[i];
-        if (lenToDelete == 1) printf("byteoff a acessar = %lld\n", byteOff);
-        fseek(input, byteOff, SEEK_SET);
+        if(byteOff != -1) { // flag
+            // fseek to register position in input (data) file
+            fseek(input, byteOff, SEEK_SET);
 
-        // overwrites data->removed to '1'
-        fwrite(&removed, sizeof(char), 1, input);
+            // overwrites data->removed to '1'
+            fwrite(&removed, sizeof(char), 1, input);
 
-        // number of removed in header += 1
-        add1FileRemReg(h);
-
-        // updating the arrpos in the to delete struct
-        int position = toDelete->arrPos[i]; // position to be deleted
+            // number of removed in header += 1
+            add1FileRemReg(h);
+        }
 
         // deleting in index array
+        int position = toDelete->arrPos[i]; // position to be deleted
         // removing and shifting updating indexData Array
         if(toDelete->arrPos[i] != -1) {
             indexDataArr = remIndexDataArr(indexDataArr, num - i - 1, position);
@@ -651,19 +644,120 @@ IndexData *superDelete(FILE *input, FILE *index, Result *toDelete, IndexData *in
         
     }
 
-    // dando merda aqui
     indexHd->numberOfRegisters = num - lenToDelete + notFound;
 
     return indexDataArr;
 }
 
-int indexDataExists(IndexData *idArr, char *memberName, int pos) {
-    if(isIntegerMember(memberName)) {
-        if(idArr[pos].searchKeyInt == -1) return 0;
+void printSearchArray(Search *s) {
+    printf("SEARCH: \n");
+    for(int i=0; i<s->len; i++) {
+        if(isIntegerMember(s[i].memberName)) {
+            printf("%s %d ", s[i].memberName, s[i].intMember);
+        }
+        else {
+            printf("%s %s ", s[i].memberName, s[i].strMember); 
+        }
     }
-    else { // string type
-        if(idArr[pos].searchKeyStr == NULL) return 0;
+    printf("\n");
+} 
+
+Result *createResult(long long int byteOff, int pos) {
+    Result *r = (Result *)malloc(sizeof(Result));
+
+    r->arrByteOff = (long long int *)malloc(sizeof(long long int));
+    r->arrByteOff[0] = byteOff;
+
+    r->arrPos = (int *)malloc(sizeof(long long int));
+    r->arrPos[0] = byteOff;
+    
+    r->length = 1;
+
+    return r;
+}
+
+IndexData *superUpdate(FILE *input, Search *update, Result *foundRegisters, IndexData *indexDataArr, IndexHeader *indexHd, Header *h, char *memberName) {
+    // no registers found
+    if(foundRegisters == NULL || foundRegisters->arrByteOff == NULL || foundRegisters->length <= 0) {
+        //printf("nenhum registro encontrado\n");
+        return indexDataArr;
     }
 
-    return 1;
+    // number of positions to be updated
+    int lenfoundRegisters = foundRegisters->length;
+
+    // running positions
+    for(int i=0; i<lenfoundRegisters; i++) {
+        // getting byteoffset of the register to be updated
+        long long int byteOff = foundRegisters->arrByteOff[i];
+        int indexPos = foundRegisters->arrPos[i];
+
+        // fseeking to that position and reading register data
+        fseek(input, byteOff, SEEK_SET);
+        Data *reg = readBinaryRegister(input);
+        int oldSize = registerSize(reg);
+        
+        // doing updates and checking variable members sizes
+        int teste = 0;
+        for (int j = 0; j < update->len; j++) {
+            if (isIntegerMember(update[j].memberName)) {
+                teste += sizeTest(reg, update[j].memberName, NULL, update[j].intMember);
+                updateReg(reg, update[j].memberName, NULL, update[j].intMember);
+            }
+            else {
+                teste += sizeTest(reg, update[j].memberName, update[j].strMember, -1);
+                updateReg(reg, update[j].memberName, update[j].strMember, -1);
+            }
+        }
+
+        int flagIndex = 0;
+        if (teste >= 0) { // there is space to writing
+            writeUpdatedRegister(input, reg, byteOff, oldSize); //writes
+
+            // need to update in index data arr?
+            for (int i = 0; i < update->len; i++) {
+                if (isMemberInIndex(update, i, memberName))
+                    flagIndex = 1;
+            }
+        }
+        else { // no space, needs to write register at end of file
+
+            // calls function to delete the register at bytoff and with indexPos
+            Result *toDelete = createResult(byteOff, indexPos);
+            indexDataArr = superDelete(input, toDelete, indexDataArr, indexHd, h);
+
+            // insert the register at index array
+            if (isIntegerMember(memberName)) {
+                indexDataArr = appendIndexArray(indexDataArr, indexHd, memberName, selectIntegerMember(memberName, reg), NULL, getNexByteOffset(h));
+            }
+            else {
+                indexDataArr = appendIndexArray(indexDataArr, indexHd, memberName, -1, selectStrMember(memberName, reg), getNexByteOffset(h));
+            }
+
+            // write the register in input file and updates header
+            int newByteOff = writeRegister(input, reg) + bytesFixedMember;
+            addByteOffset(h, newByteOff);
+        }
+        if (flagIndex == 1) { // updates in index array (deletes and inserts)
+            // calls function to delete the res with indexPos
+            Result *toDelete = createResult(-1, indexPos);
+            indexDataArr = superDelete(input, toDelete, indexDataArr, indexHd, h);
+
+            // insert the register at index array
+            if (isIntegerMember(memberName)) {
+                indexDataArr = appendIndexArray(indexDataArr, indexHd, memberName, selectIntegerMember(memberName, reg), NULL, byteOff);
+            }
+            else {
+                indexDataArr = appendIndexArray(indexDataArr, indexHd, memberName, -1, selectStrMember(memberName, reg), byteOff);
+            }
+        }
+    }
+    
+    // sorting Index Array again
+    if (isIntegerMember(memberName)) {
+        sortIndexArrInt(indexDataArr, indexHd->numberOfRegisters);
+    }
+    else {
+        sortIndexArrString(indexDataArr, indexHd->numberOfRegisters);
+    }
 }

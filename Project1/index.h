@@ -28,12 +28,14 @@ int getResLenght(Result *r);
 long long int getResByteOffset(Result *r, int pos);
 Search *createSearchArr(FILE *input, int *numberPairs);
 IndexData *appendIndexArray(IndexData *arr, IndexHeader *h, char *memberName, int intKey, char *strKey, long long int byteOff);
-IndexData *superDelete(FILE *input, FILE *index, Result *toDelete, IndexData *indexDataArr, IndexHeader *indexHd, char *memberName, Header *h);
+IndexData *superDelete(FILE *input, Result *toDelete, IndexData *indexDataArr, IndexHeader *indexHd, Header *h);
 void sortIndexArrString(IndexData *arr, int len);
 void sortIndexArrInt(IndexData *arr, int len);
 int getIndexArrLen(IndexHeader *h);
 void printIndexHeader(IndexHeader *h);
 Result *sequentialSearch(FILE *input, Search *wanted, Header *h, int numberPairs);
+void printSearchArray(Search *s);
+IndexData *superUpdate(FILE *input, Search *update, Result *toUpdate, IndexData *indexDataArr, IndexHeader *indexHd, Header *h, char *memberName);
 // IndexData *indexArrayAppend(IndexData *arr, int *len, int intKey, char *strKey, long long int byteoffset);
 
 #endif

@@ -1,0 +1,13 @@
+7 binario13.bin marcaCelular string indice13.bin 4
+
+1 numeroArtigo 171
+1 lugarCrime "AGUAS DE SANTA BARBARA"
+
+2 marcaCelular "SAMSUNG" dataCrime "09/01/2020"
+1 lugarCrime "CRUZEIRO"
+
+2 idCrime 835 lugarCrime "SAO PAULO"
+1 dataCrime "30/02/2021"
+
+1 idCrime 223
+1 marcaCelular "APPLE"

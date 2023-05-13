@@ -176,7 +176,7 @@ Data *readBinaryRegister(FILE *input) {
     strAux1 = readMember(input, delimiter);
     tmp->crimeDescription = strAux1;
 
-    fread(&charAux, sizeof(char), 1, input);//reading register delimiter
+    fread(&charAux, sizeof(char), 1, input); //reading register delimiter '#'
 
     return tmp;
 }
@@ -511,5 +511,70 @@ char *selectStrMember(char *memberName, Data *reg) {
     }
     else {//(strncmp(memberName, "descricaoCrime", 14) == 0) 
         return reg->crimeDescription;
+    }
+}
+
+// return the difference beetween the old and new size
+int sizeTest(Data *reg, char *memberName, char *newStr, int newInt) {
+    if (strncmp(newStr, "NULO", 4) == 0) {
+        newStr = NULL;
+    }
+
+    if(strncmp(memberName, "lugarCrime", 10) == 0) { 
+        return stringLenght(reg->crimePlace) - stringLenght(newStr);
+    }
+    else if (strncmp(memberName, "descricaoCrime", 14) == 0) {
+        return stringLenght(reg->crimeDescription) - stringLenght(newStr);
+    }
+    
+    return 0;
+}
+
+//return the difference beetween the old - new size
+void updateReg(Data *reg, char *memberName, char *newStr, int newInt) {
+
+    if (isIntegerMember(memberName)) {
+        if (strncmp("idCrime", memberName, 7) == 0) {
+            reg->crimeID = newInt;
+        }   
+        else { // memberName == articleNumber
+            reg->articleNumber = newInt;
+        }
+    }
+    else {
+        if (strncmp(newStr, "NULO", 4) == 0)
+            newStr = NULL;
+
+        if(strncmp(memberName, "dataCrime", 9) == 0) {
+            reg->crimeDate = newStr;
+        }
+        else if(strncmp(memberName, "lugarCrime", 10) == 0) { 
+            reg->crimePlace = newStr;
+        }
+        else if(strncmp(memberName, "marcaCelular", 12) == 0) { 
+            reg->telephoneBrand = newStr;
+        }
+        else {//(strncmp(memberName, "descricaoCrime", 14) == 0) 
+            reg->crimeDescription = newStr;
+        }
+    }
+}
+
+int registerSize(Data *reg) {
+    return bytesFixedMember + stringLenght(reg->crimeDescription) + stringLenght(reg->crimePlace) + 2;
+}
+
+void writeUpdatedRegister(FILE *input, Data *reg, long long int byteoff, int oldSize) {
+    fseek(input, byteoff, SEEK_SET);
+    int newSize = writeRegister(input, reg) + bytesFixedMember;
+
+    fseek(input, -1, SEEK_CUR); // goes before # written
+
+    int trashPositions = oldSize - newSize;
+    //printf("old size: %d\nnew size: %d\n", oldSize, newSize);
+    //printf("trash positions: %d\n", trashPositions);
+    char trash = '$';
+    for(int i=0; i<trashPositions; i++) {
+        fwrite(&trash, sizeof(char), 1, input);
     }
 }

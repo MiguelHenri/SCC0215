@@ -36,5 +36,8 @@ int strMemberCompare(char *searchMember, char *searchKey, Data *reg);
 Data *readRegisterStdin2();
 int selectIntegerMember(char *memberName, Data *reg);
 char *selectStrMember(char *memberName, Data *reg);
-
+void updateReg(Data *reg, char *memberName, char *newStr, int newInt);
+int sizeTest(Data *currentReg, char *memberName, char *newStr, int newInt);
+int registerSize(Data *reg);
+void writeUpdatedRegister(FILE *input, Data *reg, long long int byteoff, int oldSize);
 #endif

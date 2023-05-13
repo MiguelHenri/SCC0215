@@ -7,6 +7,11 @@
 #include "funcoesFornecidas.h"
 #include "index.h"
 
+/*
+    verificar header dos aquivos
+    escrever status certo
+*/
+
 int main() {
     int operacao;
     char fileNameInput[50];
@@ -101,9 +106,26 @@ int main() {
         int numberInsertions;
         scanf(" %d", &numberInsertions);
 
-
-
         insertRegister(input, memberName, indexType, nameIndexFile, numberInsertions);
+        fclose(input);
+        binarioNaTela(fileNameInput);
+        binarioNaTela(nameIndexFile);
+    }
+    else if (operacao == 7) {
+        FILE *input = fopen(fileNameInput, "rb+");
+        if (input == NULL) {
+            FILE_ERROR;
+            return 0;
+        }
+
+        getc(stdin);
+        char *memberName = readMember(stdin, ' ');
+        char *indexType = readMember(stdin, ' ');
+        char *nameIndexFile = readMember(stdin, ' ');
+        int numberUpdates;
+        scanf(" %d", &numberUpdates);
+
+        updateRegister(input, memberName, indexType, nameIndexFile, numberUpdates);
         fclose(input);
         binarioNaTela(fileNameInput);
         binarioNaTela(nameIndexFile);

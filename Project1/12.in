@@ -1,0 +1,17 @@
+7 binario12.bin dataCrime string indice12.bin 5
+
+1 lugarCrime "SAO PAULO"
+1 lugarCrime "SAO CARLOS"
+
+2 dataCrime "20/11/2021" numeroArtigo 155
+2 marcaCelular "MOTOROLA" dataCrime "20/11/2020"
+
+1 marcaCelular "APPLE"
+1 marcaCelular "IPHONE"
+
+3 dataCrime "29/08/2020" lugarCrime "MOGI MIRIM" descricaoCrime "LESAO CORPORAL (ART 129)"
+2 numeroArtigo 171 descricaoCrime "ESTELIONATO (ART. 171)"
+
+1 idCrime 845
+1 marcaCelular "APPLE"
+

@@ -13,5 +13,6 @@ void createIndexFile(FILE *input, char *memberName, char *indexType, char *nameI
 void searchInBinaryFile(FILE *input, char *memberName, char *indexType, char *nameIndexFile, int numberSearches);
 void deleteRegister(FILE *input, char *memberName, char *indexType, char *nameIndexFile, int numberDeletions);
 void insertRegister(FILE *input, char *memberName, char *indexType, char *nameIndexFile, int numberInsert);
+void updateRegister(FILE *input, char *memberName, char *indexType, char *nameIndexFile, int numUpdates);
 
 #endif
