@@ -230,6 +230,8 @@ void updateRegister(FILE *input, char *memberName, char *indexType, char *nameIn
     // reading index file data
     IndexData *indexDataArr = readFileIndex(indexFile, memberName, indexHeader);
     fclose(indexFile);
+    //printf("criei arr indice\n");
+
 
     for (int i = 0; i < numUpdates; i++) {
         int pairsSearch;

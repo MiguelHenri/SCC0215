@@ -263,6 +263,7 @@ IndexData *readFileIndex(FILE *indexFile, char *memberName, IndexHeader *header)
 
     // alocatting the array of our index data
     IndexData *array = (IndexData *)malloc(sizeof(IndexData) * header->numberOfRegisters);
+    //printf("tamanho do arr %d\n", header->numberOfRegisters);
 
     // reading data
     for (int i = 0; i < header->numberOfRegisters; i++) {
@@ -283,6 +284,7 @@ IndexData *readFileIndex(FILE *indexFile, char *memberName, IndexHeader *header)
 
             // inserting in the array
             array[i].searchKeyStr = strAux;
+            //printf("chave lida %s\n", array[i].searchKeyStr);
         }
 
         // reading byteOffset and inserting it
@@ -743,6 +745,7 @@ IndexData *superUpdate(FILE *input, Search *update, Result *foundRegisters, Inde
             }
 
             // write the register in input file and updates header
+            fseek(input, getNexByteOffset(h), SEEK_SET);
             int newByteOff = writeRegister(input, reg) + bytesFixedMember;
             addByteOffset(h, newByteOff);
         }
