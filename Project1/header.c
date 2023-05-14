@@ -82,14 +82,12 @@ void updateHeader(FILE *output, Header *h) {
 
 void addByteOffset(Header *h, int n) {
     h->nextByteOffset += n;
-    // printf("novo prox byre off %lld", h->nextByteOffset);
 }
 
 /*
-* ARRUMAR ESSA FUNCAO !!! 
 * Function utilized to read the header struct from a given file and deal 
 * with exception cases
-* It returns 1 if everything is fine and 0 if there is a problem
+* It returns the header read
 */
 Header *readHeaderBinary(FILE *input) {
     if (input == NULL) return 0;

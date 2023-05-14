@@ -52,6 +52,7 @@ char *readMember(FILE *input, char delimiter) {
     else    // returns the member 
         return str;
 }
+
 /*
 * Function employed to complete strings, that have fixed lenght, with '$'
 * It returns a pointer to the new string
@@ -106,6 +107,9 @@ void readCsvHeader(FILE *input) {
     }
 }
 
+/*
+* Function used to get a string lenght, deals with NULL case
+*/
 int stringLenght(char *str) {
     if (str == NULL) return 0;
 
@@ -118,15 +122,21 @@ int stringLenght(char *str) {
     return count;
 }
 
+/*
+* Function used to copy a string into a new string with maxLen lenght
+* This is used to truncate data, completing empty spaces with trash ($)
+*/
 char *superStringCopy(char *origin, int maxLen) {
     int i = 0;
     char *copy = (char *)malloc(sizeof(char) * maxLen);
     
+    // copies string
     while (origin[i] != '\0' && i < maxLen) {
         copy[i] = origin[i];
         i++;
     }
 
+    // completes empty spaces with $
     for (; i < maxLen; i++) {
         copy[i] = '$';
     }
@@ -134,24 +144,12 @@ char *superStringCopy(char *origin, int maxLen) {
     return copy;
 }
 
+/*
+* This function is used to append byteOffset into a byteOffset array with lenght len
+*/
 long long int *byteOffsetArrAppend(long long int *arr, int len, long long int byteOffset) {
     arr = (long long int *)realloc(arr, sizeof(long long int) * len);
     arr[len-1] = byteOffset;
 
-    // printf("append com mbyteoff %lld\n", byteOffset);
-
-    // printf("len vale %d\n", *len);
     return arr;
-}
-
-void sortIntArr(int *arr, int len) {
-    for (int i = 0; i < len; i++) {
-        for (int j = 0; j < len-i-1; j++) {
-            if (arr[j] <= arr[j+1]) {
-                int aux = arr[j];
-                arr[j] = arr[j+1];
-                arr[j+1] = aux;
-            }         
-        }
-    }
 }

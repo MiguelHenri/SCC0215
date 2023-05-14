@@ -67,7 +67,11 @@ void selectFrom(FILE *from) {
     }
 }
 
-// funcionalidade 3
+/*
+* This function receives a .bin file input with registers
+* It indexes the registers according to the index member name (ex: idCrime)
+* and creates and writes an index file named 'nameIndexFile'
+*/
 void createIndexFile(FILE *input, char *memberName, char *indexType, char *nameIndexFile) {
     FILE *index = fopen(nameIndexFile, "wb");
     if (index == NULL) {
@@ -78,14 +82,17 @@ void createIndexFile(FILE *input, char *memberName, char *indexType, char *nameI
     IndexHeader *h = createIndexHeader();
     IndexData *arr = createIndexArr(input, h, indexType, memberName);
 
+    // writes index file after sorting index arr data
     writeFileIndex(index, arr, h, memberName);
     fclose(index);
-
-    binarioNaTela(nameIndexFile);
-    
 }
 
-// funcionaliade 4
+/*
+* This function receives a .bin file input with registers
+* and a .bin index file named 'nameIndexFile', indexed by 'memberName'
+* It searches numberSearches registers and prints its data
+* It priorizes searching by index (if possible)
+*/
 void searchInBinaryFile(FILE *input, char *memberName, char *indexType, char *nameIndexFile, int numberSearches) {
     Header *h = readHeaderBinary(input);
     if (!h) return;
@@ -101,9 +108,7 @@ void searchInBinaryFile(FILE *input, char *memberName, char *indexType, char *na
 
     // reading index file data
     IndexData *indexDataArr = readFileIndex(indexFile, memberName, indexHeader);
-    // printIndex(indexDataArr, indexHeader);
     fclose(indexFile);
-    //printf("consegui criar arr de indice\n");
 
     for (int i = 0; i < numberSearches; i++) {
         int pairs;
@@ -122,14 +127,17 @@ void searchInBinaryFile(FILE *input, char *memberName, char *indexType, char *na
                 printData(d);
             }
         }
-        // printf("\n\n");
         //returning file pointer to the beggining
         fseek(input, 0, SEEK_SET);
     }
 
 }
 
-// funcionalidade 5
+/*
+* This function receives a .bin file input with registers
+* and a .bin index file named 'nameIndexFile', indexed by 'memberName'
+* It searches numberDeletions registers, and delete they in both files if found
+*/
 void deleteRegister(FILE *input, char *memberName, char *indexType, char *nameIndexFile, int numberDeletions) {
     // reading data header
     Header *h = readHeaderBinary(input);
@@ -137,24 +145,21 @@ void deleteRegister(FILE *input, char *memberName, char *indexType, char *nameIn
 
     FILE *indexFile = fopen(nameIndexFile, "rb");
 
-    // reading header data
-    // verificar no futuro o status e atribuir erro ou nao
+    // reading header data, verifies file consistency
     IndexHeader *indexHeader = createIndexHeader();
 
     readIndexHeader(indexFile, indexHeader);
 
     // reading index file data
     IndexData *indexDataArr = readFileIndex(indexFile, memberName, indexHeader);
-    // printIndex(indexDataArr, indexHeader);
     fclose(indexFile);
 
     for(int i=0; i<numberDeletions; i++) {
-        // printf("delecao de numero: %d\n", i+1);
+        // reading data to be deleted
         int pairs;
         Search *s = createSearchArr(input, &pairs);
-        // finding registers to be deleted and its offset
 
-        //fprintf(stderr, "crirei vetor de seacr\n");
+        // finding registers to be deleted and its offset
         Result *res = superSearch(input, memberName, indexDataArr, indexHeader, s, pairs, h);
 
         // deleting registers found
@@ -166,25 +171,26 @@ void deleteRegister(FILE *input, char *memberName, char *indexType, char *nameIn
     writeFileIndex(indexFile, indexDataArr, indexHeader, memberName);
     fclose(indexFile);
 
-    // printf("tem %d no indice\n", getIndexArrLen(indexHeader));
     // updating header in data file
     fseek(input, 0, SEEK_SET);
     writeHeader(input, h);
     
 }
 
-// funcionalidade 6
+/*
+* This function receives a .bin file input with registers
+* and a .bin index file named 'nameIndexFile', indexed by 'memberName'
+* It inserts numberInsert registers, to both files
+*/
 void insertRegister(FILE *input, char *memberName, char *indexType, char *nameIndexFile, int numberInsert) {
     
     // opening index file .bin
     FILE *indexFile = fopen(nameIndexFile, "rb+");
 
-    // reading header data
-    // verificar no futuro o status e atribuir erro ou nao
+    // reading header data, also verifies file consistency
     IndexHeader *indexHeader = createIndexHeader();
 
     readIndexHeader(indexFile, indexHeader);
-    // printIndexHeader(indexHeader);
 
     // reading index file data
     IndexData *indexDataArr = readFileIndex(indexFile, memberName, indexHeader);
@@ -194,7 +200,6 @@ void insertRegister(FILE *input, char *memberName, char *indexType, char *nameIn
     updateHeader(input, h);
     for (int i = 0; i < numberInsert; i++) {
         Data *reg = readRegisterStdin2();
-        //printData(reg);
         
         long long int currentByteOff = insertRegisterInBinFile(input, reg, h);
         if (isIntegerMember(memberName)) {
@@ -206,15 +211,20 @@ void insertRegister(FILE *input, char *memberName, char *indexType, char *nameIn
         }
     }
 
+    // updating data file header
     updateHeader(input, h);
+
+    // updating index file 
     indexFile = fopen(nameIndexFile, "wb");
     writeFileIndex(indexFile, indexDataArr, indexHeader, memberName);
-    // printIndexHeader(indexHeader);
-    // printIndex(indexDataArr, indexHeader);
     fclose(indexFile);
 }
 
-//funcionalidade 7
+/*
+* This function receives a .bin file input with registers
+* and a .bin index file named 'nameIndexFile', indexed by 'memberName'
+* It searches numUpdates registers, and update them if found
+*/
 void updateRegister(FILE *input, char *memberName, char *indexType, char *nameIndexFile, int numUpdates) {
     // reading data header
     Header *h = readHeaderBinary(input);
@@ -222,24 +232,18 @@ void updateRegister(FILE *input, char *memberName, char *indexType, char *nameIn
 
     FILE *indexFile = fopen(nameIndexFile, "rb+");
 
-    // reading header data
-    // verificar no futuro o status e atribuir erro ou nao
+    // reading header data, also verifies file consistency
     IndexHeader *indexHeader = createIndexHeader();
     readIndexHeader(indexFile, indexHeader);
 
     // reading index file data
     IndexData *indexDataArr = readFileIndex(indexFile, memberName, indexHeader);
     fclose(indexFile);
-    //printf("criei arr indice\n");
-
 
     for (int i = 0; i < numUpdates; i++) {
         int pairsSearch;
         // reading input with data to be searched
-        Search *s = createSearchArr(input, &pairsSearch);
-        //printSearchArray(s);
-        //printf("pairs search %d\n", pairsSearch);
-        
+        Search *s = createSearchArr(input, &pairsSearch);    
 
         // finding registers to be updated and its offset
         Result *res = superSearch(input, memberName, indexDataArr, indexHeader, s, pairsSearch, h);
@@ -247,8 +251,6 @@ void updateRegister(FILE *input, char *memberName, char *indexType, char *nameIn
         // reading update values
         int pairsUpdate;
         Search *update = createSearchArr(stdin, &pairsUpdate);
-        //printf("pairs update %d\n", pairsUpdate);
-        //printSearchArray(update);
         
         indexDataArr = superUpdate(input, update, res, indexDataArr, indexHeader, h, memberName);
     }

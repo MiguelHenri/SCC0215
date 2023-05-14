@@ -5,14 +5,6 @@
 
 /*
     [ TO-DO ]
-    fazer uma função que compara string em geral (ex: data)
-    modularizar
-
-    fazer a funcao de inserir no vetor de byteoffset
-
-    quando vou criar o arq index, ao ler, escrever cabecelho com status inconsistente e dps escreveer consistente ?
-
-    testar para pairs
 */
 
 struct data {
@@ -353,6 +345,7 @@ char *getDataCrimeDescription(Data *d) {
     return d->crimeDescription;
 }
 
+
 int regMissingData(Data *d) {
     return d == NULL || d->crimeDate[0] == '\0';
 }
@@ -514,7 +507,11 @@ char *selectStrMember(char *memberName, Data *reg) {
     }
 }
 
-// return the difference beetween the old and new size
+/*
+* Function that returns the difference between the actual member size
+* and the new member size
+* memberName contains the memberType to compare (ex: idCrime)
+*/
 int sizeTest(Data *reg, char *memberName, char *newStr, int newInt) {
     if (newStr == 0) return 0;
 
@@ -532,19 +529,24 @@ int sizeTest(Data *reg, char *memberName, char *newStr, int newInt) {
     return 0;
 }
 
-//return the difference beetween the old - new size
+/*
+* Function that updates a register member 
+* memberName contains the member type to be updated (ex: idCrime)
+* newStr or newInt contains the new data
+*/
 void updateReg(Data *reg, char *memberName, char *newStr, int newInt) {
 
+    // finding member type to be updated
     if (isIntegerMember(memberName)) {
         if (strncmp("idCrime", memberName, 7) == 0) {
             reg->crimeID = newInt;
         }   
-        else { // memberName == articleNumber
+        else { // memberName == numeroArtigo
             reg->articleNumber = newInt;
         }
     }
     else {
-        if (strncmp(newStr, "NULO", 4) == 0)
+        if (strncmp(newStr, "NULO", 4) == 0) // if NULO writes null
             newStr = NULL;
 
         if(strncmp(memberName, "dataCrime", 9) == 0) {
@@ -566,16 +568,25 @@ int registerSize(Data *reg) {
     return bytesFixedMember + stringLenght(reg->crimeDescription) + stringLenght(reg->crimePlace) + 2;
 }
 
+/*
+* Function that writes a updated register into the data file (input)
+* It compares the register new and old size, and writes trash ($) if needed
+*/
 void writeUpdatedRegister(FILE *input, Data *reg, long long int byteoff, int oldSize) {
+    // fseeking to the position to be updated (byteOff)
     fseek(input, byteoff, SEEK_SET);
+
+    // writing the register updated and getting its size
     int newSize = writeRegister(input, reg) + bytesFixedMember;
 
-    fseek(input, -1, SEEK_CUR); // goes before # written
-
+    // trash will be written if oldSize is bigger than newSize
     int trashPositions = oldSize - newSize;
-    //printf("old size: %d\nnew size: %d\n", oldSize, newSize);
-    //printf("trash positions: %d\n", trashPositions);
     char trash = '$';
+
+    if(trashPositions > 0) // if trash needs to be written
+        fseek(input, -1, SEEK_CUR); // goes before # wrote by writeRegister
+
+    // writes trash if needed
     for(int i=0; i<trashPositions; i++) {
         fwrite(&trash, sizeof(char), 1, input);
     }
