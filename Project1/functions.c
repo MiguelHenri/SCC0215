@@ -79,11 +79,11 @@ void createIndexFile(FILE *input, char *memberName, char *indexType, char *nameI
         return;
     }
 
-    IndexHeader *h = createIndexHeader();
-    IndexData *arr = createIndexArr(input, h, indexType, memberName);
+    IndexHeader *idxHeader = createIndexHeader();
+    IndexData *arr = createIndexArr(input, idxHeader, memberName);
 
     // writes index file after sorting index arr data
-    writeFileIndex(index, arr, h, memberName);
+    writeFileIndex(index, arr, idxHeader, memberName);
     fclose(index);
 }
 
@@ -94,13 +94,12 @@ void createIndexFile(FILE *input, char *memberName, char *indexType, char *nameI
 * It priorizes searching by index (if possible)
 */
 void searchInBinaryFile(FILE *input, char *memberName, char *indexType, char *nameIndexFile, int numberSearches) {
-    Header *h = readHeaderBinary(input);
-    if (!h) return;
+    Header *dataHeader = readHeaderBinary(input);
+    if (!dataHeader) return;
 
     FILE *indexFile = fopen(nameIndexFile, "rb");
 
     // reading header data
-    // verificar no futuro o status e atribuir erro ou nao
     IndexHeader *indexHeader = createIndexHeader();
     int intAux; char charAux;
 
@@ -111,9 +110,8 @@ void searchInBinaryFile(FILE *input, char *memberName, char *indexType, char *na
     fclose(indexFile);
 
     for (int i = 0; i < numberSearches; i++) {
-        int pairs;
-        Search *s = createSearchArr(input, &pairs);
-        Result *res = superSearch(input, memberName, indexDataArr, indexHeader, s, pairs, h);
+        Search *search = createSearchArr(input);
+        Result *res = superSearch(input, memberName, indexDataArr, indexHeader, search, dataHeader);
         
         printf("Resposta para a busca %d\n", i+1);
         
@@ -140,8 +138,8 @@ void searchInBinaryFile(FILE *input, char *memberName, char *indexType, char *na
 */
 void deleteRegister(FILE *input, char *memberName, char *indexType, char *nameIndexFile, int numberDeletions) {
     // reading data header
-    Header *h = readHeaderBinary(input);
-    if (!h) return;
+    Header *dataHeader = readHeaderBinary(input);
+    if (!dataHeader) return;
 
     FILE *indexFile = fopen(nameIndexFile, "rb");
 
@@ -154,16 +152,15 @@ void deleteRegister(FILE *input, char *memberName, char *indexType, char *nameIn
     IndexData *indexDataArr = readFileIndex(indexFile, memberName, indexHeader);
     fclose(indexFile);
 
-    for(int i=0; i<numberDeletions; i++) {
+    for(int i = 0; i < numberDeletions; i++) {
         // reading data to be deleted
-        int pairs;
-        Search *s = createSearchArr(input, &pairs);
+        Search *search = createSearchArr(input);
 
         // finding registers to be deleted and its offset
-        Result *res = superSearch(input, memberName, indexDataArr, indexHeader, s, pairs, h);
+        Result *res = superSearch(input, memberName, indexDataArr, indexHeader, search, dataHeader);
 
         // deleting registers found
-        indexDataArr = superDelete(input, res, indexDataArr, indexHeader, h);
+        indexDataArr = superDelete(input, res, indexDataArr, indexHeader, dataHeader);
     }
 
     // updating index file
@@ -173,7 +170,7 @@ void deleteRegister(FILE *input, char *memberName, char *indexType, char *nameIn
 
     // updating header in data file
     fseek(input, 0, SEEK_SET);
-    writeHeader(input, h);
+    writeHeader(input, dataHeader);
     
 }
 
@@ -196,14 +193,13 @@ void insertRegister(FILE *input, char *memberName, char *indexType, char *nameIn
     IndexData *indexDataArr = readFileIndex(indexFile, memberName, indexHeader);
     fclose(indexFile);
 
-    Header *h = readHeaderBinary(input);
-    updateHeader(input, h);
+    Header *dataHeader = readHeaderBinary(input);
+    updateHeader(input, dataHeader);
     for (int i = 0; i < numberInsert; i++) {
         Data *reg = readRegisterStdin2();
         
-        long long int currentByteOff = insertRegisterInBinFile(input, reg, h);
+        long long int currentByteOff = insertRegisterInBinFile(input, reg, dataHeader);
         if (isIntegerMember(memberName)) {
-
             indexDataArr = appendIndexArray(indexDataArr, indexHeader, memberName, selectIntegerMember(memberName, reg), NULL, currentByteOff);
         }
         else {
@@ -212,7 +208,7 @@ void insertRegister(FILE *input, char *memberName, char *indexType, char *nameIn
     }
 
     // updating data file header
-    updateHeader(input, h);
+    updateHeader(input, dataHeader);
 
     // updating index file 
     indexFile = fopen(nameIndexFile, "wb");
@@ -227,8 +223,8 @@ void insertRegister(FILE *input, char *memberName, char *indexType, char *nameIn
 */
 void updateRegister(FILE *input, char *memberName, char *indexType, char *nameIndexFile, int numUpdates) {
     // reading data header
-    Header *h = readHeaderBinary(input);
-    if (!h) return;
+    Header *dataHeader = readHeaderBinary(input);
+    if (!dataHeader) return;
 
     FILE *indexFile = fopen(nameIndexFile, "rb+");
 
@@ -241,25 +237,24 @@ void updateRegister(FILE *input, char *memberName, char *indexType, char *nameIn
     fclose(indexFile);
 
     for (int i = 0; i < numUpdates; i++) {
-        int pairsSearch;
         // reading input with data to be searched
-        Search *s = createSearchArr(input, &pairsSearch);    
+        Search *search = createSearchArr(input);    
 
         // finding registers to be updated and its offset
-        Result *res = superSearch(input, memberName, indexDataArr, indexHeader, s, pairsSearch, h);
+        Result *res = superSearch(input, memberName, indexDataArr, indexHeader, search, dataHeader);
         
         // reading update values
-        int pairsUpdate;
-        Search *update = createSearchArr(stdin, &pairsUpdate);
+        Search *update = createSearchArr(stdin);
         
-        indexDataArr = superUpdate(input, update, res, indexDataArr, indexHeader, h, memberName);
+        indexDataArr = superUpdate(input, update, res, indexDataArr, indexHeader, dataHeader, memberName);
     }
 
     // updating index file
     indexFile = fopen(nameIndexFile, "wb");
     writeFileIndex(indexFile, indexDataArr, indexHeader, memberName);
     fclose(indexFile);
+
     // updating header in data file
     fseek(input, 0, SEEK_SET);
-    writeHeader(input, h);
+    writeHeader(input, dataHeader);
 }

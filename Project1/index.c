@@ -66,30 +66,15 @@ void readIndexHeader(FILE *indexFile, IndexHeader *indexHeader) {
     setIndexHeaderNumReg(indexHeader, intAux);
 }
 
-IndexData *indexArrayAppend(IndexData *arr, int *len, int intKey, char *strKey, long long int byteoffset) {
-    //dont append because this register have null values
-    if (intKey == -1 && strKey == NULL) 
-        return arr;
-        
-    arr = (IndexData *)realloc(arr, sizeof(IndexData) * (++(*len)));
-
-    if (strKey != NULL) { //appending a string in the index array
-        arr[*len - 1].searchKeyStr = strKey;
-    }
-    else { //appendig an int in the index array
-        arr[*len - 1].searchKeyInt = intKey;
-    }
-
-    arr[*len - 1].byteOffset = byteoffset;
-
-    return arr;
-}
-
 void printIndexHeader(IndexHeader *h) {
     printf("tem %d registros no indice\n", h->numberOfRegisters);
 }
 
-
+/*
+* Function that appends a key and its byteoffset in the index data array,
+* the value in the index header is also updated
+* It returns the adress of the new array realloced
+*/
 IndexData *appendIndexArray(IndexData *arr, IndexHeader *h, char *memberName, int intKey, char *strKey, long long int byteOff)  {
     //dont append because this register have null values
     if (intKey == -1 && strKey == NULL) 
@@ -129,7 +114,7 @@ IndexData *appendIndexArray(IndexData *arr, IndexHeader *h, char *memberName, in
 /*
 * Functions that creates and indexData array with data from the file 'input'
 */
-IndexData *createIndexArr(FILE *input, IndexHeader *h, char *indexType, char *memberName) {
+IndexData *createIndexArr(FILE *input, IndexHeader *h, char *memberName) {
     Header *headerFile = readHeaderBinary(input);
     if (!verifyFileIntegrity(headerFile)) { //verifying if the file is usable
         FILE_ERROR;
@@ -159,14 +144,13 @@ IndexData *createIndexArr(FILE *input, IndexHeader *h, char *indexType, char *me
             if(strncmp(memberName, "idCrime", 7) == 0) {
                 // if not null, we add it to our array
                 if (getDataCrimeId(reg) != -1) { 
-                    //arr = appendIndexArray(arr, h, memberName, getDataCrimeId(reg), NULL, currentOffset);
-                    arr = indexArrayAppend(arr, &lenArrIndex, getDataCrimeId(reg), NULL, currentOffset);
+                    arr = appendIndexArray(arr, h, memberName, getDataCrimeId(reg), NULL, currentOffset);
                 }
             }
             else if(strncmp(memberName, "numeroArtigo", 12) == 0) {
                 // if not null, we add it to our array
                 if (getDataArticleNumber(reg) != -1) { 
-                    arr = indexArrayAppend(arr, &lenArrIndex, getDataArticleNumber(reg), NULL, currentOffset);
+                    arr = appendIndexArray(arr, h, memberName, getDataArticleNumber(reg), NULL, currentOffset);
                 }
             }
         }
@@ -174,32 +158,30 @@ IndexData *createIndexArr(FILE *input, IndexHeader *h, char *indexType, char *me
             if (strncmp(memberName, "lugarCrime", 10) == 0) {
                 // if not null, we add it to our array
                 if (!regMissingData(reg) && getDataCrimePlace(reg) != NULL) { 
-                    arr = indexArrayAppend(arr, &lenArrIndex, -1, superStringCopy(getDataCrimePlace(reg), maxLenStr), currentOffset);
+                    arr = appendIndexArray(arr, h, memberName, -1, superStringCopy(getDataCrimePlace(reg), maxLenStr), currentOffset);  
                 }
             }
             else if (strncmp(memberName, "descricaoCrime", 14) == 0) {
                 // if not null, we add it to our array
                 if (!regMissingData(reg) && getDataCrimeDescription(reg) != NULL) {     
-                    arr = indexArrayAppend(arr, &lenArrIndex, -1, superStringCopy(getDataCrimeDescription(reg), maxLenStr), currentOffset);
+                    arr = appendIndexArray(arr, h, memberName, -1, superStringCopy(getDataCrimeDescription(reg), maxLenStr), currentOffset);
                 }
             }
             else if (strncmp(memberName, "marcaCelular", 12) == 0) {
                 // if not null, we add it to our array
                 if (!regMissingData(reg) && getDataTelephoneBrand(reg) != NULL) { 
-                    arr = indexArrayAppend(arr, &lenArrIndex, -1, superStringCopy(getDataTelephoneBrand(reg), maxLenStr), currentOffset);
+                    arr = appendIndexArray(arr, h, memberName, -1, superStringCopy(getDataTelephoneBrand(reg), maxLenStr), currentOffset);
                 }
             }
             else if (strncmp(memberName, "dataCrime", 9) == 0) {
                 // if not null, we add it to our array
                 if (!regMissingData(reg) && getDataCrimeDate(reg) != NULL) { 
-                    arr = indexArrayAppend(arr, &lenArrIndex, -1, superStringCopy(getDataCrimeDate(reg), maxLenStr), currentOffset);
+                    arr = appendIndexArray(arr, h, memberName, -1, superStringCopy(getDataCrimeDate(reg), maxLenStr), currentOffset);
                 }
             }
         }
     }
 
-    // updating the header value
-    h->numberOfRegisters = lenArrIndex;
     return arr;
 }
 
@@ -362,8 +344,9 @@ int *posArrAppend(int *arr, int len, int pos) {
 /*
 * Auxiliary function that finds all int keys in the binary search called
 * in searchIndexArr 
+* It returns the new lenght of the array 
 */
-void findAllIntKeys(IndexData *arr, Result *r, Search *wanted, int posWanted, int currentIdx, int lenArrByteOff) {
+int findAllIntKeys(IndexData *arr, Result *r, Search *wanted, int posWanted, int currentIdx, int lenArrByteOff) {
     int verifyPrevious = currentIdx;
     while (verifyPrevious >= 0 && arr[verifyPrevious].searchKeyInt == wanted[posWanted].intMember)
         verifyPrevious -= 1;
@@ -375,6 +358,25 @@ void findAllIntKeys(IndexData *arr, Result *r, Search *wanted, int posWanted, in
 
         currentIdx++;
     }
+
+    return lenArrByteOff;
+}
+
+int findAllStrKeys(IndexData *arr, Result *r, Search *wanted, int posWanted, int currentIdx, int lenArrByteOff) {
+    int verifyPrevious = currentIdx;
+    while (verifyPrevious >= 0 && 
+           strncmp(arr[verifyPrevious].searchKeyStr, superStringCopy(wanted[posWanted].strMember, maxLenStr), maxLenStr) == 0)
+        verifyPrevious -= 1;
+
+    currentIdx = verifyPrevious + 1;
+    while (strncmp(arr[currentIdx].searchKeyStr, superStringCopy(wanted[posWanted].strMember, maxLenStr), maxLenStr) == 0) {
+        r->arrByteOff = byteOffsetArrAppend(r->arrByteOff, ++lenArrByteOff, arr[currentIdx].byteOffset);
+        r->arrPos = posArrAppend(r->arrPos, lenArrByteOff, currentIdx);
+
+        currentIdx++;
+    }
+
+    return lenArrByteOff;
 }
 
 Result *searchInIndexArr(IndexData *arr, IndexHeader *h, Search *wanted, int iteration, char *memberName) {
@@ -391,47 +393,36 @@ Result *searchInIndexArr(IndexData *arr, IndexHeader *h, Search *wanted, int ite
         int mid = (begin + end) / 2;
 
         if (isIntegerMember(memberName)) { // looking for an int in index array
-            if (arr[mid].searchKeyInt == wanted[iteration].intMember) { // found
-                int verifyPrevious = mid;
-                while (verifyPrevious >= 0 && arr[verifyPrevious].searchKeyInt == wanted[iteration].intMember)
-                    verifyPrevious -= 1;
-
-                mid = verifyPrevious + 1;
-                while (arr[mid].searchKeyInt == wanted[iteration].intMember) {
-                    r->arrByteOff = byteOffsetArrAppend(r->arrByteOff, ++lenArrByteOff, arr[mid].byteOffset);
-                    r->arrPos = posArrAppend(r->arrPos, lenArrByteOff, mid);
-                    mid++;
-                }
-                //findAllIntKeys(arr, r, wanted, iteration, mid);
             
+            // found
+            if (arr[mid].searchKeyInt == wanted[iteration].intMember) { 
+                lenArrByteOff = findAllIntKeys(arr, r, wanted, iteration, mid, lenArrByteOff);
                 break;
             }
-            else { // keep searching
-                if (arr[mid].searchKeyInt > wanted[iteration].intMember) end = mid-1;
-                else begin = mid+1;
+            // searching in the beggining of the subdivided array
+            else if (arr[mid].searchKeyInt > wanted[iteration].intMember) {
+                end = mid-1;
+            }
+            // searching in the ending of the subdivided array
+            else {
+                begin = mid+1;
             }
         }
         else { //looking for a string in index array
             int cmpResult = strncmp(arr[mid].searchKeyStr, superStringCopy(wanted[iteration].strMember, maxLenStr), maxLenStr);
-            if (cmpResult == 0) { // found
-
-                int verifyPrevious = mid;
-                while (verifyPrevious >= 0 && strncmp(arr[verifyPrevious].searchKeyStr, superStringCopy(wanted[iteration].strMember, maxLenStr), maxLenStr) == 0) {
-                    verifyPrevious--;
-                }
-
-                mid = verifyPrevious + 1;
-                while (strncmp(arr[mid].searchKeyStr, superStringCopy(wanted[iteration].strMember, maxLenStr), maxLenStr) == 0) {
-                    r->arrByteOff = byteOffsetArrAppend(r->arrByteOff, ++lenArrByteOff, arr[mid].byteOffset);
-                    r->arrPos = posArrAppend(r->arrPos, lenArrByteOff, mid);
-                    mid++;
-                }
-
+            
+            // found the key we want
+            if (cmpResult == 0) { 
+                lenArrByteOff = findAllStrKeys(arr, r, wanted, iteration, mid, lenArrByteOff);
                 break;
             }
+            // searching in the beggining of the subdivided array
+            else if (cmpResult > 0) {
+                end = mid-1;
+            }
+            // searching in the ending of the subdivided array
             else {
-                if (cmpResult > 0) end = mid-1;
-                else begin = mid+1;
+                begin = mid+1;
             }
         }
     }
@@ -445,11 +436,12 @@ Result *searchInIndexArr(IndexData *arr, IndexHeader *h, Search *wanted, int ite
 * Function created to verify if a register found in the binary search fufills
 * all the requirements asked by the user
 */
-Result *verifyingRegRequirements(FILE *input, Result *resArr, Search *wanted, int numRequirements) {
+Result *verifyingRegRequirements(FILE *input, Result *resArr, Search *wanted) {
     int newLenArr = 0;
     int lenAux = resArr->length;
     long long int *newArrByteOff = NULL;
     int *newArrPos = NULL;
+    int numRequirements = wanted->len;
 
     for (int i = 0; i < lenAux; i++) {
         // variable created to count the requirements a register fuffils
@@ -503,7 +495,7 @@ int isMemberInIndex(Search *wanted, int iteration, char *memberNameIndex) {
 * from a register and its key
 * It returns the adress of the array created
 */
-Search *createSearchArr(FILE *input, int*pairs) {
+Search *createSearchArr(FILE *input) {
     int arrLen;
     fscanf(stdin, "%d", &arrLen); //the number of searches/size of search array
 
@@ -530,7 +522,6 @@ Search *createSearchArr(FILE *input, int*pairs) {
     }
 
     // setting the len in the struct
-    *pairs = arrLen;
     tmp->len = arrLen;
     return tmp;
 }
@@ -540,10 +531,11 @@ Search *createSearchArr(FILE *input, int*pairs) {
 * It returns a result struct that contains an array of byteoffset
 * and an array of pos in the index file
 */
-Result *sequentialSearch(FILE *input, Search *wanted, Header *h, int numberPairs) {
+Result *sequentialSearch(FILE *input, Search *wanted, Header *h) {
     // starting the byteoffset from the final of the first register
     long long int byteOffset = bytesHeader;
     int lenArrByteOffset = 0;
+    int numRequirements = wanted->len;
     
     Result *r = (Result *)malloc(sizeof(Result));
     r->arrByteOff = NULL;
@@ -559,7 +551,7 @@ Result *sequentialSearch(FILE *input, Search *wanted, Header *h, int numberPairs
         int requirements = 0;
         int bytesCurrentReg = bytesFixedMember;
 
-        for (int i = 0; i < numberPairs; i++) {
+        for (int i = 0; i < numRequirements; i++) {
 
             // comparing 
             if (isIntegerMember(wanted[i].memberName)) {
@@ -574,7 +566,7 @@ Result *sequentialSearch(FILE *input, Search *wanted, Header *h, int numberPairs
         bytesCurrentReg += (stringLenght(getDataCrimePlace(aux)) + stringLenght(getDataCrimeDescription(aux)) + 2);
         
         // found compatible register
-        if (requirements == numberPairs && getDataRemoved(aux) == '0') { 
+        if (requirements == numRequirements && getDataRemoved(aux) == '0') { 
             lenArrByteOffset++;
             r->arrByteOff = (long long int *)realloc(r->arrByteOff, sizeof(long long int) * lenArrByteOffset);
 
@@ -635,30 +627,33 @@ void printIndex(IndexData *arr, IndexHeader *h) {
 * Function that searches the register wanted, we search in the index array if the key
 * we want its in the search array, otherwise we search sequentially
 */
-Result *superSearch(FILE *input, char *memberName, IndexData *arrIndex, IndexHeader *header, Search *s, int pairs, Header *headerBin) {
-
-    //check if will be search by index or linear search
+Result *superSearch(FILE *input, char *memberName, IndexData *arrIndex, IndexHeader *header, Search *s, Header *headerBin) {
     Result *indexSearchResult = NULL;
 
-    int i;
-    for (i = 0; i < pairs; i++) {
-        if (isMemberInIndex(s, i, memberName))
+    //check if will be search by index or linear search
+    int verifyWhichSearch = 0;
+    while (verifyWhichSearch < s->len) {
+        if (isMemberInIndex(s, verifyWhichSearch, memberName))
             break;
+
+        verifyWhichSearch++;
     }
 
-    if (i == pairs) { // no searching by index
+    // no searching by index because none of the members we want to search is indexed
+    // in the index file
+    if (verifyWhichSearch == s->len) { 
         // using sequential search
-        indexSearchResult = sequentialSearch(input, s, headerBin, pairs);
+        indexSearchResult = sequentialSearch(input, s, headerBin);
 
         // finding positions at index array by checking offsets found
         indexSearchResult->arrPos = createArrPos(indexSearchResult, arrIndex, header);
     }
     else {
         // binary searching in index array
-        indexSearchResult = searchInIndexArr(arrIndex, header, s, i, memberName);
+        indexSearchResult = searchInIndexArr(arrIndex, header, s, verifyWhichSearch, memberName);
 
         // checking registers found by index due to other search requirements
-        indexSearchResult = verifyingRegRequirements(input, indexSearchResult, s, pairs);
+        indexSearchResult = verifyingRegRequirements(input, indexSearchResult, s);
     }
     
     return indexSearchResult;
@@ -676,12 +671,16 @@ int getIndexArrLen(IndexHeader *h) {
     return h->numberOfRegisters;
 }
 
+/*
+* Funtions that removes a key in the index array 
+*/
 IndexData *remIndexDataArr(IndexData *indexDataArr, int len, int pos) {
-    
+    // throwing the key in 'pos' to the end of the array
     for (int i = pos; i < len; i++) {
         swap(indexDataArr, i, i+1);
     }
 
+    // reallocing and removeing the key that was in pos
     indexDataArr = (IndexData *)realloc(indexDataArr, sizeof(IndexData) * len);
     return indexDataArr;
 }
@@ -879,4 +878,8 @@ IndexData *superUpdate(FILE *input, Search *update, Result *foundRegisters, Inde
     }
 
     return indexDataArr;
+}
+
+int getSearchLen(Search *s) {
+    return s->len;
 }
