@@ -194,7 +194,9 @@ void insertRegister(FILE *input, char *memberName, char *indexType, char *nameIn
     fclose(indexFile);
 
     Header *dataHeader = readHeaderBinary(input);
+    // switching the status to inconsistent
     updateHeader(input, dataHeader);
+
     for (int i = 0; i < numberInsert; i++) {
         Data *reg = readRegisterStdin2();
         
@@ -207,7 +209,7 @@ void insertRegister(FILE *input, char *memberName, char *indexType, char *nameIn
         }
     }
 
-    // updating data file header
+    // updating data file header to consistent again
     updateHeader(input, dataHeader);
 
     // updating index file 
@@ -224,7 +226,8 @@ void insertRegister(FILE *input, char *memberName, char *indexType, char *nameIn
 void updateRegister(FILE *input, char *memberName, char *indexType, char *nameIndexFile, int numUpdates) {
     // reading data header
     Header *dataHeader = readHeaderBinary(input);
-    if (!dataHeader) return;
+    // switching the status to inconsistent
+    updateHeader(input, dataHeader);
 
     FILE *indexFile = fopen(nameIndexFile, "rb+");
 
@@ -255,6 +258,5 @@ void updateRegister(FILE *input, char *memberName, char *indexType, char *nameIn
     fclose(indexFile);
 
     // updating header in data file
-    fseek(input, 0, SEEK_SET);
-    writeHeader(input, dataHeader);
+    updateHeader(input, dataHeader);
 }
