@@ -127,7 +127,7 @@ Result *verifyingRegRequirements(FILE *dataFile, Result *resArr, Search *wanted)
         // variable created to count the requirements a register fuffils
         int requirementsFufilled = 0;
         
-        // fseeking to the register found in index file
+        // fseeking to the register found in index tree file
         fseek(dataFile, resArr->arrByteOff[i], SEEK_SET);
         // reading the register
         Data *reg = readBinaryRegister(dataFile);
@@ -169,4 +169,46 @@ long long int *byteOffsetArrAppend(long long int *arr, int len, long long int by
     arr[len-1] = byteOffset;
 
     return arr;
+}
+
+
+void appendResult(Result *r, long long int byteOff) {
+    r->length++;
+    r->arrByteOff = byteOffsetArrAppend(r->arrByteOff, r->length, byteOff);
+}
+
+int getIntegerSearchValue(Search *s) {
+    return s == NULL ? -1 : s->intMember;
+}
+
+int isMemberInIndex(Search *wanted, int iteration, char *memberNameIndex) {
+    return (strcmp(wanted[iteration].memberName, memberNameIndex) == 0);
+}
+
+int searchingCrimeId (Search *wanted, int *key) {
+    //check if we are searching idCrime
+    int i = 0;
+    while (i < wanted->len) {
+        if (strncmp(wanted[i].memberName, "idCrime", 7) == 0) {
+            *key = wanted[i].intMember;
+            return 1;
+        }
+
+        i++;
+    }
+    return 0;
+}
+
+void printResultData(Result *res, FILE *dataFile) {   
+    // printing result data in search type format
+    if (res == NULL || res->length == 0) {
+        printf("Registro inexistente.\n");
+    }
+    else { //arrByteOffset != NULL
+        for (int j = 0; j < res->length; j++) {
+            fseek(dataFile, res->arrByteOff[j], SEEK_SET);
+            Data *d = readBinaryRegister(dataFile);
+            printData(d);
+        }
+    }
 }

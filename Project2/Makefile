@@ -1,4 +1,4 @@
-all: main.o functions.o header.o registers.o utils.o funcoesFornecidas.o tree.o
+all: main.o functions.o header.o registers.o utils.o funcoesFornecidas.o tree.o search.o
 	gcc -o programaTrab *.o -g
 
 run:
@@ -17,7 +17,7 @@ functions.o: functions.c functions.h
 header.o: header.c header.h 
 	gcc -c header.c -g
 
-registers.o: registers.c registers.h index.h
+registers.o: registers.c registers.h 
 	gcc -c registers.c -g
 
 utils.o: utils.c utils.h
@@ -28,3 +28,6 @@ funcoesFornecidas.o: funcoesFornecidas.c funcoesFornecidas.h
 
 tree.o: tree.c tree.h
 	gcc -c tree.c -g
+
+search.o: search.c search.h
+	gcc -c search.c -g

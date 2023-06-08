@@ -6,7 +6,6 @@
 #include "header.h"
 #include "utils.h"
 #include "funcoesFornecidas.h"
-#include "index.h"
 
 #define numMembers 6
 #define crimeDateLen 10
