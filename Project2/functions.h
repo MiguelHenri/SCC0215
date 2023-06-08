@@ -7,6 +7,7 @@
 #include "tree.h"
 #include "search.h"
 
-void searchInTree(FILE *dataFile, FILE *treeFile, char *dataMemberName, char *nameIndexFile, int numberSearches);
+void searchInTree(FILE *dataFile, FILE *treeFile, char *dataMemberName, int numberSearches);
+void insertIntoTree(FILE *dataFile, FILE *treeFile, char *memberName, int numInsertions);
 
 #endif

@@ -12,10 +12,12 @@ typedef struct node Node;
 typedef struct treeHeader TreeHeader;
 
 void initKey(Key *k);
-void initPointers(int p[]);
+void initPointers(int *p);
 TreeHeader *readTreeHeader(FILE *treeFile);
-Result *ultraTreeSearch(FILE *dataFile, FILE *treeFile, int key, TreeHeader *tHeader);
+Result *ultraTreeSearch(FILE *dataFile, FILE *treeFile, int key, TreeHeader *tHeader, int **arrayRRN);
 void printNode(Node *n);
 void printTreeHeader(TreeHeader *t);
 void printArvore(FILE *treeFile);
+void insertTree(FILE *dataFile, FILE *treeFile, int key, TreeHeader *tHeader);
+
 #endif

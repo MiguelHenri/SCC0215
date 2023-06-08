@@ -8,18 +8,19 @@
 #include "tree.h"
 
 int main() {
-    int operacao;
+    int operation;
     char fileNameInput[50];
     
-    scanf("%d %s", &operacao, fileNameInput);
+    scanf("%d %s", &operation, fileNameInput);
 
-    if (operacao == 9) {
+    FILE *dataFile = fopen(fileNameInput, "rb");
+    if (dataFile == NULL) {
+        FILE_ERROR;
+        return 0;
+    }
+
+    if (operation == 9) {
         // searching using tree B* data index
-        FILE *dataFile = fopen(fileNameInput, "rb");
-        if (dataFile == NULL) {
-            FILE_ERROR;
-            return 0;
-        }
 
         getc(stdin);
         char *memberName = readMember(stdin, ' ');
@@ -28,15 +29,33 @@ int main() {
         int numSearches;
         scanf(" %d", &numSearches);
 
+        // only reading to search
         FILE *treeFile = fopen(nameIndexFile, "rb");
 
-        // printf("abri todos os arq\n");
+        searchInTree(dataFile, treeFile, memberName, numSearches);
 
-        searchInTree(dataFile, treeFile, memberName, nameIndexFile, numSearches);
-
-        fclose(dataFile);
         fclose(treeFile);
     }
+    else if (operation == 10){
+        // inserting new data into index/data file
+
+        getc(stdin);
+        char *memberName = readMember(stdin, ' ');
+        char *indexType = readMember(stdin, ' ');
+        char *nameIndexFile = readMember(stdin, ' ');
+        int numInsertions;
+        scanf(" %d", &numInsertions);
+
+        // will need to read data to find where to put new register
+        // and will need to write new register
+        FILE *treeFile = fopen(nameIndexFile, "rb+");
+
+        insertIntoTree(dataFile, treeFile, memberName, numInsertions);
+
+        fclose(treeFile);
+    }
+
+    fclose(dataFile);
 
     return 0;
 }

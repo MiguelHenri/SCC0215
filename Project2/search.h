@@ -17,5 +17,6 @@ int getIntegerSearchValue(Search *s);
 void appendResult(Result *r, long long int byteOff);
 int searchingCrimeId (Search *wanted, int *key);
 void printResultData(Result *res, FILE *dataFile);
+long long int getByteoffset(Result *r, int idx);
 
 #endif

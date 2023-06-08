@@ -212,3 +212,7 @@ void printResultData(Result *res, FILE *dataFile) {
         }
     }
 }
+
+long long int getByteoffset(Result *r, int idx) {
+    return r->arrByteOff[idx];
+}

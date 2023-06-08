@@ -122,15 +122,6 @@ void setKey(Node *n, int value, long long int offset) {
     n->keys[index].value = value;
 }
 
-void insertKey(Node *node, int value, long long byteOffSet) {
-    // inserting key
-    setKey(node, value, byteOffSet);
-    // need to sort and evaluate tree pointers
-    // split etc
-    node->numKeys++;
-    sortNode(node);
-}
-
 TreeHeader *readTreeHeader(FILE *treeFile) {
     int intAux;
     char charAux;
@@ -228,7 +219,7 @@ int binarySearchInNode(Node *n, int key, int *found, int *RRN) {
     }
 }
 
-Result *ultraTreeSearch(FILE *dataFile, FILE *treeFile, int key, TreeHeader *tHeader) {
+Result *ultraTreeSearch(FILE *dataFile, FILE *treeFile, int key, TreeHeader *tHeader, int **arrayRRN) {
     Result *r = createResult();
     int currentLevel = 0;
 
@@ -237,8 +228,12 @@ Result *ultraTreeSearch(FILE *dataFile, FILE *treeFile, int key, TreeHeader *tHe
     
     // while not leaf node
     int index = 0;
+    int count = 0;
     int RRN = tHeader->root; // starting from root node
     while (currentLevel < tHeader->totalLevels) {
+
+        // saving RRN
+        (*arrayRRN)[count] = RRN;
 
         // reading node
         Node *n = readTreeNode(treeFile);
@@ -261,6 +256,9 @@ Result *ultraTreeSearch(FILE *dataFile, FILE *treeFile, int key, TreeHeader *tHe
             break;
         }
         fseek(treeFile, HEADERSIZE * (RRN+1), SEEK_SET);
+
+        // updating counter
+        count += 1;
     }
     
     return r;
@@ -275,4 +273,39 @@ void printArvore(FILE *treeFile) {
         printf("RRN = %d\n", i);
         printNode(n);
     }
+}
+
+void insertTree(FILE *dataFile, FILE *treeFile, int key, TreeHeader *tHeader) {
+    int numLevels = tHeader->totalLevels;
+    int numNodes = tHeader->nextRRN;
+    
+    int *arrayRRN = (int *)malloc(sizeof(int) * numLevels);
+    for (int i=0; i<numLevels; i++) arrayRRN[i] = -1;
+    Node **arrayNode = (Node **)malloc(sizeof(Node *) * numNodes);
+
+    Result *r = ultraTreeSearch(dataFile, treeFile, key, tHeader, &arrayRRN);
+
+    //for (int i=0; i<numLevels; i++) 
+    //    printf("RRN: %d\n", arrayRRN[i]);
+        
+    // if node[arrayrrn[ultima pos]].numchaves == 4 { fazer split ou redistribuicao}
+    if (arrayNode[arrayRRN[numLevels-1]]->numKeys < 4) {
+        //setKey(arrayNode[arrayRRN[numLevels-1]], key, getByteoffset(r, 0));
+    }
+    else { // implementar rotinas
+    
+    
+    }
+
+
+    // no a direita tem 1 chave a menos se n ficar igual    
+    // split 1 - 2 na raiz
+    // split 2 - 3 nos outros 
+
+    // redistribuicao primeiro com a pag da esq dps dir
+    // ver as condicionais de ocupacao
+    // split com a pag direita dps esquerda
+
+    // fazer vetorzao com ponteiros para todos os nos possiveis
+
 }
