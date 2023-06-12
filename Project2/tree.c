@@ -127,8 +127,12 @@ void setKey(Node *n, int value, long long int offset) {
     int index = n->numKeys;
     if (index >= TREE_ORDER-1) return;
     n->numKeys++;
-    n->keys[index].byteOffSet = offset;
-    n->keys[index].value = value;
+    for (int i = 0; i < TREE_ORDER-1; i++) {
+        if (n->keys[i].value == -1) {
+            n->keys[i].byteOffSet = offset;
+            n->keys[i].value = value;       
+        }
+    }
 
     sortNode(n);
 }
@@ -330,7 +334,7 @@ void redistribution(Node *left, Node *right, Redistribution *r) {
         r->pointers[i] = left->pointers[i];
         i++;
     }
-    r->pointers[i] = left->pointers[i]
+    r->pointers[i] = left->pointers[i];
 
     while (i < (right->numKeys +left->numKeys)) {
         r->keys[i] = right->keys[i-left->numKeys];
@@ -339,6 +343,24 @@ void redistribution(Node *left, Node *right, Redistribution *r) {
     }
     r->pointers[i+1] = right->pointers[i-left->numKeys];
 
+}
+
+void nodeShift(Node *n, int begin, int end) {
+    for (int i = begin; i < end; i++) {
+        // shifiting
+        n->keys[i+1].value = n->keys[i].value;
+        n->keys[i+1].byteOffSet = n->keys[i].byteOffSet;
+        n->pointers[i+1] = n->pointers[i];
+
+        // setting the previous position to null values
+        n->keys[i].value = -1;
+        n->keys[i].byteOffSet = -1;
+        n->pointers[i] = -1;
+    }
+}
+
+void setPointer(Node *n, int pointerValue, int pointerPos) {
+    n->pointers[pointerPos] = pointerValue;
 }
 
 void split1to2(Node **arrayNode, int pageSon, int pageFather, int pageRoot, Node *root, int key, Result *res) {
@@ -355,24 +377,65 @@ void split1to2(Node **arrayNode, int pageSon, int pageFather, int pageRoot, Node
         setKey(father, key, byteOffKey);
         father->pointers[0] = pageRoot;
         father->pointers[1] = pageSon;
-        
 
+        // nao sei para onde vai o ponteiro 
     }
     // the key is going to be on the new son
     else if (indexKey > TREE_ORDER/2) {
-        setKey(son, key, byteOffKey);
+        int lastPos = TREE_ORDER-2;
+        int mid = TREE_ORDER/2;
+
+        setKey(father, root->keys[mid].value, root->keys[mid].byteOffSet);
+
+        // verificando se o filho vai ficar na primeira posicao ou na segunda
+        if (key > root->keys[lastPos].value) { //segunda
+            setKey(son, root->keys[lastPos].value, root->keys[lastPos].byteOffSet);
+            setKey(son, key, byteOffKey);
+
+            // setting the new pointers on the brand new node that is not the new root
+            setPointer(son, root->pointers[lastPos], 0);
+            setPointer(son, root->pointers[lastPos+1], 1);
+
+            // setting the old pointers in the previous root node to null values
+            setPointer(root, -1, lastPos+1);
+            setPointer(root, -1, lastPos);
+        }
+        else {
+            setKey(son, key, byteOffKey);
+            setKey(son, root->keys[lastPos].value, root->keys[lastPos].byteOffSet);
+
+            setPointer(son, root->pointers[lastPos], 1);
+            setPointer(son, root->pointers[lastPos+1], 2);
+
+            setPointer(root, -1, lastPos+1);
+            setPointer(root, -1, lastPos);
+        }
+
+        father->pointers[0] = pageRoot;
+        father->pointers[1] = pageSon;
+
+        // removing from the old root node
+        for (int i = TREE_ORDER/2; i < TREE_ORDER-1; i++)
+            removeKeyFromNode(root, i);
     }
     // the key will be on root node
     else {
-        
+        setKey(father, root->keys[TREE_ORDER/2].value, root->keys[TREE_ORDER/2].byteOffSet);
 
-        for (int i = 2; i < TREE_ORDER-1; i++)
-            removeKeyFromNode(root, i);
-    
-        setKey(root, key, byteOffKey);
+        if (key > root->keys[0].value) {
+            removeKeyFromNode(root, 1);
+            removeKeyFromNode(root, 2);
+            removeKeyFromNode(root, 3);
+
+            setKey(root, key, byteOffKey);
+
+        }
+        else {
+        
+        }
+
     }
-    
-    
+       
 }
 
 // void split2to3()
