@@ -2,6 +2,7 @@
 #include "registers.h"
 
 struct result {
+    int index;
     long long int *arrByteOff;
     int length;
 };
@@ -112,6 +113,7 @@ Result *createResult() {
 
     r->arrByteOff = NULL;
     r->length = 0;
+    r->index = -1;
 
     return r;
 }
@@ -172,9 +174,10 @@ long long int *byteOffsetArrAppend(long long int *arr, int len, long long int by
 }
 
 
-void appendResult(Result *r, long long int byteOff) {
+void appendResult(Result *r, long long int byteOff, int index) {
     r->length++;
     r->arrByteOff = byteOffsetArrAppend(r->arrByteOff, r->length, byteOff);
+    r->index = index;
 }
 
 int getIntegerSearchValue(Search *s) {
@@ -187,10 +190,12 @@ int isMemberInIndex(Search *wanted, int iteration, char *memberNameIndex) {
 
 int searchingCrimeId (Search *wanted, int *key) {
     //check if we are searching idCrime
+    //printf("entrou\n");
     int i = 0;
     while (i < wanted->len) {
         if (strncmp(wanted[i].memberName, "idCrime", 7) == 0) {
             *key = wanted[i].intMember;
+            //printf("saiu\n");
             return 1;
         }
 
@@ -215,4 +220,12 @@ void printResultData(Result *res, FILE *dataFile) {
 
 long long int getByteoffset(Result *r, int idx) {
     return r->arrByteOff[idx];
+}
+
+int getIndex(Result *r) {
+    return r->index;
+}
+
+int setIndex(Result *r, int index) {
+    r->index = index;
 }

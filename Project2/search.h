@@ -14,9 +14,11 @@ Result *createResult();
 long long int *byteOffsetArrAppend(long long int *arr, int len, long long int byteOffset);
 Result *verifyingRegRequirements(FILE *dataFile, Result *resArr, Search *wanted);
 int getIntegerSearchValue(Search *s);
-void appendResult(Result *r, long long int byteOff);
+void appendResult(Result *r, long long int byteOff, int index);
 int searchingCrimeId (Search *wanted, int *key);
 void printResultData(Result *res, FILE *dataFile);
 long long int getByteoffset(Result *r, int idx);
+int getIndex(Result *r);
+int setIndex(Result *r, int index);
 
 #endif

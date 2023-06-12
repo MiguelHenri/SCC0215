@@ -14,7 +14,7 @@ void searchInTree(FILE *dataFile, FILE *treeFile, char *dataMemberName, int numb
     // reading index tree header data and verifying consistency
     TreeHeader *tHeader = readTreeHeader(treeFile);
     
-    // printTreeHeader(tHeader);
+    //printTreeHeader(tHeader);
     // printArvore(treeFile);
 
     for (int i = 0; i < numberSearches; i++) {
@@ -26,7 +26,6 @@ void searchInTree(FILE *dataFile, FILE *treeFile, char *dataMemberName, int numb
         // search in tree
         int key;
         if (strncmp(dataMemberName, "idCrime", 7) == 0 && searchingCrimeId(wanted, &key)) {
-            //printf("cheguei");
             r = ultraTreeSearch(dataFile, treeFile, key, tHeader, NULL);
             r = verifyingRegRequirements(dataFile, r, wanted);
         }

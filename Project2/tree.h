@@ -10,6 +10,7 @@
 typedef struct key Key;
 typedef struct node Node;
 typedef struct treeHeader TreeHeader;
+typedef struct redistribution Redistribution;
 
 void initKey(Key *k);
 void initPointers(int *p);
