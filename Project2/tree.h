@@ -19,6 +19,15 @@ Result *ultraTreeSearch(FILE *dataFile, FILE *treeFile, int key, TreeHeader *tHe
 void printNode(Node *n);
 void printTreeHeader(TreeHeader *t);
 void printArvore(FILE *treeFile);
-void insertTree(FILE *dataFile, FILE *treeFile, int key, TreeHeader *tHeader);
+Node **insertTree(FILE *dataFile, FILE *treeFile, int key, TreeHeader *tHeader, Node **arrayNode);
+void writeTreeHeader(FILE *treeFile, TreeHeader *t);
+void overwriteTreeFile(FILE *treeFile, Node **arrayNode, TreeHeader *tHeader);
+Node **appendArrayNode(Node **arr, Node *node, int newLen);
+int getNextRRN(TreeHeader *t);
+TreeHeader *createTreeHeader();
+void setRoot(TreeHeader *tHeader, int newRoot);
+void addTotalKeys(TreeHeader *tHeader);
+void addTotalLevels(TreeHeader *tHeader);
+void addNextRRN(TreeHeader *tHeader);
 
 #endif

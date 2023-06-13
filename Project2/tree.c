@@ -69,7 +69,6 @@ TreeHeader *createTreeHeader() {
 }
 
 Node *createNode() {
-    
     // allocating space and initializing data
     Node *n = (Node *)malloc(sizeof(Node));
     n->level = -1;
@@ -78,6 +77,18 @@ Node *createNode() {
     initPointers(n->pointers);
 
     return n;
+}
+
+void writeTreeHeader(FILE *treeFile, TreeHeader *t) {
+    fwrite(&(t->status), sizeof(char), 1, treeFile);
+    fwrite(&(t->root), sizeof(int), 1, treeFile);
+    fwrite(&(t->nextRRN), sizeof(int), 1, treeFile);
+    fwrite(&(t->totalLevels), sizeof(int), 1, treeFile);
+    fwrite(&(t->totalKeys), sizeof(int), 1, treeFile);
+
+    char trash = '$';
+    for (int i = 0; i < GARBAGE; i++)
+        fwrite(&trash, sizeof(char), 1, treeFile);
 }
 
 void initKey(Key *k) {
@@ -102,8 +113,12 @@ void swapKeys(Node *node, int pos1, int pos2) {
     
     node->keys[pos2].value = tmpInt;
     node->keys[pos2].byteOffSet = tmpLLint;
+}
 
-    // set pointers
+void swapPointers(Node *node, int pos1, int pos2) {
+    int tmp = node->pointers[pos1];
+    node->pointers[pos1] = node->pointers[pos2];
+    node->pointers[pos2] = tmp;
 }
 
 void sortNode(Node *node) {
@@ -113,6 +128,7 @@ void sortNode(Node *node) {
         for (int j = 0; j < i - 1; j++) {
             if (node->keys[j].value > node->keys[j+1].value) {
                 swapKeys(node, j, j+1);
+                swapPointers(node, j+1, j+2);
             }
         }
     }
@@ -127,13 +143,17 @@ void setKey(Node *n, int value, long long int offset) {
     int index = n->numKeys;
     if (index >= TREE_ORDER-1) return;
     n->numKeys++;
+
+    // set key in first empty position
     for (int i = 0; i < TREE_ORDER-1; i++) {
         if (n->keys[i].value == -1) {
             n->keys[i].byteOffSet = offset;
-            n->keys[i].value = value;       
+            n->keys[i].value = value; 
+            break;      
         }
     }
 
+    // sorting node
     sortNode(n);
 }
 
@@ -166,6 +186,22 @@ TreeHeader *readTreeHeader(FILE *treeFile) {
     fseek(treeFile, GARBAGE, SEEK_CUR);
 
     return header;
+}
+
+void addNextRRN(TreeHeader *tHeader) {
+    tHeader->nextRRN++;
+}
+
+void addTotalLevels(TreeHeader *tHeader) {
+    tHeader->totalLevels++;
+}
+
+void addTotalKeys(TreeHeader *tHeader) {
+    tHeader->totalKeys++;
+}
+
+void setRoot(TreeHeader *tHeader, int newRoot) {
+    tHeader->root = newRoot;
 }
 
 Node *readTreeNode(FILE *treeFile) {
@@ -295,10 +331,7 @@ void printArvore(FILE *treeFile) {
 void removeKeyFromNode(Node *n, int index) {
     n->keys[index].value = -1;
     n->keys[index].byteOffSet = -1;
-
     n->pointers[index+1] = -1;
-    if (index == 0) 
-        n->pointers[0] = -1;
 
     n->numKeys--;
 }
@@ -363,6 +396,13 @@ void setPointer(Node *n, int pointerValue, int pointerPos) {
     n->pointers[pointerPos] = pointerValue;
 }
 
+Node **appendArrayNode(Node **arr, Node *node, int newLen) {
+    arr = (Node**)realloc(arr, sizeof(Node *) * newLen);
+    arr[newLen-1] = node;
+
+    return arr;
+}
+
 void split1to2(Node **arrayNode, int pageSon, int pageFather, int pageRoot, Node *root, int key, Result *res) {
     Node *son = createNode();
     Node *father = createNode();
@@ -370,85 +410,65 @@ void split1to2(Node **arrayNode, int pageSon, int pageFather, int pageRoot, Node
     int indexKey = getIndex(res);
     long long int byteOffKey = getByteoffset(res, 0);
 
-    Redistribution *red = createRedistribution(root->numKeys + 1);
-
-    // the key is going to be promoted
-    if (indexKey == TREE_ORDER/2) {
-        setKey(father, key, byteOffKey);
-        father->pointers[0] = pageRoot;
-        father->pointers[1] = pageSon;
-
-        // nao sei para onde vai o ponteiro 
-    }
-    // the key is going to be on the new son
-    else if (indexKey > TREE_ORDER/2) {
-        int lastPos = TREE_ORDER-2;
+    // the key to be inserted is going to be promoted
+    if (indexKey == roundUp(((double)TREE_ORDER)/2)) {
+        // getting mid
         int mid = TREE_ORDER/2;
 
-        setKey(father, root->keys[mid].value, root->keys[mid].byteOffSet);
-
-        // verificando se o filho vai ficar na primeira posicao ou na segunda
-        if (key > root->keys[lastPos].value) { //segunda
-            setKey(son, root->keys[lastPos].value, root->keys[lastPos].byteOffSet);
-            setKey(son, key, byteOffKey);
-
-            // setting the new pointers on the brand new node that is not the new root
-            setPointer(son, root->pointers[lastPos], 0);
-            setPointer(son, root->pointers[lastPos+1], 1);
-
-            // setting the old pointers in the previous root node to null values
-            setPointer(root, -1, lastPos+1);
-            setPointer(root, -1, lastPos);
-        }
-        else {
-            setKey(son, key, byteOffKey);
-            setKey(son, root->keys[lastPos].value, root->keys[lastPos].byteOffSet);
-
-            setPointer(son, root->pointers[lastPos], 1);
-            setPointer(son, root->pointers[lastPos+1], 2);
-
-            setPointer(root, -1, lastPos+1);
-            setPointer(root, -1, lastPos);
-        }
-
-        father->pointers[0] = pageRoot;
-        father->pointers[1] = pageSon;
-
-        // removing from the old root node
-        for (int i = TREE_ORDER/2; i < TREE_ORDER-1; i++)
-            removeKeyFromNode(root, i);
-    }
-    // the key will be on root node
-    else {
-        setKey(father, root->keys[TREE_ORDER/2].value, root->keys[TREE_ORDER/2].byteOffSet);
-
-        if (key > root->keys[0].value) {
-            removeKeyFromNode(root, 1);
-            removeKeyFromNode(root, 2);
-            removeKeyFromNode(root, 3);
-
-            setKey(root, key, byteOffKey);
-
-        }
-        else {
+        // promoting key
+        // father receiving the mid key from the old root
+        setKey(father, key, byteOffKey);
         
+        // son receiving data from old root
+        for (int i = (mid+1); i < TREE_ORDER-1; i++) {
+            setKey(son, root->keys[i].value, root->keys[i].byteOffSet);
+            // removing data from old root
+            removeKeyFromNode(root, i);
+        }
+    }
+    // the key is going to be on the new son or old root
+    else {
+        // getting mid (key to be promoted)
+        int mid;
+        if (indexKey > TREE_ORDER/2) mid = (TREE_ORDER/2) + 1;
+        else mid = TREE_ORDER/2;
+
+        // promoting key
+        // father receiving the mid key from the old root
+        setKey(father, root->keys[mid].value, root->keys[mid].byteOffSet);
+        // removing mid key from old root
+        removeKeyFromNode(root, mid);
+
+        // son receiving data from old root
+        for (int i = (mid+1); i < TREE_ORDER-1; i++) {
+            setKey(son, root->keys[i].value, root->keys[i].byteOffSet);
+            // removing data from old root
+            removeKeyFromNode(root, i);
         }
 
+        // deciding which page will receive the key
+        if (indexKey > TREE_ORDER/2) setKey(son, key, byteOffKey);
+        else setKey(root, key, byteOffKey);
+        
+
     }
-       
+    // setting father pointers
+    father->pointers[0] = pageRoot;
+    father->pointers[1] = pageSon;
+
+    // appending new nodes to arrayNode
+    arrayNode = appendArrayNode(arrayNode, son, pageSon);
+    arrayNode = appendArrayNode(arrayNode, father, pageSon+1);
 }
 
 // void split2to3()
 
-void insertTree(FILE *dataFile, FILE *treeFile, int key, TreeHeader *tHeader) {
+Node **insertTree(FILE *dataFile, FILE *treeFile, int key, TreeHeader *tHeader, Node **arrayNode) {
     int numLevels = tHeader->totalLevels; // manter atualizado
     int numNodes = tHeader->nextRRN;
     
     int *arrayRRN = (int *)malloc(sizeof(int) * numLevels);
     for (int i=0; i<numLevels; i++) arrayRRN[i] = -1;
-
-    Node **arrayNode = (Node **)malloc(sizeof(Node *) * numNodes);
-    for (int i = 0; i < numNodes; i++) arrayNode[i] = NULL;
 
     // getting RRNs of the nodes to 'update' pointers 
     Result *r = ultraTreeSearch(dataFile, treeFile, key, tHeader, &arrayRRN);
@@ -472,20 +492,18 @@ void insertTree(FILE *dataFile, FILE *treeFile, int key, TreeHeader *tHeader) {
             promotionFlag = 0;
         }
         else { // no space
-            int newPageSon = tHeader->nextRRN++;
-            int newPageFather = tHeader->nextRRN++;
+            int pageSon = tHeader->nextRRN++;
+            int pageFather = tHeader->nextRRN++;
 
-            // insert
-            // sort
-            // update pointers
-
-            //         [ 3 ] rrn 2
-            // [ 1 2 ] rrn 0  [ 4 5 ] rrn 1 
+            split1to2(arrayNode, pageSon, pageFather, currentNode, n, key, r);
+            tHeader->totalLevels += 1;
         }
 
         if (promotionFlag == 0) break;
             
     }
+
+    return arrayNode; 
 
     // no a direita tem 1 chave a menos se n ficar igual    
     // split 1 - 2 na raiz
@@ -498,3 +516,31 @@ void insertTree(FILE *dataFile, FILE *treeFile, int key, TreeHeader *tHeader) {
     // fazer vetorzao com ponteiros para todos os nos possiveis
 
 }
+
+void writeNode(FILE *treeFile, Node *node) {
+    fwrite(&(node->level), sizeof(int), 1, treeFile);
+    fwrite(&(node->numKeys), sizeof(int), 1, treeFile);
+
+    for (int i = 0; i < TREE_ORDER; i++) {
+        fwrite(&(node->pointers[i]), sizeof(int), 1, treeFile);
+        if (i < TREE_ORDER-1) {
+            fwrite(&(node->keys[i].value), sizeof(int), 1, treeFile);
+            fwrite(&(node->keys[i].byteOffSet), sizeof(long long int), 1, treeFile);
+        }
+    }
+
+}
+
+void overwriteTreeFile(FILE *treeFile, Node **arrayNode, TreeHeader *tHeader) {
+    for (int i=0; i < tHeader->nextRRN - 1; i++) {
+        if (arrayNode[i] != NULL) {
+            fseek(treeFile, HEADERSIZE * (i + 1), SEEK_SET);
+            writeNode(treeFile, arrayNode[i]);
+        }
+    }
+}
+
+int getNextRRN(TreeHeader *t) {
+    return t->nextRRN;
+}
+

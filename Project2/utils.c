@@ -144,3 +144,8 @@ char *superStringCopy(char *origin, int maxLen) {
     return copy;
 }
 
+int roundUp(double num) {
+    int intPart = (int)num;
+    return num-intPart >= 0.5 ? intPart+1 : intPart;
+}
+

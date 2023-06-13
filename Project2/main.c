@@ -36,7 +36,7 @@ int main() {
 
         fclose(treeFile);
     }
-    else if (operation == 10){
+    else if (operation == 10) {
         // inserting new data into index/data file
 
         getc(stdin);
