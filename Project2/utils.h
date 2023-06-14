@@ -15,6 +15,7 @@ void readCsvHeader(FILE *input);
 int stringLenght(char *str);
 char *superStringCopy(char *origin, int maxLen);
 int roundUp(double num);
+void bubbleSort(int *arr, int len);
 
 
 #endif

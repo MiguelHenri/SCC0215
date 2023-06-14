@@ -18,6 +18,11 @@ struct redistribution {
     int *pointers;
 };
 
+struct insertUtils {
+    int *arrayRRN;
+    int *arrayPos;
+};
+
 struct treeHeader {
     char status;
     int root;
@@ -79,6 +84,15 @@ Node *createNode() {
     return n;
 }
 
+InsertUtils *creteInsertUtils(int treeLevel) {
+    InsertUtils *i = (InsertUtils *)malloc(sizeof(InsertUtils));
+
+    i->arrayPos = (int *)malloc(sizeof(int) * treeLevel);
+    i->arrayRRN = (int *)malloc(sizeof(int) * treeLevel);
+
+    return i; 
+}
+
 void writeTreeHeader(FILE *treeFile, TreeHeader *t) {
     fwrite(&(t->status), sizeof(char), 1, treeFile);
     fwrite(&(t->root), sizeof(int), 1, treeFile);
@@ -125,7 +139,7 @@ void sortNode(Node *node) {
     int len = node->numKeys;
 
     for (int i = 0; i < len; i++) {
-        for (int j = 0; j < i - 1; j++) {
+        for (int j = 0; j < len - i - 1; j++) {
             if (node->keys[j].value > node->keys[j+1].value) {
                 swapKeys(node, j, j+1);
                 swapPointers(node, j+1, j+2);
@@ -270,7 +284,7 @@ int binarySearchInNode(Node *n, int key, int *found, int *RRN) {
     }
 }
 
-Result *ultraTreeSearch(FILE *dataFile, FILE *treeFile, int key, TreeHeader *tHeader, int **arrayRRN) {
+Result *ultraTreeSearch(FILE *dataFile, FILE *treeFile, int key, TreeHeader *tHeader, InsertUtils *IUtils) {
     Result *r = createResult();
     int currentLevel = 0;
 
@@ -285,7 +299,7 @@ Result *ultraTreeSearch(FILE *dataFile, FILE *treeFile, int key, TreeHeader *tHe
 
         // saving RRN for insert operation
         // for searching the array is not needed
-        if (arrayRRN != NULL) (*arrayRRN)[count] = RRN;
+        if (IUtils != NULL) IUtils->arrayRRN[count] = RRN;
 
         // reading node
         Node *n = readTreeNode(treeFile);
@@ -294,6 +308,9 @@ Result *ultraTreeSearch(FILE *dataFile, FILE *treeFile, int key, TreeHeader *tHe
 
         // running node keys in binary search
         index = binarySearchInNode(n, key, &found, &RRN);
+
+        // saving index for insert operation
+        if (IUtils != NULL) IUtils->arrayPos[count] = index;
 
         // check if equal wanted
         if (found) {
@@ -349,33 +366,6 @@ Redistribution *createRedistribution(int len) {
     red->pointers[len] = -1;
 
     return red;
-}
-
-void sortRedistribuition(Redistribution *r, int len) {
-    for (int i = 0; i < len; i++) {
-        for (int j = 0; j < len-i-1; j++) {
-        
-        }
-    
-    }
-}
-
-void redistribution(Node *left, Node *right, Redistribution *r) {
-    int i = 0;
-    while (i < left->numKeys) {
-        r->keys[i] = left->keys[i];
-        r->pointers[i] = left->pointers[i];
-        i++;
-    }
-    r->pointers[i] = left->pointers[i];
-
-    while (i < (right->numKeys +left->numKeys)) {
-        r->keys[i] = right->keys[i-left->numKeys];
-        r->pointers[i+1] = right->pointers[i-left->numKeys];
-        i++;
-    }
-    r->pointers[i+1] = right->pointers[i-left->numKeys];
-
 }
 
 void nodeShift(Node *n, int begin, int end) {
@@ -463,6 +453,59 @@ void split1to2(Node **arrayNode, int pageSon, int pageFather, int pageRoot, Node
 
 // void split2to3()
 
+int redistribution(FILE *treeFile, Node **arrayNode, int indexInFather, int pageFather, int pageLeaf, int key) {
+    // getting RRNs
+    int son = arrayNode[pageFather]->pointers[indexInFather];
+    int left; int right;
+    if (indexInFather - 1 >= 0) {
+        // reading left node
+        left = arrayNode[pageFather]->pointers[indexInFather-1];
+        fseek(treeFile, HEADERSIZE * (left + 1), SEEK_SET);
+        Node *n = readTreeNode(treeFile);
+        arrayNode[left] = n;
+    }
+    if (indexInFather <= TREE_ORDER-1)
+        right = arrayarrayNode[pageFather]->pointers[indexInFather+1];
+
+    // check space in left node
+    if (arrayNode[left].numKeys < TREE_ORDER-1) {
+        int lenRedis = TREE_ORDER + arrayNode[left].numKeys + 1;
+        int redis[lenRedis];
+        int i = 0;
+        
+        // copying into a big vector
+        while (i < TREE_ORDER-1) {
+            redis[i] = arrayNode[son]->keys[i].value;
+            i += 1;
+        }
+        redis[i++] = arrayNode[pageFather]->keys[indexInFather-1].value;
+        regis[i++] = key;
+        while (i < lenRedis) {
+            redis[i] = arrayNode[left]->keys[i].value;
+            i += 1;
+        }
+
+        // sorting vector
+        bubbleSort(redis, lenRedis);
+
+        int midPos = lenRedis/2;
+        int promoted = redis[midPos];
+
+        // TODO VERIFICAR AS PROMOCOES DAS CHAVES
+        // if key < primeiro do son
+        // inserir na esq junto com o pai atual
+        // nova chave herda o ponteiro da esq do primeiro do son
+        
+    }
+    else {
+        // reading right node
+        fseek(treeFile, HEADERSIZE * (right + 1), SEEK_SET);
+        Node *n = readTreeNode(treeFile);
+        arrayNode[right] = n;
+    }
+
+}
+
 Node **insertTree(FILE *dataFile, FILE *treeFile, int key, TreeHeader *tHeader, Node **arrayNode) {
     int numLevels = tHeader->totalLevels; // manter atualizado
     int numNodes = tHeader->nextRRN;
@@ -470,15 +513,17 @@ Node **insertTree(FILE *dataFile, FILE *treeFile, int key, TreeHeader *tHeader, 
     int *arrayRRN = (int *)malloc(sizeof(int) * numLevels);
     for (int i=0; i<numLevels; i++) arrayRRN[i] = -1;
 
+    InsertUtils *IUtils = creteInsertUtils(tHeader->totalLevels);
+    
     // getting RRNs of the nodes to 'update' pointers 
-    Result *r = ultraTreeSearch(dataFile, treeFile, key, tHeader, &arrayRRN);
+    Result *r = ultraTreeSearch(dataFile, treeFile, key, tHeader, IUtils);
 
     //for (int i=0; i<numLevels; i++) 
     //    printf("RRN: %d\n", arrayRRN[i]);
 
     int promotionFlag = 0;
     for (int i = numLevels-1; i >= 0; i--) {
-        int currentNode = arrayRRN[i];
+        int currentNode = IUtils->arrayRRN[i];
     
         // reading node and updating array
         fseek(treeFile, HEADERSIZE * (currentNode+1), SEEK_SET);
@@ -494,6 +539,8 @@ Node **insertTree(FILE *dataFile, FILE *treeFile, int key, TreeHeader *tHeader, 
         else { // no space
             int pageSon = tHeader->nextRRN++;
             int pageFather = tHeader->nextRRN++;
+
+            
 
             split1to2(arrayNode, pageSon, pageFather, currentNode, n, key, r);
             tHeader->totalLevels += 1;

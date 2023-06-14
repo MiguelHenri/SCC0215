@@ -11,6 +11,7 @@ typedef struct key Key;
 typedef struct node Node;
 typedef struct treeHeader TreeHeader;
 typedef struct redistribution Redistribution;
+typedef struct insertUtils InsertUtils;
 
 void initKey(Key *k);
 void initPointers(int *p);
