@@ -109,7 +109,7 @@ void createTree(FILE *dataFile, FILE *treeFile, char *dataMemberName) {
 
 void createMiniBin(FILE *newDataFile, FILE *input, int numReg) {
     Header *h = createHeader();
-    updateHeader(newDataFile, h);
+    //updateHeader(newDataFile, h);
     writeHeader(newDataFile, h);
 
     for (int i = 0; i < numReg; i++) {

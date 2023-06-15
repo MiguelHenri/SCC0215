@@ -10,8 +10,8 @@
 typedef struct key Key;
 typedef struct node Node;
 typedef struct treeHeader TreeHeader;
-typedef struct redistribution Redistribution;
 typedef struct insertUtils InsertUtils;
+typedef struct promotedKey PromotedKey;
 
 void initKey(Key *k);
 void initPointers(int *p);
@@ -32,4 +32,5 @@ void addTotalLevels(TreeHeader *tHeader);
 void addNextRRN(TreeHeader *tHeader);
 void setKey(Node *n, int value, long long int offset);
 Node *createNode();
+
 #endif

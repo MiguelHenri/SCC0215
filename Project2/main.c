@@ -19,7 +19,19 @@ int main() {
         return 0;
     }
 
-    if (operation == 9) {
+    if (operation == 8) {
+        // creating index file from B*tree
+        getc(stdin);
+        char *memberName = readMember(stdin, ' ');
+        char *indexType = readMember(stdin, ' ');
+        char *nameIndexFile = readMember(stdin, ' ');
+        FILE *treeFile = fopen(nameIndexFile, "wb");
+        
+        createTree(dataFile, treeFile, memberName);
+        
+        fclose(treeFile);
+    }
+    else if (operation == 9) {
         // searching using tree B* data index
 
         getc(stdin);
