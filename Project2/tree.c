@@ -353,6 +353,13 @@ void removeKeyFromNode(Node *n, int index) {
     n->numKeys--;
 }
 
+void removeWithoutChangingPointer(Node *n, int index) {
+    n->keys[index].value = -1;
+    n->keys[index].byteOffSet = -1;
+
+    n->numKeys--;
+}
+
 Redistribution *createRedistribution(int len) {
     Redistribution *red = (Redistribution *)malloc(sizeof(Redistribution));
     red->keys = (Key *)malloc(sizeof(Key) * len);
@@ -368,12 +375,31 @@ Redistribution *createRedistribution(int len) {
     return red;
 }
 
-void nodeShift(Node *n, int begin, int end) {
+void nodeLeftShift(Node *n, int begin, int end) {
+    for (int i = begin; i < end; i++) {
+
+        n->keys[i].value = n->keys[i+1].value;
+        n->keys[i].byteOffSet = n->keys[i+1].byteOffSet;
+        n->pointers[i] = n->pointers[i+1];
+        if (i+2 <= TREE_ORDER) 
+            n->pointers[i+1] = n->pointers[i+2];
+
+        // setting the previous position to null values
+        n->keys[i+1].value = -1;
+        n->keys[i+1].byteOffSet = -1;
+        n->pointers[i+1] = -1;
+    }
+}
+
+void nodeRightShift(Node *n, int begin, int end) {
     for (int i = begin; i < end; i++) {
         // shifiting
         n->keys[i+1].value = n->keys[i].value;
         n->keys[i+1].byteOffSet = n->keys[i].byteOffSet;
+        if (i+2 <= TREE_ORDER)
+            n->pointers[i+2] = n->pointers[i+1];
         n->pointers[i+1] = n->pointers[i];
+        
 
         // setting the previous position to null values
         n->keys[i].value = -1;
@@ -453,7 +479,7 @@ void split1to2(Node **arrayNode, int pageSon, int pageFather, int pageRoot, Node
 
 // void split2to3()
 
-int redistribution(FILE *treeFile, Node **arrayNode, int indexInFather, int pageFather, int pageLeaf, int key) {
+int redistribution(FILE *treeFile, Node **arrayNode, int indexInFather, int pageFather, int byteOffKey, int key) {
     // getting RRNs
     int son = arrayNode[pageFather]->pointers[indexInFather];
     int left; int right;
@@ -465,45 +491,128 @@ int redistribution(FILE *treeFile, Node **arrayNode, int indexInFather, int page
         arrayNode[left] = n;
     }
     if (indexInFather <= TREE_ORDER-1)
-        right = arrayarrayNode[pageFather]->pointers[indexInFather+1];
+        right = arrayNode[pageFather]->pointers[indexInFather+1];
 
     // check space in left node
-    if (arrayNode[left].numKeys < TREE_ORDER-1) {
-        int lenRedis = TREE_ORDER + arrayNode[left].numKeys + 1;
+    if (arrayNode[left]->numKeys < TREE_ORDER-1) {
+        int lenRedis = TREE_ORDER + arrayNode[left]->numKeys + 1;
         int redis[lenRedis];
         int i = 0;
         
         // copying into a big vector
-        while (i < TREE_ORDER-1) {
-            redis[i] = arrayNode[son]->keys[i].value;
-            i += 1;
-        }
-        redis[i++] = arrayNode[pageFather]->keys[indexInFather-1].value;
-        regis[i++] = key;
-        while (i < lenRedis) {
+        int len = arrayNode[left]->numKeys;
+        for (int i = 0; i < len; i++) {
             redis[i] = arrayNode[left]->keys[i].value;
-            i += 1;
         }
+        for (int i = 0; i < arrayNode[son]->numKeys; i++) {
+            redis[i+len] = arrayNode[son]->keys[i].value;
+        }
+        len += arrayNode[son]->numKeys;
+        redis[len++] = arrayNode[pageFather]->keys[indexInFather-1].value;
+        redis[len] = key;
 
         // sorting vector
         bubbleSort(redis, lenRedis);
 
         int midPos = lenRedis/2;
-        int promoted = redis[midPos];
-
-        // TODO VERIFICAR AS PROMOCOES DAS CHAVES
-        // if key < primeiro do son
-        // inserir na esq junto com o pai atual
-        // nova chave herda o ponteiro da esq do primeiro do son
+        int val_promoted = redis[midPos];
         
+        // putting father key down to left
+        int fatherValue = arrayNode[pageFather]->keys[indexInFather-1].value;
+        long long int fatherOffset = arrayNode[pageFather]->keys[indexInFather-1].byteOffSet;
+        setKey(arrayNode[left], fatherValue, fatherOffset);
+        // removing father key, does not change pointers
+        removeWithoutChangingPointer(arrayNode[pageFather], indexInFather - 1);
+
+        if (val_promoted == key) {
+            // promoting key to the father
+            setKey(arrayNode[pageFather], key, byteOffKey);
+        }
+        else {
+            // promoting promoted to the father
+            // getting byteoff
+            int positionPromoted = midPos - arrayNode[son]->numKeys;
+            long long int byteOffPromoted = arrayNode[son]->keys[positionPromoted].byteOffSet;
+
+            // inserting promoted in father
+            setKey(arrayNode[pageFather], val_promoted, byteOffPromoted);
+
+            // removing 'promoted' from son node
+            removeWithoutChangingPointer(arrayNode[son], positionPromoted);
+
+            // inserting key to son
+            setKey(arrayNode[son], key, byteOffKey);
+        }
+
+        while (arrayNode[left]->numKeys < midPos) {
+            // changing pointer between nodes
+            setPointer(arrayNode[left], arrayNode[son]->pointers[0], arrayNode[left]->numKeys);
+            // changing key and updating pointer
+            setKey(arrayNode[left], arrayNode[son]->keys[0].value, arrayNode[son]->keys[0].byteOffSet);
+            // shifting to left
+            nodeLeftShift(arrayNode[son], 0, arrayNode[son]->numKeys);
+        }
     }
     else {
         // reading right node
         fseek(treeFile, HEADERSIZE * (right + 1), SEEK_SET);
         Node *n = readTreeNode(treeFile);
         arrayNode[right] = n;
-    }
 
+        int lenRedis = TREE_ORDER + arrayNode[right]->numKeys + 1;
+        int redis[lenRedis];
+        int i = 0;
+        
+        // copying into a big vector
+        int len = arrayNode[right]->numKeys;
+        for (int i = 0; i < len; i++) {
+            redis[i] = arrayNode[right]->keys[i].value;
+        }
+        for (int i = 0; i < arrayNode[son]->numKeys; i++) {
+            redis[i+len] = arrayNode[son]->keys[i].value;
+        }
+        len += arrayNode[son]->numKeys;
+        redis[len++] = arrayNode[pageFather]->keys[indexInFather-1].value;
+        redis[len] = key;
+
+        // sorting vector
+        bubbleSort(redis, lenRedis);
+
+        int midPos = lenRedis/2;
+        int val_promoted = redis[midPos];
+
+        // putting father key down to right
+        int fatherValue = arrayNode[pageFather]->keys[indexInFather-1].value;
+        long long int fatherOffset = arrayNode[pageFather]->keys[indexInFather-1].byteOffSet;
+        nodeRightShift(arrayNode[right], 0, arrayNode[right]->numKeys);
+        setKey(arrayNode[right], fatherValue, fatherOffset);
+        // removing father key, does not change pointers
+        removeWithoutChangingPointer(arrayNode[pageFather], indexInFather - 1);
+
+        if (val_promoted == key) {
+            // promoting key to the father
+            setKey(arrayNode[pageFather], key, byteOffKey);
+        }
+        else {
+            // promoting promoted to the father
+            // getting byteoff
+            int positionPromoted = midPos - 1;
+            long long int byteOffPromoted = arrayNode[son]->keys[positionPromoted].byteOffSet;
+
+            // inserting promoted in father
+            setKey(arrayNode[pageFather], val_promoted, byteOffPromoted);
+
+            // changing pointers
+            setPointer(arrayNode[right], arrayNode[son]->pointers[positionPromoted+1], 0);
+
+            // removing 'promoted' from son node
+            removeWithoutChangingPointer(arrayNode[son], positionPromoted);
+
+            // inserting key in son
+            setKey(arrayNode[son], key, byteOffKey);
+        }
+
+    }
 }
 
 Node **insertTree(FILE *dataFile, FILE *treeFile, int key, TreeHeader *tHeader, Node **arrayNode) {

@@ -16,7 +16,7 @@ typedef struct insertUtils InsertUtils;
 void initKey(Key *k);
 void initPointers(int *p);
 TreeHeader *readTreeHeader(FILE *treeFile);
-Result *ultraTreeSearch(FILE *dataFile, FILE *treeFile, int key, TreeHeader *tHeader, int **arrayRRN);
+Result *ultraTreeSearch(FILE *dataFile, FILE *treeFile, int key, TreeHeader *tHeader, InsertUtils *IUtils);
 void printNode(Node *n);
 void printTreeHeader(TreeHeader *t);
 void printArvore(FILE *treeFile);
