@@ -1,0 +1,2 @@
+12 binario_arv.bin ciar_arv_aux.txt indice_arv.bin 10
+

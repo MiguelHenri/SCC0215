@@ -9,5 +9,5 @@
 
 void searchInTree(FILE *dataFile, FILE *treeFile, char *dataMemberName, int numberSearches);
 void insertIntoTree(FILE *dataFile, FILE *treeFile, char *memberName, int numInsertions);
-
+void createMiniBin(FILE *newDataFile, FILE *input, int numReg);
 #endif

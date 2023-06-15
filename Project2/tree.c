@@ -479,6 +479,24 @@ void split1to2(Node **arrayNode, int pageSon, int pageFather, int pageRoot, Node
 
 // void split2to3()
 
+int *createRedistribArr(Node *left, Node *right, int fatherKey, int key, int lenArr) {
+    int *arr = (int *)malloc(sizeof(int) * lenArr);
+    int count = 0;
+    for (int i = 0; i < left->numKeys; i++) {
+        arr[i] = left->keys[i].value;
+        count += 1;
+    }
+
+    for (int i = 0; i < right->numKeys; i++) {
+        arr[count+i] = right->keys[i].value;
+    }
+    count += right->numKeys;
+    arr[count++] = fatherKey;
+    arr[count] = key;
+
+    return arr;
+}
+
 int redistribution(FILE *treeFile, Node **arrayNode, int indexInFather, int pageFather, int byteOffKey, int key) {
     // getting RRNs
     int son = arrayNode[pageFather]->pointers[indexInFather];

@@ -106,3 +106,18 @@ void createTree(FILE *dataFile, FILE *treeFile, char *dataMemberName) {
     // writing new index header file data
     writeTreeHeader(treeFile, tHeader);
 }
+
+void createMiniBin(FILE *newDataFile, FILE *input, int numReg) {
+    Header *h = createHeader();
+    updateHeader(newDataFile, h);
+    writeHeader(newDataFile, h);
+
+    for (int i = 0; i < numReg; i++) {
+        Data *reg = readRegister(input);
+
+        writeRegister(newDataFile, reg);
+        add1FileReg(h);
+    }
+    fseek(newDataFile, 0, SEEK_SET);
+    writeHeader(newDataFile, h);
+}

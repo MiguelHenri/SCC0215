@@ -30,5 +30,6 @@ void setRoot(TreeHeader *tHeader, int newRoot);
 void addTotalKeys(TreeHeader *tHeader);
 void addTotalLevels(TreeHeader *tHeader);
 void addNextRRN(TreeHeader *tHeader);
-
+void setKey(Node *n, int value, long long int offset);
+Node *createNode();
 #endif

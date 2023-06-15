@@ -54,6 +54,18 @@ int main() {
 
         fclose(treeFile);
     }
+    else if (operation == 12) {
+        getc(stdin);
+        char *regFile = readMember(stdin, ' ');
+        char *nameIndexFile = readMember(stdin, ' ');
+        int numInsertions;
+        scanf(" %d", &numInsertions);
+        FILE *out = fopen(nameIndexFile, "wb+");
+        FILE *reg = fopen(regFile, "r");
+
+        createMiniBin(out, reg, numInsertions);
+        fclose(out);
+    }
 
     fclose(dataFile);
 
