@@ -16,11 +16,11 @@ typedef struct promotedKey PromotedKey;
 void initKey(Key *k);
 void initPointers(int *p);
 TreeHeader *readTreeHeader(FILE *treeFile);
-Result *ultraTreeSearch(FILE *dataFile, FILE *treeFile, int key, TreeHeader *tHeader, InsertUtils *IUtils);
+Result *ultraTreeSearch(FILE *dataFile, FILE *treeFile, int key, TreeHeader *tHeader, InsertUtils *IUtils, Node **arrNode);
 void printNode(Node *n);
 void printTreeHeader(TreeHeader *t);
 void printArvore(FILE *treeFile);
-Node **insertTree(FILE *dataFile, FILE *treeFile, int key, TreeHeader *tHeader, Node **arrayNode);
+Node **insertTree(FILE *dataFile, FILE *treeFile, int key, long long int byteOffKey, TreeHeader *tHeader, Node **arrayNode);
 void writeTreeHeader(FILE *treeFile, TreeHeader *t);
 void overwriteTreeFile(FILE *treeFile, Node **arrayNode, TreeHeader *tHeader);
 Node **appendArrayNode(Node **arr, Node *node, int newLen);
@@ -32,5 +32,7 @@ void addTotalLevels(TreeHeader *tHeader);
 void addNextRRN(TreeHeader *tHeader);
 void setKey(Node *n, int value, long long int offset);
 Node *createNode();
+void setNodeLevel(Node *n, int level);
+void printArvore2(Node **arrNode, TreeHeader *tHeader);
 
 #endif

@@ -23,7 +23,7 @@ void searchInTree(FILE *dataFile, FILE *treeFile, char *dataMemberName, int numb
         // search in tree
         int key;
         if (strncmp(dataMemberName, "idCrime", 7) == 0 && searchingCrimeId(wanted, &key)) {
-            r = ultraTreeSearch(dataFile, treeFile, key, tHeader, NULL);
+            r = ultraTreeSearch(dataFile, treeFile, key, tHeader, NULL, NULL);
             r = verifyingRegRequirements(dataFile, r, wanted);
         }
         // else, needs to do sequential search
@@ -61,8 +61,9 @@ void insertIntoTree(FILE *dataFile, FILE *treeFile, char *memberName, int numIns
             int key = getDataCrimeId(reg);
 
             // will insert into array with tree nodes
-            arrayNode = insertTree(dataFile, treeFile, key, tHeader, arrayNode);
+            // arrayNode = insertTree(dataFile, treeFile, key, tHeader, arrayNode);
         }
+        // add byteoff to header
     }
 
     // writing new index file data
@@ -79,32 +80,43 @@ void createTree(FILE *dataFile, FILE *treeFile, char *dataMemberName) {
     // creating index tree header 
     TreeHeader *tHeader = createTreeHeader();
 
-    Node **arrayNode = (Node **)malloc(sizeof(Node *) * getNextRRN(tHeader));
-    for (int i = 0; i < getNextRRN(tHeader); i++) arrayNode[i] = NULL;
+    Node **arrayNode;
 
     // search in data file to put in tree file
+    long long int byteOff = bytesHeader;
     for (int i = 0; i < getNumFileRegisters(dataFileHeader); i++) {
-        Data * reg = readBinaryRegister(dataFile);
+        Data *reg = readBinaryRegister(dataFile);
 
         // crating the first root node
         if (getNextRRN(tHeader) == 0) {
-            Node *node = createNode();
-            setKey(node, getDataCrimeId(reg), bytesHeader);
-            arrayNode =  appendArrayNode(arrayNode, node, 1);
             addNextRRN(tHeader);
             addTotalKeys(tHeader);
             addTotalLevels(tHeader);
             setRoot(tHeader, 0);
+            
+            Node *node = createNode();
+            setNodeLevel(node, 1);
+            setKey(node, getDataCrimeId(reg), byteOff);
+
+            arrayNode = (Node **)malloc(sizeof(Node *) * 1);
+            arrayNode[0] = node;
+            // printNode(node);
         }
         else {
-            insertTree(dataFile, treeFile, getDataCrimeId(reg), tHeader, arrayNode);
+            // printf("inserindo nao raiz\n");
+            //printData(reg);
+            insertTree(dataFile, treeFile, getDataCrimeId(reg), byteOff, tHeader, arrayNode);
         }
+        
+        byteOff += registerSize(reg);
     }
-
-    // writing new index file data
-    overwriteTreeFile(treeFile, arrayNode, tHeader);
     // writing new index header file data
     writeTreeHeader(treeFile, tHeader);
+    // writing new index file data
+    overwriteTreeFile(treeFile, arrayNode, tHeader);
+    //printTreeHeader(tHeader);
+    // printNode(arrayNode[0]);
+    printArvore2(arrayNode, tHeader);
 }
 
 void createMiniBin(FILE *newDataFile, FILE *input, int numReg) {
