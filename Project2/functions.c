@@ -105,6 +105,7 @@ void createTree(FILE *dataFile, FILE *treeFile, char *dataMemberName) {
         else {
             // printf("inserindo nao raiz\n");
             //printData(reg);
+            // printf("inserindo %d\n", getDataCrimeId(reg));
             insertTree(dataFile, treeFile, getDataCrimeId(reg), byteOff, tHeader, arrayNode);
         }
         
