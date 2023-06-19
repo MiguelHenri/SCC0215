@@ -695,6 +695,7 @@ PromotedKey *redistribution(FILE *treeFile, Node **arrayNode, int indexInFather,
             arrayNode[left] = n;
         }
     }
+    // else return redistribution(treeFile, arrayNode, indexInFather-1, pageFather, toInsert, flagSucess);
     else if (indexInFather + 1 <= TREE_ORDER-1) {
         right = arrayNode[pageFather]->pointers[indexInFather+1];
         if (arrayNode[right] == NULL) {
@@ -746,25 +747,64 @@ PromotedKey *redistribution(FILE *treeFile, Node **arrayNode, int indexInFather,
         // removing father key, does not change pointers
         removeWithoutChangingPointer(arrayNode[pageFather], indexInFather - 1);
 
-        /*
-            int pos = 0;
-            int auxKey = arrayNode[son]->keys[pos].value
-            while (auxKey < valPromoted) {
-                setPointer(arrayNode[left], arrayNode[son]->pointers[pos], arrayNode[left]->numKeys);
-                setKey(arrayNode[left], auxkey, arrayNode[son]->keys[pos].byteOffSet);
-
-                removeWithoutChangingPointer(arrayNode[son], pos);
-                nodeLeftShift(arrayNode[son], 0, arrayNode[son]->numKeys);
-            }
         
-            if (val_promoted == toInsert->value) {
-                return toInsert;
-            }
-            else if (val_promoted > toInsert->value) {
+        int pos = 0;
+        int auxKey = arrayNode[son]->keys[pos].value;
 
-            
-            }     
-        */
+        // moving the the left node, the keys on the son node that will have lower value
+        // than the new father
+        while (arrayNode[left]->numKeys < TREE_ORDER-1 && auxKey < val_promoted) {
+
+            // inserting on the left node
+            setPointer(arrayNode[left], arrayNode[son]->pointers[pos], arrayNode[left]->numKeys);
+            setKey(arrayNode[left], auxKey, arrayNode[son]->keys[pos].byteOffSet);
+
+            // soft deleting the key that went to the left node, we will not erase the right pointer 
+            removeWithoutChangingPointer(arrayNode[son], pos);
+            nodeLeftShift(arrayNode[son], 0, arrayNode[son]->numKeys);
+        }
+        // inserting the first pointer on the son node to the left node, where we moved, or not, 
+        // the last key on the son node and deleting it after
+        setPointer(arrayNode[left], arrayNode[son]->pointers[0], arrayNode[left]->numKeys);
+        setPointer(arrayNode[son], -1, 0);
+    
+        if (val_promoted == toInsert->value) {
+            return toInsert;
+        }
+        else if (val_promoted > toInsert->value) {
+            // the key we want to insert must be on the left node
+            // setting the key on the left node
+            setKey(arrayNode[left], toInsert->value, toInsert->byteOffSet);
+
+            // updating the to insert value, we will have to insert the first key of the right node
+            // on the father node
+            toInsert->value = arrayNode[son]->keys[0].value;
+            toInsert->byteOffSet = arrayNode[son]->keys->byteOffSet;
+
+            // shifitting the son node to left, since we will promote the first key
+            nodeLeftShift(arrayNode[son], 0, arrayNode[son]->numKeys);
+            return toInsert;
+        }
+        else { // val_promoted < toInsert->value
+
+            // saving values to promote later
+            int tmpValue = arrayNode[son]->keys[0].value;
+            long long int tmpByteOff = arrayNode[son]->keys[0].byteOffSet;
+
+            // setting the insert value in the son node
+            setKey(arrayNode[son], toInsert->value, toInsert->byteOffSet);
+
+            // shiftin the node to the left, we will lose the info on the first position
+            // of the node, but we saved previously
+            nodeLeftShift(arrayNode[son], 0, arrayNode[son]->numKeys);
+
+            // updating the new to insert value, the promoved key
+            toInsert->value = tmpValue;
+            toInsert->byteOffSet = tmpByteOff;
+
+            return toInsert;
+        }     
+        
 
         if (val_promoted == toInsert->value) {
             return toInsert;
