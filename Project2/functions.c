@@ -90,7 +90,6 @@ void createTree(FILE *dataFile, FILE *treeFile, char *dataMemberName) {
         // crating the first root node
         if (getNextRRN(tHeader) == 0) {
             addNextRRN(tHeader);
-            addTotalKeys(tHeader);
             addTotalLevels(tHeader);
             setRoot(tHeader, 0);
             
@@ -106,15 +105,16 @@ void createTree(FILE *dataFile, FILE *treeFile, char *dataMemberName) {
             // printf("inserindo nao raiz\n");
             //printData(reg);
             // printf("inserindo %d\n", getDataCrimeId(reg));
-            insertTree(dataFile, treeFile, getDataCrimeId(reg), byteOff, tHeader, arrayNode);
+            arrayNode = insertTree(dataFile, treeFile, getDataCrimeId(reg), byteOff, tHeader, arrayNode);
         }
         
         byteOff += registerSize(reg);
     }
+
     // writing new index header file data
     writeTreeHeader(treeFile, tHeader);
     // writing new index file data
-    overwriteTreeFile(treeFile, arrayNode, tHeader);
+    // overwriteTreeFile(treeFile, arrayNode, tHeader);
     //printTreeHeader(tHeader);
     // printNode(arrayNode[0]);
     printArvore2(arrayNode, tHeader);
