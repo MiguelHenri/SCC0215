@@ -1,2 +1,2 @@
-12 binario_lixo.bin ciar_arv_aux.txt arv.bin 5
+12 binario_lixo.bin ciar_arv_aux.txt arv.bin 10
 
