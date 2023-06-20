@@ -113,8 +113,7 @@ Header *readHeaderBinary(FILE *input) {
     //reading the num of reg
     fread(&intAux, sizeof(int), 1, input);
     if (intAux == 0) {
-        REGISTER_ERROR;
-        return 0;
+        return NULL;
     }
     h->numFileRegisters = intAux;
 
