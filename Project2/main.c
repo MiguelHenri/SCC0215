@@ -28,8 +28,9 @@ int main() {
         FILE *treeFile = fopen(nameIndexFile, "wb");
         
         createTree(dataFile, treeFile, memberName);
-        
         fclose(treeFile);
+        
+        binarioNaTela(nameIndexFile);
     }
     else if (operation == 9) {
         // searching using tree B* data index
@@ -45,8 +46,8 @@ int main() {
         FILE *treeFile = fopen(nameIndexFile, "rb");
 
         searchInTree(dataFile, treeFile, memberName, numSearches);
-
         fclose(treeFile);
+        
     }
     else if (operation == 10) {
         // inserting new data into index/data file
@@ -63,8 +64,10 @@ int main() {
         FILE *treeFile = fopen(nameIndexFile, "rb+");
 
         insertIntoTree(dataFile, treeFile, memberName, numInsertions);
-
         fclose(treeFile);
+
+        binarioNaTela(nameIndexFile);
+
     }
     else if (operation == 12) {
         getc(stdin);

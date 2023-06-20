@@ -1,0 +1,145 @@
+./programaTrab
+i: 0
+inserindo a chave: 182
+estou no nivel 1
+tem espaco
+i: 0
+inserindo a chave: 1488
+estou no nivel 1
+tem espaco
+i: 011111111111111111111111
+inserindo a chave: 1298
+estou no nivel 1
+tem espaco
+i: 0
+inserindo a chave: 665
+estou no nivel 1
+split 1 to 2
+nextRRN: 3
+sobrevivi
+i: 1
+inserindo a chave: 1389
+estou no nivel 1
+tem espaco
+i: 1
+inserindo a chave: 536
+estou no nivel 1
+tem espaco
+i: 1
+inserindo a chave: 1337
+estou no nivel 1
+tem espaco
+i: 1
+inserindo a chave: 1170
+estou no nivel 1
+tem espaco
+i: 1
+inserindo a chave: 216
+estou no nivel 1
+redistribuicao
+split 2 to 3
+i: 0
+inserindo a chave: 1389
+estou no nivel 0
+tem espaco
+i: 1
+inserindo a chave: 4
+estou no nivel 1
+tem espaco
+i: 1
+inserindo a chave: 127
+estou no nivel 1
+redistribuicao
+i: 0
+inserindo a chave: 536
+estou no nivel 0
+tem espaco
+i: 1
+inserindo a chave: 304
+estou no nivel 1
+redistribuicao
+split 2 to 3
+i: 0
+inserindo a chave: 1170
+estou no nivel 0
+tem espaco
+i: 1
+inserindo a chave: 554
+estou no nivel 1
+tem espaco
+i: 1
+inserindo a chave: 1414
+estou no nivel 1
+tem espaco
+i: 1
+inserindo a chave: 564
+estou no nivel 1
+redistribuicao
+i: 0
+inserindo a chave: 304
+estou no nivel 0
+tem espaco
+i: 1
+inserindo a chave: 178
+estou no nivel 1
+redistribuicao
+split 2 to 3
+i: 0
+inserindo a chave: 536
+estou no nivel 0
+tem espaco
+i: 1
+inserindo a chave: 91
+estou no nivel 1
+tem espaco
+i: 1
+inserindo a chave: 1107
+estou no nivel 1
+tem espaco
+i: 1
+inserindo a chave: 933
+estou no nivel 1
+tem espaco
+i: 1
+inserindo a chave: 862
+estou no nivel 1
+tem espaco
+i: 1
+inserindo a chave: 599
+estou no nivel 1
+tem espaco
+i: 1
+inserindo a chave: 1135
+estou no nivel 1
+redistribuicao
+i: 0
+inserindo a chave: 1135
+estou no nivel 0
+tem espaco
+i: 1
+inserindo a chave: 308
+estou no nivel 1
+redistribuicao
+i: 0
+inserindo a chave: -1
+estou no nivel 0
+tem espaco
+i: 1
+inserindo a chave: 1520
+estou no nivel 1
+tem espaco
+i: 1
+inserindo a chave: 691
+estou no nivel 1
+redistribuicao
+i: 0
+inserindo a chave: 1107
+estou no nivel 0
+tem espaco
+i: 1
+inserindo a chave: 955
+estou no nivel 1
+redistribuicao
+split 2 to 3
+i: 0
+inserindo a chave: 
