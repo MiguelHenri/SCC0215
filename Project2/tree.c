@@ -421,8 +421,10 @@ void nodeLeftShift(Node *n, int begin, int end) {
 void nodeRightShift(Node *n, int begin, int end) {
     for (int i = end; i >= begin; i--) {
         // shifiting
-        n->keys[i+1].value = n->keys[i].value;
-        n->keys[i+1].byteOffSet = n->keys[i].byteOffSet;
+        if (i+1 < TREE_ORDER - 1) {
+            n->keys[i+1].value = n->keys[i].value;
+            n->keys[i+1].byteOffSet = n->keys[i].byteOffSet;
+        }
         if (i+2 <= TREE_ORDER)
             n->pointers[i+2] = n->pointers[i+1];
         n->pointers[i+1] = n->pointers[i];
@@ -487,43 +489,57 @@ Node **split1to2(Node **arrayNode, TreeHeader *tHeader, int pageRoot, Node *root
         setKey(father, key, byteOffKey);
         
         // son receiving data from old root
+        int newNodePos = 1;
         for (int i = mid; i < TREE_ORDER-1; i++) {
             setKey(son, root->keys[i].value, root->keys[i].byteOffSet);
+            setPointer(son, root->pointers[i+1], newNodePos);
             // removing data from old root
             removeKeyFromNode(root, i);
+            newNodePos++;
         }
+        setPointer(son, toInsert->pointerRRN, 0);
     }
     // the key is going to be on the new son or old root
     else {
         // getting mid (key to be promoted)
         int mid;
-        if (indexKey > TREE_ORDER/2) mid = (TREE_ORDER/2);
+        if (key > redis[TREE_ORDER/2]) mid = (TREE_ORDER/2);
         else mid = (TREE_ORDER/2)-1;
 
         // promoting key
         // father receiving the mid key from the old root
         printf("promovendo: %d no split1-2\n", root->keys[mid].value);
         setKey(father, root->keys[mid].value, root->keys[mid].byteOffSet);
+        setPointer(son, root->pointers[mid+1], 0);
         // removing mid key from old root
         removeKeyFromNode(root, mid);
         //printNode(root);
 
         // son receiving data from old root
+        int pointerPos = 1;
         for (int i = (mid+1); i < TREE_ORDER-1; i++) {
             setKey(son, root->keys[i].value, root->keys[i].byteOffSet);
+            setPointer(son, root->pointers[i+1], pointerPos);
             // removing data from old root
             removeKeyFromNode(root, i);
+            pointerPos++;
         }
 
         // printf("index key == %d\n", indexKey);
         // deciding which page will receive the key
-        if (indexKey > TREE_ORDER/2) {
+        if (key > redis[TREE_ORDER/2]) {
             // printf("inserindo chave no son : %d\n", key);
             setKey(son, key, byteOffKey);
+            int lixo; int lixo2;
+            int pointerPosKey = binarySearchInNode(son, key, &lixo, &lixo2) + 1;
+            setPointer(son, toInsert->pointerRRN, pointerPosKey);
         }
         else {
             // printf("inserindo chave no root : %d\n", key);
             setKey(root, key, byteOffKey);
+            int lixo; int lixo2;
+            int pointerPosKey = binarySearchInNode(root, key, &lixo, &lixo2) + 1;
+            setPointer(root, toInsert->pointerRRN, pointerPosKey);
         }
     }
 
@@ -925,6 +941,9 @@ Node **insertTree(FILE *dataFile, FILE *treeFile, int key, long long int byteOff
         }
         tHeader->totalKeys += 1;
         printf("estou no nivel %d\n", arrayNode[currentNode]->level);
+
+        if (toInsert->value == 1490) 
+            printArvore2(arrayNode, tHeader);
         
         // checking if has space to insert
         if (arrayNode[currentNode]->numKeys < 4) { // has space
@@ -941,6 +960,8 @@ Node **insertTree(FILE *dataFile, FILE *treeFile, int key, long long int byteOff
                 // printNode(arrayNode[currentNode]);
             }
             promotionFlag = 0;
+
+            if (toInsert->value == 1520) printArvore2(arrayNode, tHeader);
         }
         else if (i == 0) { // root node split 1->2
             printf("split 1 to 2\n");
@@ -962,8 +983,9 @@ Node **insertTree(FILE *dataFile, FILE *treeFile, int key, long long int byteOff
 
         }
 
-        if (toInsert->value == 665)
+        if (toInsert->value == 1490) 
             printArvore2(arrayNode, tHeader);
+
 
         // no key to be promoted
         if (promotionFlag == 0) break;
