@@ -7,7 +7,7 @@ i: 0
 inserindo a chave: 1488
 estou no nivel 1
 tem espaco
-i: 0
+i: 011111111111111111111111
 inserindo a chave: 1298
 estou no nivel 1
 tem espaco
