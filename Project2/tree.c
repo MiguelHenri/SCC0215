@@ -151,12 +151,16 @@ void sortNode(Node *node) {
     int len = node->numKeys;
 
     for (int i = 0; i < len; i++) {
+        int swap = 0;
         for (int j = 0; j < len - i - 1; j++) {
             if (node->keys[j].value > node->keys[j+1].value) {
                 swapKeys(node, j, j+1);
                 swapPointers(node, j+1, j+2);
+                swap = 1;
             }
         }
+
+        if (!swap) break;
     }
 }
 
