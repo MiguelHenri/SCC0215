@@ -742,9 +742,10 @@ PromotedKey *split2to3(FILE *treeFile, Node **arrNode, int pageFather, int index
                     toInsert->pointerRRN = -1;
                 }
             }
-        }   
+        }
+        else if (toInsert->value == secondPromoVal) {}
         else { // toInsert will be 1st of the right page
-            nodeRightShift(arrNode[pageRight], 0, arrNode[pageRight]->numKeys - 1);
+            // nodeRightShift(arrNode[pageRight], 0, arrNode[pageRight]->numKeys - 1);
             setKey(arrNode[pageRight], toInsert->value, toInsert->byteOffSet);
             if (toInsert->pointerRRN != -1) {
                 int garbage, garbage2;
@@ -1004,10 +1005,10 @@ Node **insertTree(FILE *dataFile, FILE *treeFile, int key, long long int byteOff
         tHeader->totalKeys += 1;
         printf("estou no nivel %d\n", arrayNode[currentNode]->level);
 
-        if (toInsert->value == 715) {
-            printArvore2(arrayNode, tHeader);
-            exit(0);
-        }
+        // if (toInsert->value == 715) {
+        //     printArvore2(arrayNode, tHeader);
+        //     exit(0);
+        // }
         
         // checking if has space to insert
         if (arrayNode[currentNode]->numKeys < 4) { // has space
