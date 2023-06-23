@@ -12,6 +12,7 @@ typedef struct node Node;
 typedef struct treeHeader TreeHeader;
 typedef struct insertUtils InsertUtils;
 typedef struct promotedKey PromotedKey;
+typedef struct fila Fila;
 
 void initKey(Key *k);
 void initPointers(int *p);

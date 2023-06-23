@@ -35,6 +35,59 @@ struct promotedKey {
     int pointerRRN;
 };
 
+struct fila {
+    Node **fila;
+    int inicio;
+    int fim;
+};
+
+Fila *criaFila() {
+    Fila *f = (Fila *)malloc(sizeof(Fila));
+
+    f->fila = (Node **)malloc(sizeof(Fila *) * 10000);
+    f->inicio = 0;
+    f->fim = 0;
+
+    return f;
+}
+
+void addFila(Fila *f, Node *n) {
+    f->fila[f->fim++] = n;
+}
+
+Node *removeFila(Fila *f) {
+    return f->fila[f->inicio++];
+}
+
+void printNode2(Node *n) {
+    printf("--------------------\n");
+    printf("| %d | %d | %d | %d |\n", n->keys[0].value, n->keys[1].value, n->keys[2].value, n->keys[3].value);
+    printf("%d    %d    %d    %d    %d\n", n->pointers[0], n->pointers[1], n->pointers[2], n->pointers[3], n->pointers[4]);
+    printf("--------------------\n");
+
+}
+
+void printArvore3(Node **arr, TreeHeader *tHeader) {
+    Fila *f = criaFila();
+    int rrn[10000];
+    addFila(f, arr[tHeader->root]);
+    rrn[0] = tHeader->root;
+
+    for (int i = 0; i < tHeader->nextRRN; i++) {
+        Node *n = removeFila(f);
+        printf("-----RRN %d -----\n", rrn[i]);
+        printNode2(n);
+
+        for (int j = 0; j < TREE_ORDER; j++) {
+            if (n->pointers[j] != -1) {
+                addFila(f, arr[n->pointers[j]]);
+                rrn[f->fim-1] = n->pointers[j];
+            }
+        }
+    }
+    free(f->fila);
+}
+
 void printNode(Node *n) {
     printf("-------------------------\n");
     printf("nivel do no: %d\n", n->level);
@@ -1005,10 +1058,10 @@ Node **insertTree(FILE *dataFile, FILE *treeFile, int key, long long int byteOff
         tHeader->totalKeys += 1;
         printf("estou no nivel %d\n", arrayNode[currentNode]->level);
 
-        // if (toInsert->value == 715) {
-        //     printArvore2(arrayNode, tHeader);
-        //     exit(0);
-        // }
+        if (toInsert->value == 715) {
+            printArvore3(arrayNode, tHeader);
+            exit(0);
+        }
         
         // checking if has space to insert
         if (arrayNode[currentNode]->numKeys < 4) { // has space
@@ -1047,9 +1100,6 @@ Node **insertTree(FILE *dataFile, FILE *treeFile, int key, long long int byteOff
             }
 
         }
-
-        if (toInsert->value == -1) 
-            printArvore2(arrayNode, tHeader);
 
 
         // no key to be promoted
