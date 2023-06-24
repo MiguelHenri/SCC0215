@@ -36,5 +36,6 @@ Node *createNode();
 void setNodeLevel(Node *n, int level);
 void printArvore2(Node **arrNode, TreeHeader *tHeader);
 void treeHeaderSetStatus(TreeHeader *tHeader, char status);
+void printArvore3(Node **arr, TreeHeader *tHeader);
 
 #endif

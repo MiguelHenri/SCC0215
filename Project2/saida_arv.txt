@@ -1,0 +1,1299 @@
+./programaTrab
+primeira insercao 1493
+inserindo a chave: 182 no nó: 0
+estou no nivel 1
+tem espaco
+inserindo a chave: 1488 no nó: 0
+estou no nivel 1
+tem espaco
+inserindo a chave: 1298 no nó: 0
+estou no nivel 1
+tem espaco
+inserindo a chave: 665 no nó: 0
+estou no nivel 1
+split 1 to 2
+promovendo: 1298 no split1-2
+nextRRN: 3
+sobrevivi
+inserindo a chave: 1389 no nó: 1
+estou no nivel 1
+tem espaco
+inserindo a chave: 536 no nó: 0
+estou no nivel 1
+tem espaco
+inserindo a chave: 1337 no nó: 1
+estou no nivel 1
+tem espaco
+inserindo a chave: 1170 no nó: 0
+estou no nivel 1
+tem espaco
+inserindo a chave: 216 no nó: 0
+estou no nivel 1
+redistribuicao
+split 2 to 3
+first promo val: 665
+inserindo a chave: 1389 no nó: 2
+estou no nivel 2
+tem espaco
+inserindo RRN: 3, na posicao: 2
+inserindo a chave: 4 no nó: 0
+estou no nivel 1
+tem espaco
+inserindo a chave: 127 no nó: 0
+estou no nivel 1
+redistribuicao
+inserindo a chave: 536 no nó: 2
+estou no nivel 2
+tem espaco
+inserindo a chave: 304 no nó: 0
+estou no nivel 1
+redistribuicao
+split 2 to 3
+first promo val: 216
+inserindo a chave: 1170 no nó: 2
+estou no nivel 2
+tem espaco
+inserindo RRN: 4, na posicao: 2
+inserindo a chave: 554 no nó: 1
+estou no nivel 1
+tem espaco
+inserindo a chave: 1414 no nó: 3
+estou no nivel 1
+tem espaco
+inserindo a chave: 564 no nó: 1
+estou no nivel 1
+redistribuicao
+inserindo a chave: 304 no nó: 2
+estou no nivel 2
+tem espaco
+inserindo a chave: 178 no nó: 0
+estou no nivel 1
+redistribuicao
+split 2 to 3
+first promo val: 182
+inserindo a chave: 554 no nó: 2
+estou no nivel 2
+tem espaco
+inserindo RRN: 5, na posicao: 2
+inserindo a chave: 91 no nó: 0
+estou no nivel 1
+tem espaco
+inserindo a chave: 1107 no nó: 5
+estou no nivel 1
+tem espaco
+inserindo a chave: 933 no nó: 5
+estou no nivel 1
+tem espaco
+inserindo a chave: 862 no nó: 5
+estou no nivel 1
+redistribuicao
+inserindo a chave: 564 no nó: 2
+estou no nivel 2
+tem espaco
+inserindo a chave: 599 no nó: 5
+estou no nivel 1
+redistribuicao
+inserindo a chave: 1107 no nó: 2
+estou no nivel 2
+tem espaco
+inserindo a chave: 1135 no nó: 4
+estou no nivel 1
+tem espaco
+inserindo a chave: 308 no nó: 1
+estou no nivel 1
+redistribuicao
+split 2 to 3
+first promo val: 536
+inserindo a chave: 665 no nó: 2
+estou no nivel 2
+split 1 to 2
+promovendo: 665 no split1-2
+nextRRN: 9
+sobrevivi
+inserindo a chave: 1520 no nó: 3
+estou no nivel 1
+tem espaco
+inserindo a chave: 691 no nó: 6
+estou no nivel 1
+tem espaco
+inserindo a chave: 955 no nó: 6
+estou no nivel 1
+tem espaco
+inserindo a chave: 50 no nó: 0
+estou no nivel 1
+redistribuicao
+inserindo a chave: 178 no nó: 2
+estou no nivel 2
+tem espaco
+inserindo a chave: 925 no nó: 6
+estou no nivel 1
+redistribuicao
+split 2 to 3
+first promo val: 933
+--------------------
+| 933 | 1389 | -1 | -1 |
+6    4    3    -1    -1
+--------------------
+inserindo a chave: 1170 no nó: 7
+estou no nivel 2
+tem espaco
+inserindo RRN: 9, na posicao: 2
+inserindo a chave: 609 no nó: 5
+estou no nivel 1
+tem espaco
+inserindo a chave: 228 no nó: 1
+estou no nivel 1
+redistribuicao
+split 2 to 3
+first promo val: 304
+inserindo a chave: 564 no nó: 2
+estou no nivel 2
+tem espaco
+inserindo RRN: 10, na posicao: 3
+inserindo a chave: 966 no nó: 4
+estou no nivel 1
+tem espaco
+inserindo a chave: 886 no nó: 6
+estou no nivel 1
+tem espaco
+inserindo a chave: 1513 no nó: 3
+estou no nivel 1
+redistribuicao
+inserindo a chave: 1488 no nó: 7
+estou no nivel 2
+tem espaco
+inserindo a chave: 1531 no nó: 3
+estou no nivel 1
+tem espaco
+inserindo a chave: 689 no nó: 6
+estou no nivel 1
+redistribuicao
+split 2 to 3
+first promo val: 886
+--------------------
+| 886 | 1170 | 1488 | -1 |
+6    4    9    3    -1
+--------------------
+inserindo a chave: 966 no nó: 7
+estou no nivel 2
+tem espaco
+inserindo RRN: 11, na posicao: 2
+inserindo a chave: 1218 no nó: 9
+estou no nivel 1
+redistribuicao
+inserindo a chave: 1298 no nó: 7
+estou no nivel 2
+tem espaco
+inserindo a chave: 1238 no nó: 11
+estou no nivel 1
+redistribuicao
+inserindo a chave: 1107 no nó: 7
+estou no nivel 2
+tem espaco
+inserindo a chave: 1321 no nó: 9
+estou no nivel 1
+tem espaco
+inserindo a chave: 545 no nó: 5
+estou no nivel 1
+tem espaco
+inserindo a chave: 321 no nó: 5
+estou no nivel 1
+redistribuicao
+inserindo a chave: 308 no nó: 2
+estou no nivel 2
+tem espaco
+inserindo a chave: 1217 no nó: 11
+estou no nivel 1
+redistribuicao
+split 2 to 3
+first promo val: 1218
+--------------------
+| 886 | 1107 | 1218 | 1488 |
+6    4    11    9    3
+--------------------
+inserindo a chave: 1337 no nó: 7
+estou no nivel 2
+redistribuicao
+inserindo a chave: 886 no nó: 8
+estou no nivel 3
+tem espaco
+inserindo a chave: 1490 no nó: 3
+estou no nivel 1
+redistribuicao
+inserindo a chave: 1493 no nó: 7
+estou no nivel 2
+tem espaco
+inserindo a chave: 463 no nó: 5
+estou no nivel 1
+redistribuicao
+inserindo a chave: 554 no nó: 2
+estou no nivel 2
+tem espaco
+inserindo a chave: 1047 no nó: 4
+estou no nivel 1
+redistribuicao
+inserindo a chave: 1047 no nó: 7
+estou no nivel 2
+tem espaco
+inserindo a chave: 620 no nó: 10
+estou no nivel 1
+tem espaco
+inserindo a chave: 1265 no nó: 9
+estou no nivel 1
+tem espaco
+inserindo a chave: 603 no nó: 10
+estou no nivel 1
+redistribuicao
+inserindo a chave: 620 no nó: 2
+estou no nivel 2
+tem espaco
+inserindo a chave: 166 no nó: 0
+estou no nivel 1
+redistribuicao
+split 2 to 3
+first promo val: 127
+inserindo a chave: 216 no nó: 2
+estou no nivel 2
+redistribuicao
+split 2 to 3
+first promo val: 554
+inserindo a chave: 1218 no nó: 8
+estou no nivel 3
+tem espaco
+inserindo RRN: 14, na posicao: 2
+inserindo a chave: 132 no nó: 1
+estou no nivel 1
+tem espaco
+inserindo a chave: 1168 no nó: 11
+estou no nivel 1
+redistribuicao
+split 2 to 3
+split pra esquerda
+first promo val: 966
+--------------------
+| 620 | 886 | 966 | -1 |
+10    6    4    11    -1
+--------------------
+inserindo a chave: 1168 no nó: 7
+estou no nivel 2
+tem espaco
+inserindo RRN: 15, na posicao: 4
+inserindo a chave: 611 no nó: 10
+estou no nivel 1
+redistribuicao
+split 2 to 3
+first promo val: 609
+--------------------
+| 609 | 886 | 966 | 1168 |
+10    6    4    11    15
+--------------------
+inserindo a chave: 689 no nó: 7
+estou no nivel 2
+redistribuicao
+inserindo a chave: 609 no nó: 8
+estou no nivel 3
+tem espaco
+inserindo a chave: 894 no nó: 4
+estou no nivel 1
+tem espaco
+inserindo a chave: 1311 no nó: 9
+estou no nivel 1
+redistribuicao
+split 2 to 3
+first promo val: 1311
+inserindo a chave: 1414 no nó: 14
+estou no nivel 2
+tem espaco
+inserindo RRN: 17, na posicao: 2
+inserindo a chave: 472 no nó: 5
+estou no nivel 1
+redistribuicao
+inserindo a chave: 463 no nó: 2
+estou no nivel 2
+tem espaco
+inserindo a chave: 1495 no nó: 3
+estou no nivel 1
+tem espaco
+inserindo a chave: 1280 no nó: 9
+estou no nivel 1
+tem espaco
+inserindo a chave: 517 no nó: 5
+estou no nivel 1
+tem espaco
+inserindo a chave: 245 no nó: 13
+estou no nivel 1
+redistribuicao
+split 2 to 3
+first promo val: 308
+inserindo a chave: 517 no nó: 2
+estou no nivel 2
+redistribuicao
+split 2 to 3
+first promo val: 517
+inserindo a chave: 886 no nó: 8
+estou no nivel 3
+tem espaco
+inserindo RRN: 19, na posicao: 2
+inserindo a chave: 1499 no nó: 3
+estou no nivel 1
+redistribuicao
+inserindo a chave: 1499 no nó: 14
+estou no nivel 2
+tem espaco
+inserindo a chave: 885 no nó: 16
+estou no nivel 1
+tem espaco
+inserindo a chave: 191 no nó: 1
+estou no nivel 1
+redistribuicao
+inserindo a chave: 132 no nó: 2
+estou no nivel 2
+tem espaco
+inserindo a chave: 101 no nó: 0
+estou no nivel 1
+redistribuicao
+split 2 to 3
+first promo val: 101
+inserindo a chave: 178 no nó: 2
+estou no nivel 2
+tem espaco
+inserindo RRN: 20, na posicao: 2
+inserindo a chave: 85 no nó: 0
+estou no nivel 1
+tem espaco
+inserindo a chave: 326 no nó: 5
+estou no nivel 1
+tem espaco
+inserindo a chave: 231 no nó: 13
+estou no nivel 1
+tem espaco
+inserindo a chave: 1409 no nó: 12
+estou no nivel 1
+tem espaco
+inserindo a chave: 584 no nó: 10
+estou no nivel 1
+tem espaco
+inserindo a chave: 140 no nó: 1
+estou no nivel 1
+tem espaco
+inserindo a chave: 1449 no nó: 17
+estou no nivel 1
+redistribuicao
+inserindo a chave: 1495 no nó: 14
+estou no nivel 2
+tem espaco
+inserindo a chave: 1054 no nó: 11
+estou no nivel 1
+tem espaco
+inserindo a chave: 608 no nó: 10
+estou no nivel 1
+redistribuicao
+inserindo a chave: 584 no nó: 7
+estou no nivel 2
+tem espaco
+inserindo a chave: 99 no nó: 0
+estou no nivel 1
+redistribuicao
+split 2 to 3
+first promo val: 91
+inserindo a chave: 132 no nó: 2
+estou no nivel 2
+redistribuicao
+inserindo a chave: 308 no nó: 8
+estou no nivel 3
+tem espaco
+inserindo a chave: 507 no nó: 5
+estou no nivel 1
+redistribuicao
+split 2 to 3
+first promo val: 472
+--------------------
+| 472 | 584 | 609 | 689 |
+5    18    10    6    16
+--------------------
+inserindo a chave: 545 no nó: 7
+estou no nivel 2
+redistribuicao
+inserindo a chave: 689 no nó: 8
+estou no nivel 3
+tem espaco
+inserindo a chave: 698 no nó: 16
+estou no nivel 1
+tem espaco
+inserindo a chave: 1208 no nó: 15
+estou no nivel 1
+tem espaco
+inserindo a chave: 1466 no nó: 17
+estou no nivel 1
+redistribuicao
+split 2 to 3
+first promo val: 1490
+inserindo a chave: 1513 no nó: 14
+estou no nivel 2
+tem espaco
+inserindo RRN: 23, na posicao: 4
+inserindo a chave: 728 no nó: 16
+estou no nivel 1
+redistribuicao
+split 2 to 3
+first promo val: 862
+inserindo a chave: 925 no nó: 19
+estou no nivel 2
+tem espaco
+inserindo RRN: 24, na posicao: 2
+inserindo a chave: 206 no nó: 20
+estou no nivel 1
+tem espaco
+inserindo a chave: 534 no nó: 18
+estou no nivel 1
+tem espaco
+inserindo a chave: 441 no nó: 5
+estou no nivel 1
+tem espaco
+inserindo a chave: 1173 no nó: 15
+estou no nivel 1
+redistribuicao
+split 2 to 3
+split pra esquerda
+first promo val: 1135
+inserindo a chave: 1173 no nó: 19
+estou no nivel 2
+redistribuicao
+split 2 to 3
+first promo val: 1135
+inserindo a chave: 1414 no nó: 8
+estou no nivel 3
+tem espaco
+inserindo RRN: 26, na posicao: 4
+inserindo a chave: 643 no nó: 6
+estou no nivel 1
+tem espaco
+inserindo a chave: 478 no nó: 18
+estou no nivel 1
+redistribuicao
+inserindo a chave: 536 no nó: 7
+estou no nivel 2
+tem espaco
+inserindo a chave: 65 no nó: 0
+estou no nivel 1
+tem espaco
+inserindo a chave: 596 no nó: 10
+estou no nivel 1
+tem espaco
+inserindo a chave: 343 no nó: 5
+estou no nivel 1
+redistribuicao
+split 2 to 3
+first promo val: 441
+--------------------
+| 441 | 536 | 584 | 609 |
+5    18    22    10    6
+--------------------
+inserindo a chave: 507 no nó: 7
+estou no nivel 2
+redistribuicao
+inserindo a chave: 609 no nó: 8
+estou no nivel 3
+tem espaco
+inserindo a chave: 1045 no nó: 11
+estou no nivel 1
+tem espaco
+inserindo a chave: 76 no nó: 0
+estou no nivel 1
+redistribuicao
+inserindo a chave: 85 no nó: 2
+estou no nivel 2
+tem espaco
+inserindo a chave: 1501 no nó: 3
+estou no nivel 1
+tem espaco
+inserindo a chave: 251 no nó: 13
+estou no nivel 1
+redistribuicao
+inserindo a chave: 228 no nó: 2
+estou no nivel 2
+tem espaco
+inserindo a chave: 443 no nó: 18
+estou no nivel 1
+tem espaco
+inserindo a chave: 358 no nó: 5
+estou no nivel 1
+tem espaco
+inserindo a chave: 1268 no nó: 9
+estou no nivel 1
+redistribuicao
+inserindo a chave: 1238 no nó: 14
+estou no nivel 2
+tem espaco
+inserindo a chave: 131 no nó: 1
+estou no nivel 1
+redistribuicao
+inserindo a chave: 131 no nó: 2
+estou no nivel 2
+tem espaco
+inserindo a chave: 1504 no nó: 3
+estou no nivel 1
+redistribuicao
+inserindo a chave: 1493 no nó: 26
+estou no nivel 2
+tem espaco
+inserindo a chave: 275 no nó: 13
+estou no nivel 1
+redistribuicao
+split 2 to 3
+split pra esquerda
+first promo val: 216
+inserindo a chave: 251 no nó: 2
+estou no nivel 2
+redistribuicao
+split 2 to 3
+first promo val: 216
+inserindo a chave: 507 no nó: 8
+estou no nivel 3
+split 1 to 2
+promovendo: 609 no split1-2
+nextRRN: 32
+sobrevivi
+inserindo a chave: 1193 no nó: 25
+estou no nivel 1
+redistribuicao
+inserindo a chave: 1173 no nó: 14
+estou no nivel 2
+tem espaco
+inserindo a chave: 715 no nó: 16
+estou no nivel 1
+tem espaco
+inserindo a chave: 731 no nó: 16
+estou no nivel 1
+redistribuicao
+inserindo a chave: 731 no nó: 19
+estou no nivel 2
+tem espaco
+inserindo a chave: 1073 no nó: 11
+estou no nivel 1
+redistribuicao
+inserindo a chave: 1047 no nó: 19
+estou no nivel 2
+tem espaco
+inserindo a chave: 555 no nó: 22
+estou no nivel 1
+tem espaco
+inserindo a chave: 1473 no nó: 17
+estou no nivel 1
+redistribuicao
+split 2 to 3
+first promo val: 1488
+inserindo a chave: 1499 no nó: 26
+estou no nivel 2
+tem espaco
+inserindo RRN: 32, na posicao: 2
+inserindo a chave: 907 no nó: 4
+estou no nivel 1
+redistribuicao
+split 2 to 3
+first promo val: 894
+inserindo a chave: 955 no nó: 19
+estou no nivel 2
+redistribuicao
+inserindo a chave: 1047 no nó: 30
+estou no nivel 3
+tem espaco
+inserindo a chave: 1056 no nó: 11
+estou no nivel 1
+tem espaco
+inserindo a chave: 402 no nó: 5
+estou no nivel 1
+redistribuicao
+inserindo a chave: 326 no nó: 7
+estou no nivel 2
+tem espaco
+inserindo a chave: 1478 no nó: 17
+estou no nivel 1
+tem espaco
+inserindo a chave: 944 no nó: 24
+estou no nivel 1
+tem espaco
+inserindo a chave: 41 no nó: 0
+estou no nivel 1
+redistribuicao
+split 2 to 3
+first promo val: 65
+inserindo a chave: 99 no nó: 2
+estou no nivel 2
+tem espaco
+inserindo RRN: 34, na posicao: 2
+inserindo a chave: 477 no nó: 18
+estou no nivel 1
+redistribuicao
+inserindo a chave: 443 no nó: 7
+estou no nivel 2
+tem espaco
+inserindo a chave: 309 no nó: 28
+estou no nivel 1
+redistribuicao
+inserindo a chave: 275 no nó: 7
+estou no nivel 2
+tem espaco
+inserindo a chave: 493 no nó: 18
+estou no nivel 1
+redistribuicao
+split 2 to 3
+split pra esquerda
+first promo val: 441
+--------------------
+| 275 | 326 | 441 | -1 |
+13    28    5    18    -1
+--------------------
+inserindo a chave: 477 no nó: 7
+estou no nivel 2
+tem espaco
+inserindo RRN: 35, na posicao: 4
+inserindo a chave: 616 no nó: 6
+estou no nivel 1
+redistribuicao
+split 2 to 3
+first promo val: 643
+inserindo a chave: 698 no nó: 19
+estou no nivel 2
+redistribuicao
+split 2 to 3
+first promo val: 894
+inserindo a chave: 1173 no nó: 30
+estou no nivel 3
+tem espaco
+inserindo RRN: 37, na posicao: 2
+inserindo a chave: 1182 no nó: 25
+estou no nivel 1
+redistribuicao
+split 2 to 3
+first promo val: 1217
+inserindo a chave: 1268 no nó: 37
+estou no nivel 2
+tem espaco
+inserindo RRN: 38, na posicao: 2
+inserindo a chave: 1345 no nó: 12
+estou no nivel 1
+redistribuicao
+inserindo a chave: 1337 no nó: 37
+estou no nivel 2
+tem espaco
+inserindo a chave: 364 no nó: 5
+estou no nivel 1
+tem espaco
+inserindo a chave: 171 no nó: 21
+estou no nivel 1
+tem espaco
+inserindo a chave: 375 no nó: 5
+estou no nivel 1
+redistribuicao
+inserindo a chave: 402 no nó: 7
+estou no nivel 2
+tem espaco
+inserindo a chave: 1105 no nó: 11
+estou no nivel 1
+redistribuicao
+inserindo a chave: 1056 no nó: 14
+estou no nivel 2
+tem espaco
+inserindo a chave: 1049 no nó: 33
+estou no nivel 1
+redistribuicao
+inserindo a chave: 1054 no nó: 14
+estou no nivel 2
+tem espaco
+inserindo a chave: 595 no nó: 10
+estou no nivel 1
+redistribuicao
+split 2 to 3
+split pra esquerda
+first promo val: 564
+inserindo a chave: 599 no nó: 29
+estou no nivel 2
+tem espaco
+inserindo RRN: 39, na posicao: 3
+inserindo a chave: 437 no nó: 18
+estou no nivel 1
+redistribuicao
+inserindo a chave: 472 no nó: 7
+estou no nivel 2
+tem espaco
+inserindo a chave: 936 no nó: 24
+estou no nivel 1
+redistribuicao
+split 2 to 3
+first promo val: 936
+inserindo a chave: 1045 no nó: 14
+estou no nivel 2
+tem espaco
+inserindo RRN: 40, na posicao: 2
+inserindo a chave: 816 no nó: 4
+estou no nivel 1
+tem espaco
+inserindo a chave: 480 no nó: 35
+estou no nivel 1
+tem espaco
+inserindo a chave: 263 no nó: 13
+estou no nivel 1
+redistribuicao
+split 2 to 3
+first promo val: 251
+--------------------
+| 251 | 326 | 402 | 472 |
+13    28    5    18    35
+--------------------
+inserindo a chave: 308 no nó: 7
+estou no nivel 2
+redistribuicao
+inserindo a chave: 472 no nó: 8
+estou no nivel 3
+tem espaco
+inserindo a chave: 98 no nó: 1
+estou no nivel 1
+tem espaco
+inserindo a chave: 1163 no nó: 15
+estou no nivel 1
+redistribuicao
+split 2 to 3
+split pra esquerda
+first promo val: 1107
+inserindo a chave: 1168 no nó: 14
+estou no nivel 2
+redistribuicao
+inserindo a chave: 936 no nó: 30
+estou no nivel 3
+tem espaco
+inserindo a chave: 1411 no nó: 12
+estou no nivel 1
+tem espaco
+inserindo a chave: 350 no nó: 5
+estou no nivel 1
+redistribuicao
+inserindo a chave: 350 no nó: 7
+estou no nivel 2
+tem espaco
+inserindo a chave: 835 no nó: 4
+estou no nivel 1
+redistribuicao
+inserindo a chave: 835 no nó: 19
+estou no nivel 2
+tem espaco
+inserindo a chave: 223 no nó: 13
+estou no nivel 1
+tem espaco
+inserindo a chave: 772 no nó: 36
+estou no nivel 1
+redistribuicao
+inserindo a chave: 715 no nó: 19
+estou no nivel 2
+tem espaco
+inserindo a chave: 84 no nó: 1
+estou no nivel 1
+redistribuicao
+inserindo a chave: 76 no nó: 2
+estou no nivel 2
+tem espaco
+inserindo a chave: 967 no nó: 33
+estou no nivel 1
+tem espaco
+inserindo a chave: 632 no nó: 6
+estou no nivel 1
+tem espaco
+inserindo a chave: 1072 no nó: 11
+estou no nivel 1
+tem espaco
+inserindo a chave: 284 no nó: 28
+estou no nivel 1
+tem espaco
+inserindo a chave: 642 no nó: 6
+estou no nivel 1
+redistribuicao
+split 2 to 3
+first promo val: 632
+inserindo a chave: 689 no nó: 19
+estou no nivel 2
+redistribuicao
+split 2 to 3
+first promo val: 835
+inserindo a chave: 1054 no nó: 30
+estou no nivel 3
+tem espaco
+inserindo RRN: 44, na posicao: 2
+inserindo a chave: 921 no nó: 24
+estou no nivel 1
+tem espaco
+inserindo a chave: 346 no nó: 41
+estou no nivel 1
+redistribuicao
+inserindo a chave: 346 no nó: 7
+estou no nivel 2
+tem espaco
+inserindo a chave: 677 no nó: 16
+estou no nivel 1
+tem espaco
+inserindo a chave: 501 no nó: 35
+estou no nivel 1
+redistribuicao
+inserindo a chave: 501 no nó: 29
+estou no nivel 2
+tem espaco
+inserindo a chave: 959 no nó: 33
+estou no nivel 1
+redistribuicao
+inserindo a chave: 967 no nó: 14
+estou no nivel 2
+tem espaco
+inserindo a chave: 919 no nó: 24
+estou no nivel 1
+redistribuicao
+inserindo a chave: 907 no nó: 14
+estou no nivel 2
+tem espaco
+inserindo a chave: 803 no nó: 36
+estou no nivel 1
+redistribuicao
+inserindo a chave: 731 no nó: 19
+estou no nivel 2
+tem espaco
+inserindo a chave: 21 no nó: 0
+estou no nivel 1
+redistribuicao
+split 2 to 3
+first promo val: 50
+inserindo a chave: 85 no nó: 2
+estou no nivel 2
+redistribuicao
+split 2 to 3
+first promo val: 131
+inserindo a chave: 308 no nó: 8
+estou no nivel 3
+tem espaco
+inserindo RRN: 46, na posicao: 2
+inserindo a chave: 1276 no nó: 38
+estou no nivel 1
+redistribuicao
+inserindo a chave: 1276 no nó: 37
+estou no nivel 2
+tem espaco
+inserindo a chave: 1393 no nó: 12
+estou no nivel 1
+redistribuicao
+split 2 to 3
+split pra esquerda
+first promo val: 1321
+inserindo a chave: 1393 no nó: 37
+estou no nivel 2
+tem espaco
+inserindo RRN: 47, na posicao: 4
+inserindo a chave: 225 no nó: 13
+estou no nivel 1
+redistribuicao
+inserindo a chave: 223 no nó: 7
+estou no nivel 2
+tem espaco
+inserindo a chave: 405 no nó: 18
+estou no nivel 1
+redistribuicao
+split 2 to 3
+split pra esquerda
+first promo val: 375
+inserindo a chave: 441 no nó: 46
+estou no nivel 2
+tem espaco
+inserindo RRN: 48, na posicao: 3
+inserindo a chave: 1435 no nó: 17
+estou no nivel 1
+redistribuicao
+inserindo a chave: 1478 no nó: 26
+estou no nivel 2
+tem espaco
+inserindo a chave: 563 no nó: 22
+estou no nivel 1
+tem espaco
+inserindo a chave: 289 no nó: 28
+estou no nivel 1
+redistribuicao
+split 2 to 3
+split pra esquerda
+first promo val: 245
+--------------------
+| 178 | 223 | 245 | -1 |
+21    20    13    28    -1
+--------------------
+inserindo a chave: 284 no nó: 7
+estou no nivel 2
+tem espaco
+inserindo RRN: 49, na posicao: 4
+inserindo a chave: 1335 no nó: 12
+estou no nivel 1
+tem espaco
+inserindo a chave: 762 no nó: 36
+estou no nivel 1
+tem espaco
+inserindo a chave: 319 no nó: 41
+estou no nivel 1
+redistribuicao
+inserindo a chave: 343 no nó: 46
+estou no nivel 2
+tem espaco
+inserindo a chave: 671 no nó: 16
+estou no nivel 1
+redistribuicao
+inserindo a chave: 642 no nó: 19
+estou no nivel 2
+tem espaco
+inserindo a chave: 1115 no nó: 15
+estou no nivel 1
+tem espaco
+inserindo a chave: 6 no nó: 0
+estou no nivel 1
+tem espaco
+inserindo a chave: 876 no nó: 4
+estou no nivel 1
+redistribuicao
+split 2 to 3
+first promo val: 886
+inserindo a chave: 921 no nó: 14
+estou no nivel 2
+tem espaco
+inserindo RRN: 50, na posicao: 2
+inserindo a chave: 1180 no nó: 25
+estou no nivel 1
+tem espaco
+inserindo a chave: 1166 no nó: 15
+estou no nivel 1
+redistribuicao
+inserindo a chave: 1168 no nó: 44
+estou no nivel 2
+tem espaco
+inserindo a chave: 414 no nó: 18
+estou no nivel 1
+tem espaco
+inserindo a chave: 444 no nó: 48
+estou no nivel 1
+tem espaco
+inserindo a chave: 88 no nó: 45
+estou no nivel 1
+tem espaco
+inserindo a chave: 139 no nó: 21
+estou no nivel 1
+redistribuicao
+split 2 to 3
+first promo val: 166
+--------------------
+| 166 | 223 | 245 | 284 |
+21    20    13    28    49
+--------------------
+inserindo a chave: 191 no nó: 7
+estou no nivel 2
+redistribuicao
+inserindo a chave: 166 no nó: 8
+estou no nivel 3
+tem espaco
+inserindo a chave: 1033 no nó: 40
+estou no nivel 1
+tem espaco
+inserindo a chave: 1528 no nó: 23
+estou no nivel 1
+tem espaco
+inserindo a chave: 1165 no nó: 15
+estou no nivel 1
+redistribuicao
+inserindo a chave: 1166 no nó: 44
+estou no nivel 2
+tem espaco
+inserindo a chave: 769 no nó: 36
+estou no nivel 1
+redistribuicao
+split 2 to 3
+split pra esquerda
+first promo val: 728
+inserindo a chave: 772 no nó: 19
+estou no nivel 2
+tem espaco
+inserindo RRN: 52, na posicao: 4
+inserindo a chave: 29 no nó: 0
+estou no nivel 1
+redistribuicao
+inserindo a chave: 41 no nó: 2
+estou no nivel 2
+tem espaco
+inserindo a chave: 1529 no nó: 23
+estou no nivel 1
+tem espaco
+inserindo a chave: 291 no nó: 49
+estou no nivel 1
+tem espaco
+inserindo a chave: 129 no nó: 34
+estou no nivel 1
+tem espaco
+inserindo a chave: 1503 no nó: 32
+estou no nivel 1
+tem espaco
+inserindo a chave: 1476 no nó: 17
+estou no nivel 1
+=============Antes do split=============
+-----RRN: 31 --- QTD chaves: 1-----
+--------------------
+| 609 | -1 | -1 | -1 |
+8    30    -1    -1    -1
+--------------------
+-----RRN: 8 --- QTD chaves: 3-----
+--------------------
+| 166 | 308 | 472 | -1 |
+2    7    46    29    -1
+--------------------
+-----RRN: 30 --- QTD chaves: 4-----
+--------------------
+| 835 | 1054 | 1173 | 1414 |
+19    14    44    37    26
+--------------------
+-----RRN: 2 --- QTD chaves: 4-----
+--------------------
+| 41 | 85 | 99 | 131 |
+0    1    45    34    21
+--------------------
+-----RRN: 7 --- QTD chaves: 4-----
+--------------------
+| 191 | 223 | 245 | 284 |
+20    51    13    28    49
+--------------------
+-----RRN: 46 --- QTD chaves: 3-----
+--------------------
+| 343 | 375 | 441 | -1 |
+41    5    18    48    -1
+--------------------
+-----RRN: 29 --- QTD chaves: 4-----
+--------------------
+| 501 | 536 | 564 | 599 |
+35    27    22    10    39
+--------------------
+-----RRN: 19 --- QTD chaves: 4-----
+--------------------
+| 642 | 689 | 728 | 772 |
+6    16    43    36    52
+--------------------
+-----RRN: 14 --- QTD chaves: 4-----
+--------------------
+| 886 | 921 | 936 | 967 |
+4    24    50    33    40
+--------------------
+-----RRN: 44 --- QTD chaves: 2-----
+--------------------
+| 1107 | 1166 | -1 | -1 |
+11    15    42    -1    -1
+--------------------
+-----RRN: 37 --- QTD chaves: 4-----
+--------------------
+| 1217 | 1276 | 1321 | 1393 |
+25    9    38    12    47
+--------------------
+-----RRN: 26 --- QTD chaves: 3-----
+--------------------
+| 1478 | 1499 | 1513 | -1 |
+17    3    32    23    -1
+--------------------
+-----RRN: 0 --- QTD chaves: 4-----
+--------------------
+| 4 | 6 | 21 | 29 |
+-1    -1    -1    -1    -1
+--------------------
+-----RRN: 1 --- QTD chaves: 4-----
+--------------------
+| 50 | 65 | 76 | 84 |
+-1    -1    -1    -1    -1
+--------------------
+-----RRN: 45 --- QTD chaves: 3-----
+--------------------
+| 88 | 91 | 98 | -1 |
+-1    -1    -1    -1    -1
+--------------------
+-----RRN: 34 --- QTD chaves: 3-----
+--------------------
+| 101 | 127 | 129 | -1 |
+-1    -1    -1    -1    -1
+--------------------
+-----RRN: 21 --- QTD chaves: 3-----
+--------------------
+| 132 | 139 | 140 | -1 |
+-1    -1    -1    -1    -1
+--------------------
+-----RRN: 20 --- QTD chaves: 3-----
+--------------------
+| 171 | 178 | 182 | -1 |
+-1    -1    -1    -1    -1
+--------------------
+-----RRN: 51 --- QTD chaves: 2-----
+--------------------
+| 206 | 216 | -1 | -1 |
+-1    -1    -1    -1    -1
+--------------------
+-----RRN: 13 --- QTD chaves: 3-----
+--------------------
+| 225 | 228 | 231 | -1 |
+-1    -1    -1    -1    -1
+--------------------
+-----RRN: 28 --- QTD chaves: 3-----
+--------------------
+| 251 | 263 | 275 | -1 |
+-1    -1    -1    -1    -1
+--------------------
+-----RRN: 49 --- QTD chaves: 3-----
+--------------------
+| 289 | 291 | 304 | -1 |
+-1    -1    -1    -1    -1
+--------------------
+-----RRN: 41 --- QTD chaves: 4-----
+--------------------
+| 309 | 319 | 321 | 326 |
+-1    -1    -1    -1    -1
+--------------------
+-----RRN: 5 --- QTD chaves: 4-----
+--------------------
+| 346 | 350 | 358 | 364 |
+-1    -1    -1    -1    -1
+--------------------
+-----RRN: 18 --- QTD chaves: 4-----
+--------------------
+| 402 | 405 | 414 | 437 |
+-1    -1    -1    -1    -1
+--------------------
+-----RRN: 48 --- QTD chaves: 3-----
+--------------------
+| 443 | 444 | 463 | -1 |
+-1    -1    -1    -1    -1
+--------------------
+-----RRN: 35 --- QTD chaves: 4-----
+--------------------
+| 477 | 478 | 480 | 493 |
+-1    -1    -1    -1    -1
+--------------------
+-----RRN: 27 --- QTD chaves: 3-----
+--------------------
+| 507 | 517 | 534 | -1 |
+-1    -1    -1    -1    -1
+--------------------
+-----RRN: 22 --- QTD chaves: 4-----
+--------------------
+| 545 | 554 | 555 | 563 |
+-1    -1    -1    -1    -1
+--------------------
+-----RRN: 10 --- QTD chaves: 3-----
+--------------------
+| 584 | 595 | 596 | -1 |
+-1    -1    -1    -1    -1
+--------------------
+-----RRN: 39 --- QTD chaves: 2-----
+--------------------
+| 603 | 608 | -1 | -1 |
+-1    -1    -1    -1    -1
+--------------------
+-----RRN: 6 --- QTD chaves: 4-----
+--------------------
+| 611 | 616 | 620 | 632 |
+-1    -1    -1    -1    -1
+--------------------
+-----RRN: 16 --- QTD chaves: 4-----
+--------------------
+| 643 | 665 | 671 | 677 |
+-1    -1    -1    -1    -1
+--------------------
+-----RRN: 43 --- QTD chaves: 3-----
+--------------------
+| 691 | 698 | 715 | -1 |
+-1    -1    -1    -1    -1
+--------------------
+-----RRN: 36 --- QTD chaves: 3-----
+--------------------
+| 731 | 762 | 769 | -1 |
+-1    -1    -1    -1    -1
+--------------------
+-----RRN: 52 --- QTD chaves: 2-----
+--------------------
+| 803 | 816 | -1 | -1 |
+-1    -1    -1    -1    -1
+--------------------
+-----RRN: 4 --- QTD chaves: 3-----
+--------------------
+| 862 | 876 | 885 | -1 |
+-1    -1    -1    -1    -1
+--------------------
+-----RRN: 24 --- QTD chaves: 3-----
+--------------------
+| 894 | 907 | 919 | -1 |
+-1    -1    -1    -1    -1
+--------------------
+-----RRN: 50 --- QTD chaves: 2-----
+--------------------
+| 925 | 933 | -1 | -1 |
+-1    -1    -1    -1    -1
+--------------------
+-----RRN: 33 --- QTD chaves: 4-----
+--------------------
+| 944 | 955 | 959 | 966 |
+-1    -1    -1    -1    -1
+--------------------
+-----RRN: 40 --- QTD chaves: 4-----
+--------------------
+| 1033 | 1045 | 1047 | 1049 |
+-1    -1    -1    -1    -1
+--------------------
+-----RRN: 11 --- QTD chaves: 4-----
+--------------------
+| 1056 | 1072 | 1073 | 1105 |
+-1    -1    -1    -1    -1
+--------------------
+-----RRN: 15 --- QTD chaves: 4-----
+--------------------
+| 1115 | 1135 | 1163 | 1165 |
+-1    -1    -1    -1    -1
+--------------------
+-----RRN: 42 --- QTD chaves: 4-----
+--------------------
+| 1168 | 1168 | 1170 | 1173 |
+-1    -1    -1    -1    -1
+--------------------
+-----RRN: 25 --- QTD chaves: 4-----
+--------------------
+| 1180 | 1182 | 1193 | 1208 |
+-1    -1    -1    -1    -1
+--------------------
+-----RRN: 9 --- QTD chaves: 4-----
+--------------------
+| 1218 | 1238 | 1265 | 1268 |
+-1    -1    -1    -1    -1
+--------------------
+-----RRN: 38 --- QTD chaves: 3-----
+--------------------
+| 1280 | 1298 | 1311 | -1 |
+-1    -1    -1    -1    -1
+--------------------
+-----RRN: 12 --- QTD chaves: 4-----
+--------------------
+| 1335 | 1337 | 1345 | 1389 |
+-1    -1    -1    -1    -1
+--------------------
+-----RRN: 47 --- QTD chaves: 3-----
+--------------------
+| 1393 | 1409 | 1411 | -1 |
+-1    -1    -1    -1    -1
+--------------------
+-----RRN: 17 --- QTD chaves: 4-----
+--------------------
+| 1435 | 1449 | 1466 | 1473 |
+-1    -1    -1    -1    -1
+--------------------
+-----RRN: 3 --- QTD chaves: 4-----
+--------------------
+| 1488 | 1490 | 1493 | 1495 |
+-1    -1    -1    -1    -1
+--------------------
+-----RRN: 32 --- QTD chaves: 3-----
+--------------------
+| 1501 | 1503 | 1504 | -1 |
+-1    -1    -1    -1    -1
+--------------------
+-----RRN: 23 --- QTD chaves: 4-----
+--------------------
+| 1520 | 1528 | 1529 | 1531 |
+-1    -1    -1    -1    -1
+--------------------
