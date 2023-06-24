@@ -12,6 +12,7 @@ typedef struct node Node;
 typedef struct treeHeader TreeHeader;
 typedef struct insertUtils InsertUtils;
 typedef struct promotedKey PromotedKey;
+typedef struct fila Fila;
 
 void initKey(Key *k);
 void initPointers(int *p);
@@ -35,5 +36,6 @@ Node *createNode();
 void setNodeLevel(Node *n, int level);
 void printArvore2(Node **arrNode, TreeHeader *tHeader);
 void treeHeaderSetStatus(TreeHeader *tHeader, char status);
+void printArvore3(Node **arr, TreeHeader *tHeader);
 
 #endif

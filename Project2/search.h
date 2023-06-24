@@ -20,5 +20,7 @@ void printResultData(Result *res, FILE *dataFile);
 long long int getByteoffset(Result *r, int idx);
 int getIndex(Result *r);
 int setIndex(Result *r, int index);
+int getFoundFlag(Result *r);
+void setFoundFlag(Result *r, int value);
 
 #endif

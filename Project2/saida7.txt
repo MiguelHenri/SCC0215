@@ -1,0 +1,391 @@
+./programaTrab
+primeira insercao 1493
+inserindo a chave: 182 no nó: 0
+estou no nivel 1
+tem espaco
+inserindo a chave: 1488 no nó: 0
+estou no nivel 1
+tem espaco
+inserindo a chave: 1298 no nó: 0
+estou no nivel 1
+tem espaco
+inserindo a chave: 665 no nó: 0
+estou no nivel 1
+split 1 to 2
+promovendo: 1298 no split1-2
+nextRRN: 3
+sobrevivi
+inserindo a chave: 1389 no nó: 1
+estou no nivel 1
+tem espaco
+inserindo a chave: 536 no nó: 0
+estou no nivel 1
+tem espaco
+inserindo a chave: 1337 no nó: 1
+estou no nivel 1
+tem espaco
+inserindo a chave: 1170 no nó: 0
+estou no nivel 1
+tem espaco
+inserindo a chave: 216 no nó: 0
+estou no nivel 1
+redistribuicao
+split 2 to 3
+first promo val: 665
+inserindo a chave: 1389 no nó: 2
+estou no nivel 2
+tem espaco
+inserindo RRN: 3, na posicao: 2
+inserindo a chave: 4 no nó: 0
+estou no nivel 1
+tem espaco
+inserindo a chave: 127 no nó: 0
+estou no nivel 1
+redistribuicao
+inserindo a chave: 536 no nó: 2
+estou no nivel 2
+tem espaco
+inserindo a chave: 304 no nó: 0
+estou no nivel 1
+redistribuicao
+split 2 to 3
+first promo val: 216
+inserindo a chave: 1170 no nó: 2
+estou no nivel 2
+tem espaco
+inserindo RRN: 4, na posicao: 2
+inserindo a chave: 554 no nó: 1
+estou no nivel 1
+tem espaco
+inserindo a chave: 1414 no nó: 3
+estou no nivel 1
+tem espaco
+inserindo a chave: 564 no nó: 1
+estou no nivel 1
+redistribuicao
+inserindo a chave: 304 no nó: 2
+estou no nivel 2
+tem espaco
+inserindo a chave: 178 no nó: 0
+estou no nivel 1
+redistribuicao
+split 2 to 3
+first promo val: 182
+inserindo a chave: 554 no nó: 2
+estou no nivel 2
+tem espaco
+inserindo RRN: 5, na posicao: 2
+inserindo a chave: 91 no nó: 0
+estou no nivel 1
+tem espaco
+inserindo a chave: 1107 no nó: 5
+estou no nivel 1
+tem espaco
+inserindo a chave: 933 no nó: 5
+estou no nivel 1
+tem espaco
+inserindo a chave: 862 no nó: 5
+estou no nivel 1
+redistribuicao
+inserindo a chave: 564 no nó: 2
+estou no nivel 2
+tem espaco
+inserindo a chave: 599 no nó: 5
+estou no nivel 1
+redistribuicao
+inserindo a chave: 1107 no nó: 2
+estou no nivel 2
+tem espaco
+inserindo a chave: 1135 no nó: 4
+estou no nivel 1
+tem espaco
+inserindo a chave: 308 no nó: 1
+estou no nivel 1
+redistribuicao
+split 2 to 3
+first promo val: 536
+inserindo a chave: 665 no nó: 2
+estou no nivel 2
+split 1 to 2
+promovendo: 665 no split1-2
+nextRRN: 9
+sobrevivi
+inserindo a chave: 1520 no nó: 3
+estou no nivel 1
+tem espaco
+inserindo a chave: 691 no nó: 6
+estou no nivel 1
+tem espaco
+inserindo a chave: 955 no nó: 6
+estou no nivel 1
+tem espaco
+inserindo a chave: 50 no nó: 0
+estou no nivel 1
+redistribuicao
+inserindo a chave: 178 no nó: 2
+estou no nivel 2
+tem espaco
+inserindo a chave: 925 no nó: 6
+estou no nivel 1
+redistribuicao
+split 2 to 3
+first promo val: 933
+--------------------
+| 933 | 1389 | -1 | -1 |
+6    4    3    -1    -1
+--------------------
+inserindo a chave: 1170 no nó: 7
+estou no nivel 2
+tem espaco
+inserindo RRN: 9, na posicao: 2
+inserindo a chave: 609 no nó: 5
+estou no nivel 1
+tem espaco
+inserindo a chave: 228 no nó: 1
+estou no nivel 1
+redistribuicao
+split 2 to 3
+first promo val: 304
+inserindo a chave: 564 no nó: 2
+estou no nivel 2
+tem espaco
+inserindo RRN: 10, na posicao: 3
+inserindo a chave: 966 no nó: 4
+estou no nivel 1
+tem espaco
+inserindo a chave: 886 no nó: 6
+estou no nivel 1
+tem espaco
+inserindo a chave: 1513 no nó: 3
+estou no nivel 1
+redistribuicao
+inserindo a chave: 1488 no nó: 7
+estou no nivel 2
+tem espaco
+inserindo a chave: 1531 no nó: 3
+estou no nivel 1
+tem espaco
+inserindo a chave: 689 no nó: 6
+estou no nivel 1
+redistribuicao
+split 2 to 3
+first promo val: 886
+--------------------
+| 886 | 1170 | 1488 | -1 |
+6    4    9    3    -1
+--------------------
+inserindo a chave: 966 no nó: 7
+estou no nivel 2
+tem espaco
+inserindo RRN: 11, na posicao: 2
+inserindo a chave: 1218 no nó: 9
+estou no nivel 1
+redistribuicao
+inserindo a chave: 1298 no nó: 7
+estou no nivel 2
+tem espaco
+inserindo a chave: 1238 no nó: 11
+estou no nivel 1
+redistribuicao
+inserindo a chave: 1107 no nó: 7
+estou no nivel 2
+tem espaco
+inserindo a chave: 1321 no nó: 9
+estou no nivel 1
+tem espaco
+inserindo a chave: 545 no nó: 5
+estou no nivel 1
+tem espaco
+inserindo a chave: 321 no nó: 5
+estou no nivel 1
+redistribuicao
+inserindo a chave: 308 no nó: 2
+estou no nivel 2
+tem espaco
+inserindo a chave: 1217 no nó: 11
+estou no nivel 1
+redistribuicao
+split 2 to 3
+first promo val: 1218
+--------------------
+| 886 | 1107 | 1218 | 1488 |
+6    4    11    9    3
+--------------------
+inserindo a chave: 1337 no nó: 7
+estou no nivel 2
+redistribuicao
+inserindo a chave: 886 no nó: 8
+estou no nivel 3
+tem espaco
+inserindo a chave: 1490 no nó: 3
+estou no nivel 1
+redistribuicao
+inserindo a chave: 1493 no nó: 7
+estou no nivel 2
+tem espaco
+inserindo a chave: 463 no nó: 5
+estou no nivel 1
+redistribuicao
+inserindo a chave: 554 no nó: 2
+estou no nivel 2
+tem espaco
+inserindo a chave: 1047 no nó: 4
+estou no nivel 1
+redistribuicao
+inserindo a chave: 1047 no nó: 7
+estou no nivel 2
+tem espaco
+inserindo a chave: 620 no nó: 10
+estou no nivel 1
+tem espaco
+inserindo a chave: 1265 no nó: 9
+estou no nivel 1
+tem espaco
+inserindo a chave: 603 no nó: 10
+estou no nivel 1
+redistribuicao
+inserindo a chave: 620 no nó: 2
+estou no nivel 2
+tem espaco
+inserindo a chave: 166 no nó: 0
+estou no nivel 1
+redistribuicao
+split 2 to 3
+first promo val: 127
+inserindo a chave: 216 no nó: 2
+estou no nivel 2
+redistribuicao
+split 2 to 3
+first promo val: 554
+inserindo a chave: 1218 no nó: 8
+estou no nivel 3
+tem espaco
+inserindo RRN: 14, na posicao: 2
+inserindo a chave: 132 no nó: 1
+estou no nivel 1
+tem espaco
+inserindo a chave: 1168 no nó: 11
+estou no nivel 1
+redistribuicao
+split 2 to 3
+split pra esquerda
+first promo val: 966
+--------------------
+| 620 | 886 | 966 | -1 |
+10    6    4    11    -1
+--------------------
+inserindo a chave: 1168 no nó: 7
+estou no nivel 2
+tem espaco
+inserindo RRN: 15, na posicao: 4
+inserindo a chave: 611 no nó: 10
+estou no nivel 1
+redistribuicao
+split 2 to 3
+first promo val: 609
+--------------------
+| 609 | 886 | 966 | 1168 |
+10    6    4    11    15
+--------------------
+inserindo a chave: 689 no nó: 7
+estou no nivel 2
+redistribuicao
+inserindo a chave: 609 no nó: 8
+estou no nivel 3
+tem espaco
+inserindo a chave: 894 no nó: 4
+estou no nivel 1
+tem espaco
+inserindo a chave: 1311 no nó: 9
+estou no nivel 1
+redistribuicao
+split 2 to 3
+first promo val: 1311
+inserindo a chave: 1414 no nó: 14
+estou no nivel 2
+tem espaco
+inserindo RRN: 17, na posicao: 2
+inserindo a chave: 472 no nó: 5
+estou no nivel 1
+redistribuicao
+inserindo a chave: 463 no nó: 2
+estou no nivel 2
+tem espaco
+inserindo a chave: 1495 no nó: 3
+estou no nivel 1
+tem espaco
+inserindo a chave: 1280 no nó: 9
+estou no nivel 1
+tem espaco
+inserindo a chave: 517 no nó: 5
+estou no nivel 1
+tem espaco
+inserindo a chave: 245 no nó: 13
+estou no nivel 1
+redistribuicao
+split 2 to 3
+first promo val: 308
+inserindo a chave: 517 no nó: 2
+estou no nivel 2
+redistribuicao
+split 2 to 3
+first promo val: 517
+inserindo a chave: 886 no nó: 8
+estou no nivel 3
+tem espaco
+inserindo RRN: 19, na posicao: 2
+inserindo a chave: 1499 no nó: 3
+estou no nivel 1
+redistribuicao
+inserindo a chave: 1499 no nó: 14
+estou no nivel 2
+tem espaco
+inserindo a chave: 885 no nó: 16
+estou no nivel 1
+tem espaco
+inserindo a chave: 191 no nó: 1
+estou no nivel 1
+redistribuicao
+inserindo a chave: 132 no nó: 2
+estou no nivel 2
+tem espaco
+inserindo a chave: 101 no nó: 0
+estou no nivel 1
+redistribuicao
+split 2 to 3
+first promo val: 101
+inserindo a chave: 178 no nó: 2
+estou no nivel 2
+tem espaco
+inserindo RRN: 20, na posicao: 2
+inserindo a chave: 85 no nó: 0
+estou no nivel 1
+tem espaco
+inserindo a chave: 326 no nó: 5
+estou no nivel 1
+tem espaco
+inserindo a chave: 231 no nó: 13
+estou no nivel 1
+tem espaco
+inserindo a chave: 1409 no nó: 12
+estou no nivel 1
+tem espaco
+inserindo a chave: 584 no nó: 10
+estou no nivel 1
+tem espaco
+inserindo a chave: 140 no nó: 1
+estou no nivel 1
+tem espaco
+inserindo a chave: 1449 no nó: 17
+estou no nivel 1
+redistribuicao
+inserindo a chave: 1495 no nó: 14
+estou no nivel 2
+tem espaco
+inserindo a chave: 1054 no nó: 11
+estou no nivel 1
+tem espaco
+inserindo a chave: 608 no nó: 10
+estou no nivel 1
+redistribuicao
+inserindo a chav

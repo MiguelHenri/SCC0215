@@ -24,7 +24,9 @@ int main() {
         getc(stdin);
         char *memberName = readMember(stdin, ' ');
         char *indexType = readMember(stdin, ' ');
-        char *nameIndexFile = readMember(stdin, ' ');
+        // char *nameIndexFile = readMember(stdin, ' ');
+        char nameIndexFile[100];
+        scanf("%s", nameIndexFile);
         FILE *treeFile = fopen(nameIndexFile, "wb");
         
         createTree(dataFile, treeFile, memberName);
