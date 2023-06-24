@@ -28,11 +28,17 @@ int main() {
         char nameIndexFile[100];
         scanf("%s", nameIndexFile);
         FILE *treeFile = fopen(nameIndexFile, "wb");
+        if (treeFile == NULL) {
+            FILE_ERROR;
+            return 0;
+        }
         
         createTree(dataFile, treeFile, memberName);
         fclose(treeFile);
         
         binarioNaTela(nameIndexFile);
+
+        fclose(dataFile);
     }
     else if (operation == 9) {
         // searching using tree B* data index
@@ -46,10 +52,16 @@ int main() {
 
         // only reading to search
         FILE *treeFile = fopen(nameIndexFile, "rb");
+        if (treeFile == NULL) {
+            FILE_ERROR;
+            return 0;
+        }
 
         searchInTree(dataFile, treeFile, memberName, numSearches);
         fclose(treeFile);
-        
+
+        fclose(dataFile);
+
     }
     else if (operation == 10) {
         // inserting new data into index/data file
@@ -64,10 +76,20 @@ int main() {
         // will need to read data to find where to put new register
         // and will need to write new register
         FILE *treeFile = fopen(nameIndexFile, "rb+");
+        if (treeFile == NULL) {
+            FILE_ERROR;
+            return 0;
+        }
+
+        // will write into dataFile
+        fclose(dataFile);
+        FILE *dataFile = fopen(fileNameInput, "rb+");
 
         insertIntoTree(dataFile, treeFile, memberName, numInsertions);
         fclose(treeFile);
+        fclose(dataFile);
 
+        binarioNaTela(fileNameInput);
         binarioNaTela(nameIndexFile);
 
     }
@@ -82,9 +104,9 @@ int main() {
 
         createMiniBin(out, reg, numInsertions);
         fclose(out);
-    }
 
-    fclose(dataFile);
+        fclose(dataFile);
+    }
 
     return 0;
 }

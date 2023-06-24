@@ -8,17 +8,12 @@ void searchInTree(FILE *dataFile, FILE *treeFile, char *dataMemberName, int numb
     // reading the data header and verifying if it is consistent
     Header *dataFileHeader = readHeaderBinary(dataFile);
 
-
     // reading index tree header data and verifying consistency
     TreeHeader *tHeader = readTreeHeader(treeFile);
-    
-    //printTreeHeader(tHeader);
-    // printArvore(treeFile);
 
     for (int i = 0; i < numberSearches; i++) {
         Result *r = NULL;
 
-        printTreeHeader(tHeader);
         Search *wanted = createSearchArr();
 
         // if tree is indexed by idCrime, and we are searching idCrime,
@@ -51,23 +46,31 @@ void insertIntoTree(FILE *dataFile, FILE *treeFile, char *memberName, int numIns
     Node **arrayNode = (Node **)malloc(sizeof(Node *) * getNextRRN(tHeader));
     for (int i = 0; i < getNextRRN(tHeader); i++) arrayNode[i] = NULL;
 
+    long long int byteOffset = getNextByteOffset(dataFileHeader);
+
     // looping insertions
     for (int i=0; i<numInsertions; i++) {
         // reading register
         Data *reg = readRegisterStdin2();
 
-        // inserting into reg file
-        // fseek and write
-
         if (strncmp(memberName, "idCrime", 7) == 0) { 
             int key = getDataCrimeId(reg);
 
             // will insert into array with tree nodes
-            // arrayNode = insertTree(dataFile, treeFile, key, tHeader, arrayNode);
+            arrayNode = insertTree(dataFile, treeFile, key, byteOffset, tHeader, arrayNode);
+
+            // add byteoff to header
+            addTotalKeys(tHeader);
+            byteOffset += registerSize(reg);
+
+            // inserting into data file
+            insertRegisterInBinFile(dataFile, reg, dataFileHeader);
         }
-        // add byteoff to header
+        
     }
 
+    // overwriting data header
+    writeHeader(dataFile, dataFileHeader);
     // writing new index file data
     overwriteTreeFile(treeFile, arrayNode, tHeader);
     // writing new index header file data
@@ -105,7 +108,7 @@ void createTree(FILE *dataFile, FILE *treeFile, char *dataMemberName) {
             Node *node = createNode();
             setNodeLevel(node, 1);
             setKey(node, getDataCrimeId(reg), byteOff);
-            printf("primeira insercao %d\n", getDataCrimeId(reg));
+            // printf("primeira insercao %d\n", getDataCrimeId(reg));
             arrayNode = (Node **)malloc(sizeof(Node *) * 1);
             arrayNode[0] = node;
             // printNode(node);
@@ -124,8 +127,8 @@ void createTree(FILE *dataFile, FILE *treeFile, char *dataMemberName) {
 
     // writing new index file data
     // marking as consistent
-    printTreeHeader(tHeader);
-    printArvore3(arrayNode, tHeader);
+    // printTreeHeader(tHeader);
+    // printArvore3(arrayNode, tHeader);
     treeHeaderSetStatus(tHeader, '1');
     writeTreeHeader(treeFile, tHeader);
     // printArvore2(arrayNode, tHeader);

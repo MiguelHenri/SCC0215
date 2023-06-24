@@ -359,7 +359,7 @@ int regMissingData(Data *d) {
 int insertRegisterInBinFile(FILE *binFile, Data *reg, Header *h) {
     
     //calculating the byteoffset and setting the file to the end
-    long long int currentOffset = getNexByteOffset(h);
+    long long int currentOffset = getNextByteOffset(h);
     fseek(binFile, currentOffset, SEEK_SET);
 
     //adding the byteoffset to the header
@@ -404,7 +404,7 @@ Data *readRegisterStdin2() {
         getc(stdin); // reading the space character
     }
     else { // string read == NULO
-        d->crimeDate = NULL;
+        d->crimeDate = completeSetString(NULL, crimeDateLen);
         char garbage[60];
         scanf("%s", garbage);
         getc(stdin); // reading the space character
@@ -470,7 +470,7 @@ Data *readRegisterStdin2() {
         getc(stdin);
     }
     else { // string read == NULO
-        d->telephoneBrand = NULL;
+        d->telephoneBrand = completeSetString(NULL, telephoneBrandLen);
         char *garbage = readMember(stdin, '\n');
         free(garbage);
     }
