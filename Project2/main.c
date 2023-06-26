@@ -24,7 +24,7 @@ int main() {
         getc(stdin);
         char *memberName = readMember(stdin, ' ');
         char *indexType = readMember(stdin, ' ');
-        // char *nameIndexFile = readMember(stdin, ' ');
+
         char nameIndexFile[100];
         scanf("%s", nameIndexFile);
         FILE *treeFile = fopen(nameIndexFile, "wb");
@@ -33,11 +33,10 @@ int main() {
             return 0;
         }
         
-        createTree(dataFile, treeFile, memberName);
+        createTree(dataFile, treeFile);
         fclose(treeFile);
         
         binarioNaTela(nameIndexFile);
-
         fclose(dataFile);
     }
     else if (operation == 9) {
@@ -58,8 +57,8 @@ int main() {
         }
 
         searchInTree(dataFile, treeFile, memberName, numSearches);
-        fclose(treeFile);
 
+        fclose(treeFile);
         fclose(dataFile);
 
     }
@@ -86,26 +85,12 @@ int main() {
         FILE *dataFile = fopen(fileNameInput, "rb+");
 
         insertIntoTree(dataFile, treeFile, memberName, numInsertions);
+        
         fclose(treeFile);
         fclose(dataFile);
 
         binarioNaTela(fileNameInput);
         binarioNaTela(nameIndexFile);
-
-    }
-    else if (operation == 12) {
-        getc(stdin);
-        char *regFile = readMember(stdin, ' ');
-        char *nameIndexFile = readMember(stdin, ' ');
-        int numInsertions;
-        scanf(" %d", &numInsertions);
-        FILE *out = fopen(nameIndexFile, "wb+");
-        FILE *reg = fopen(regFile, "r");
-
-        createMiniBin(out, reg, numInsertions);
-        fclose(out);
-
-        fclose(dataFile);
     }
 
     return 0;

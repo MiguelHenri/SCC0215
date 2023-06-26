@@ -8,8 +8,7 @@
 #include "search.h"
 
 void searchInTree(FILE *dataFile, FILE *treeFile, char *dataMemberName, int numberSearches);
-void insertIntoTree(FILE *dataFile, FILE *treeFile, char *memberName, int numInsertions);
-void createTree(FILE *dataFile, FILE *treeFile, char *dataMemberName);
-void createMiniBin(FILE *newDataFile, FILE *input, int numReg);
+void insertIntoTree(FILE *dataFile, FILE *treeFile, char *dataMemberName, int numInsertions);
+void createTree(FILE *dataFile, FILE *treeFile);
 
 #endif
