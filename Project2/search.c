@@ -5,6 +5,7 @@ struct result {
     int index;
     long long int *arrByteOff;
     int length;
+    int found;
 };
 
 struct search {
@@ -15,6 +16,14 @@ struct search {
     };
     int len;
 };
+
+int getFoundFlag(Result *r) {
+    return r->found;
+}
+
+void setFoundFlag(Result *r, int value) {
+    r->found = value;
+}
 
 /*
 * Function that creates a search array, that contains the name of a member
@@ -114,6 +123,7 @@ Result *createResult() {
     r->arrByteOff = NULL;
     r->length = 0;
     r->index = -1;
+    r->found = 0;
 
     return r;
 }

@@ -118,11 +118,14 @@ void createTree(FILE *dataFile, FILE *treeFile, char *dataMemberName) {
             overwriteTreeFile(treeFile, arrayNode, tHeader);
         }
         
+        addTotalKeys(tHeader);
         byteOff += registerSize(reg);
     }
 
     // writing new index file data
     // marking as consistent
+    printTreeHeader(tHeader);
+    printArvore3(arrayNode, tHeader);
     treeHeaderSetStatus(tHeader, '1');
     writeTreeHeader(treeFile, tHeader);
     // printArvore2(arrayNode, tHeader);
