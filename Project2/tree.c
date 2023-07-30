@@ -1,8 +1,6 @@
 #include "tree.h"
 #include "registers.h"
 
-// to-do include pointers in son split1to2
-
 struct key {
     int value;
     long long int byteOffSet;
@@ -35,101 +33,47 @@ struct promotedKey {
     int pointerRRN;
 };
 
-struct fila {
-    Node **fila;
-    int inicio;
-    int fim;
-};
-
-Fila *criaFila() {
-    Fila *f = (Fila *)malloc(sizeof(Fila));
-
-    f->fila = (Node **)malloc(sizeof(Fila *) * 10000);
-    f->inicio = 0;
-    f->fim = 0;
-
-    return f;
-}
-
-void addFila(Fila *f, Node *n) {
-    f->fila[f->fim++] = n;
-}
-
-Node *removeFila(Fila *f) {
-    return f->fila[f->inicio++];
-}
-
-void printNode2(Node *n) {
-    printf("----------%d---------\n", n->numKeys);
-    printf("| %d | %d | %d | %d |\n", n->keys[0].value, n->keys[1].value, n->keys[2].value, n->keys[3].value);
-    printf("%d    %d    %d    %d    %d\n", n->pointers[0], n->pointers[1], n->pointers[2], n->pointers[3], n->pointers[4]);
-    printf("--------------------\n");
-
-}
-
-void printArvore3(Node **arr, TreeHeader *tHeader) {
-    Fila *f = criaFila();
-    int rrn[10000];
-    addFila(f, arr[tHeader->root]);
-    rrn[0] = tHeader->root;
-
-    for (int i = 0; i < tHeader->nextRRN; i++) {
-        Node *n = removeFila(f);
-        if (n == NULL) break;
-        printf("-----RRN: %d --- QTD chaves: %d-----\n", rrn[i], n->numKeys);
-        printNode2(n);
-
-        for (int j = 0; j < TREE_ORDER; j++) {
-            if (n->pointers[j] != -1) {
-                addFila(f, arr[n->pointers[j]]);
-                rrn[f->fim-1] = n->pointers[j];
-            }
-        }
-    }
-    free(f->fila);
-}
-
-void printNode(Node *n) {
-    printf("-------------------------\n");
-    printf("nivel do no: %d\n", n->level);
-    printf("num de chaves: %d\n", n->numKeys);
-
+/*
+* Function that initializes the node key values and offsets
+*/
+void initKey(Key *k) {
     for (int i = 0; i < TREE_ORDER-1; i++) {
-        printf("chave %d: %d\n", i, n->keys[i].value);
+        k[i].value = -1;
+        k[i].byteOffSet = -1;
     }
+}
+
+/*
+* Function that initializes the node pointers
+*/
+void initPointers(int *p) {
     for (int i = 0; i < TREE_ORDER; i++) {
-        printf("ponteiro %d: %d\n", i, n->pointers[i]);
+        p[i] = -1;
     }
-    printf("-------------------------\n");
 }
 
-void printTreeHeader(TreeHeader *t) {
-    printf("--------header----------\n");
-    printf("status: %c\n", t->status);
-    printf("root pointer: %d\n", t->root);
-    printf("next rrn %d\n", t->nextRRN);
-    printf("qtd de niveis: %d\n", t->totalLevels);
-    printf("qtd chaves: %d\n", t->totalKeys);
-    printf("-------------------------\n");
-
-}
-
+/*
+* Function that creates the header struct of the tree file
+*/
 TreeHeader *createTreeHeader() {
-
     // allocating space and initializing data
     TreeHeader *t = (TreeHeader *)malloc(sizeof(TreeHeader));
+
     t->status = '1'; // consistent
     t->root = -1; 
     t->nextRRN = 0;
     t->totalLevels = 0;
     t->totalKeys = 0;
-    for (int i=0; i<GARBAGE; i++) {
+    for (int i = 0; i < GARBAGE; i++) {
         t->garbage[i] = '$';
     }
 
     return t;
 }
 
+/*
+* Function that creates a node struct (a disk page) that will contain tree data
+*/
 Node *createNode() {
     // allocating space and initializing data
     Node *n = (Node *)malloc(sizeof(Node));
@@ -141,6 +85,10 @@ Node *createNode() {
     return n;
 }
 
+/*
+* Function that creates a Promoted key struct that will be useful when inserting 
+* data in the tree
+*/
 PromotedKey *createPromotedKey(int value, int byteOffSet, int pointer) {
     PromotedKey *k = (PromotedKey *)malloc(sizeof(PromotedKey));
     
@@ -151,6 +99,10 @@ PromotedKey *createPromotedKey(int value, int byteOffSet, int pointer) {
     return k;
 }
 
+/*
+* Function that creates a Insert Utils struct that will be useful when inserting in the
+* tree because we will be able to save the path we followed in the tree
+*/
 InsertUtils *creteInsertUtils(int treeLevel) {
     InsertUtils *i = (InsertUtils *)malloc(sizeof(InsertUtils));
 
@@ -160,6 +112,9 @@ InsertUtils *creteInsertUtils(int treeLevel) {
     return i; 
 }
 
+/*
+* Function that writes the tree header
+*/
 void writeTreeHeader(FILE *treeFile, TreeHeader *t) {
     fseek(treeFile, 0, SEEK_SET);
     fwrite(&(t->status), sizeof(char), 1, treeFile);
@@ -173,19 +128,6 @@ void writeTreeHeader(FILE *treeFile, TreeHeader *t) {
         fwrite(&trash, sizeof(char), 1, treeFile);
 }
 
-void initKey(Key *k) {
-    for (int i = 0; i < TREE_ORDER-1; i++) {
-        k[i].value = -1;
-        k[i].byteOffSet = -1;
-    }
-}
-
-void initPointers(int *p) {
-    for (int i = 0; i < TREE_ORDER; i++) {
-        p[i] = -1;
-    }
-}
-
 void swapKeys(Node *node, int pos1, int pos2) {
     int tmpInt = node->keys[pos1].value;
     long long int tmpLLint = node->keys[pos1].byteOffSet;
@@ -197,29 +139,15 @@ void swapKeys(Node *node, int pos1, int pos2) {
     node->keys[pos2].byteOffSet = tmpLLint;
 }
 
-void swapKeys2(Node **node, int pos1, int pos2) {
-    int tmpInt = (*node)->keys[pos1].value;
-    long long int tmpLLint = (*node)->keys[pos1].byteOffSet;
-
-    (*node)->keys[pos1].value = (*node)->keys[pos2].value;
-    (*node)->keys[pos1].byteOffSet = (*node)->keys[pos2].byteOffSet;
-    
-    (*node)->keys[pos2].value = tmpInt;
-    (*node)->keys[pos2].byteOffSet = tmpLLint;
-}
-
 void swapPointers(Node *node, int pos1, int pos2) {
     int tmp = node->pointers[pos1];
     node->pointers[pos1] = node->pointers[pos2];
     node->pointers[pos2] = tmp;
 }
 
-void swapPointers2(Node **node, int pos1, int pos2) {
-    int tmp = (*node)->pointers[pos1];
-    (*node)->pointers[pos1] = (*node)->pointers[pos2];
-    (*node)->pointers[pos2] = tmp;
-}
-
+/*
+* Function that sorts the node, will be useful after inserting a key to keep the node sorted
+*/
 void sortNode(Node *node) {
     int len = node->numKeys;
 
@@ -232,36 +160,22 @@ void sortNode(Node *node) {
                 swap = 1;
             }
         }
-
         if (!swap) break;
     }
 }
 
-void sortNode2(Node **node) {
-    int len = (*node)->numKeys;
-
-    for (int i = 0; i < len; i++) {
-        int swap = 0;
-        for (int j = 0; j < len - i - 1; j++) {
-            if ((*node)->keys[j].value > (*node)->keys[j+1].value) {
-                swapKeys2(node, j, j+1);
-                swapPointers2(node, j+1, j+2);
-                swap = 1;
-            }
-        }
-
-        if (!swap) break;
-    }
-}
-
-
+/*
+* Function to set the node level
+*/
 void setNodeLevel(Node *n, int level) {
     n->level = level;
 }
 
+/*
+* Function that inserts a key in a specified node if theres space avaliable
+*/
 void setKey(Node *n, int value, long long int offset) {
-    int index = n->numKeys;
-    if (index >= TREE_ORDER-1) return;
+    if (n->numKeys >= TREE_ORDER-1) return;
 
     // set key in first empty position
     for (int i = 0; i < TREE_ORDER-1; i++) {
@@ -279,26 +193,9 @@ void setKey(Node *n, int value, long long int offset) {
     sortNode(n);
 }
 
-void setKey2(Node **n, int value, long long int offset) {
-    int index = (*n)->numKeys;
-    if (index >= TREE_ORDER-1) return;
-
-    // set key in first empty position
-    for (int i = 0; i < TREE_ORDER-1; i++) {
-        if ((*n)->keys[i].value == value) return;
-
-        if ((*n)->keys[i].value == -1) {
-            (*n)->keys[i].byteOffSet = offset;
-            (*n)->keys[i].value = value; 
-            break;      
-        }
-    }
-    (*n)->numKeys++;
-
-    // sorting node
-    sortNode2(n);
-}
-
+/*
+* Function that reads the tree header
+*/
 TreeHeader *readTreeHeader(FILE *treeFile) {
     int intAux;
     char charAux;
@@ -330,6 +227,9 @@ TreeHeader *readTreeHeader(FILE *treeFile) {
     return header;
 }
 
+/*
+* The next 5 functions are used to update the tree header in the create tree function
+*/
 void addNextRRN(TreeHeader *tHeader) {
     tHeader->nextRRN++;
 }
@@ -346,15 +246,24 @@ void setRoot(TreeHeader *tHeader, int newRoot) {
     tHeader->root = newRoot;
 }
 
+void treeHeaderSetStatus(TreeHeader *tHeader, char status) {
+    tHeader->status = status;
+}
+
+/*
+* Function that reads a tree node
+*/
 Node *readTreeNode(FILE *treeFile) {
     int intAux;
     long long int llintAux;
 
     Node *n = createNode();
 
+    // reading level
     fread(&intAux, sizeof(int), 1, treeFile);
     n->level = intAux;
 
+    // reading number of keys
     fread(&intAux, sizeof(int), 1, treeFile);
     n->numKeys = intAux;
 
@@ -384,6 +293,8 @@ int binarySearchInNode(Node *n, int key, int *found, int *RRN) {
     int left, right, mid = 0;
     left = 0;
     right = n->numKeys - 1;
+
+    // binary search
     while (left <= right) {
         mid = (left + right)/2;
         
@@ -392,22 +303,20 @@ int binarySearchInNode(Node *n, int key, int *found, int *RRN) {
             *found = 1;
             return mid;
         }
- 
         // search smaller values
         else if (n->keys[mid].value > key) right = mid - 1;
-
         // search bigger values
         else if (n->keys[mid].value < key) left = mid + 1;
     }
 
-    // did not found
+    // did not found, which means we got to go down the tree
     *found = 0;
-    if (key > n->keys[mid].value) {
-        *RRN = n->pointers[mid+1];
+    if (key > n->keys[mid].value) { // going to bigger velues
+        *RRN = n->pointers[mid+1]; // keeping track of the RRNs visited
         return mid+1;
     }
-    else {
-        *RRN = n->pointers[mid];
+    else { // going to lower velues
+        *RRN = n->pointers[mid]; // keeping track of the RRNs visited
         return mid;
     }
 }
@@ -419,108 +328,65 @@ Result *ultraTreeSearch(FILE *dataFile, FILE *treeFile, int key, TreeHeader *tHe
     // positioning the file pointer to the next node that has to be read
     fseek(treeFile, HEADERSIZE * (tHeader->root+1), SEEK_SET);
     
-    // while not leaf node
     int index = 0;
     int count = 0;
     int RRN = tHeader->root; // starting from root node
-    while (currentLevel < tHeader->totalLevels) {
+    while (currentLevel < tHeader->totalLevels) { // while not leaf node
 
         // saving RRN for insert operation
-        // for searching the array is not needed
+        // just for searching operation, the array is not needed
         if (IUtils != NULL) IUtils->arrayRRN[count] = RRN;
 
         // reading node
         Node *n = NULL;
-        if (arrNode != NULL) {   
-            if (arrNode[RRN] == NULL) {
+        if (arrNode != NULL) { // inserting operation  
+            if (arrNode[RRN] == NULL) { // we didint visit this node before
                 n = readTreeNode(treeFile);
                 arrNode[RRN] = n;
             }
-            else {
+            else { // node already visited, we dont have to read the node again
                 n = arrNode[RRN];
             }
         }
-        else {
+        else { // searching operation, we gotta read anyway
             n = readTreeNode(treeFile);
         }
-            
-        // printNode(n);
-        int found = 0;
 
         // running node keys in binary search
+        int found = 0;
         index = binarySearchInNode(n, key, &found, &RRN);
-        // printf("sobrevivi a busca binai\n");
 
         // saving index for insert operation
         if (IUtils != NULL) IUtils->arrayPos[count] = index;
 
-        // check if equal wanted
+        // check if we found the key
         if (found) {
             appendResult(r, n->keys[index].byteOffSet, index);
             setFoundFlag(r, 1);
             break;
         }
 
-        currentLevel++;
-        //printf("valor do rrn: %d\n", RRN);
+        currentLevel++; // going down 1 level of the tree
+    
         // leaf node, stop searching
         if (RRN == -1) {
             setIndex(r, index);
             break;
         }
+
+        // reading the next node we have to visit
         fseek(treeFile, HEADERSIZE * (RRN+1), SEEK_SET);
 
         // updating counter
         count += 1;
     }
+
     return r;
 }
 
-void printArvore(FILE *treeFile) {
-    fseek(treeFile, 0, SEEK_SET);
-    TreeHeader *th = readTreeHeader(treeFile);
-    printTreeHeader(th);
-
-    for (int i = 0; i < th->nextRRN; i++) {
-        Node *n = readTreeNode(treeFile);
-        printf("RRN = %d\n", i);
-        printNode(n);
-    }
-}
-
-void printArvore2(Node **arrNode, TreeHeader *tHeader) {
-    
-    printTreeHeader(tHeader);
-
-    for (int i = 0; i < tHeader->nextRRN; i++) {
-        printf("--RRN: %d--\n", i);
-        printNode(arrNode[i]);
-    }
-}
-
-void removeKeyFromNode2(Node **n, int index) {
-    (*n)->keys[index].value = -1;
-    (*n)->keys[index].byteOffSet = -1;
-    (*n)->pointers[index+1] = -1;
-
-    (*n)->numKeys--;
-}
-
-void removeKeyFromNode(Node *n, int index) {
-    n->keys[index].value = -1;
-    n->keys[index].byteOffSet = -1;
-    n->pointers[index+1] = -1;
-
-    n->numKeys--;
-}
-
-void removeWithoutChangingPointer2(Node **n, int index) {
-    (*n)->keys[index].value = -1;
-    (*n)->keys[index].byteOffSet = -1;
-
-    (*n)->numKeys--;
-}
-
+/*
+* Function that removes a key, the value and offset, but not its right pointer from a specific node and index
+*/
 void removeWithoutChangingPointer(Node *n, int index) {
     n->keys[index].value = -1;
     n->keys[index].byteOffSet = -1;
@@ -528,11 +394,22 @@ void removeWithoutChangingPointer(Node *n, int index) {
     n->numKeys--;
 }
 
+/*
+* Function that removes a key, the value and offset, and its right pointer from a specific node and index
+*/
+void removeKeyFromNode(Node *n, int index) {
+    removeWithoutChangingPointer(n, index);
+    n->pointers[index+1] = -1;
+}
+
+/*
+* Shifiting the keys and pointers to the left
+*/
 void nodeLeftShift(Node *n, int begin, int end) {
     int i;
     for (i = begin; i < end; i++) {
 
-        if (i+1 < TREE_ORDER) {
+        if (i+1 < TREE_ORDER) { //shifiting
             n->keys[i].value = n->keys[i+1].value;
             n->keys[i].byteOffSet = n->keys[i+1].byteOffSet;
             n->pointers[i] = n->pointers[i+1];
@@ -544,61 +421,22 @@ void nodeLeftShift(Node *n, int begin, int end) {
         }
         
     }
+    
+    // moving the last pointer if exists
     if (i+1 <= TREE_ORDER) {
         n->pointers[i] = n->pointers[i+1];
         n->pointers[i+1] = -1;
     }
 }
 
-void nodeLeftShift2(Node **n, int begin, int end) {
-    int i;
-    for (i = begin; i < end; i++) {
-
-        if (i+1 < TREE_ORDER) {
-            (*n)->keys[i].value = (*n)->keys[i+1].value;
-            (*n)->keys[i].byteOffSet = (*n)->keys[i+1].byteOffSet;
-            (*n)->pointers[i] = (*n)->pointers[i+1];
-        }
-
-        // setting the previous position to null values
-        (*n)->keys[i+1].value = -1;
-        (*n)->keys[i+1].byteOffSet = -1;
-        (*n)->pointers[i+1] = -1;
-    }
-    if (i+1 <= TREE_ORDER) {
-        (*n)->pointers[i] = (*n)->pointers[i+1];
-        (*n)->pointers[i+1] = -1;
-    }
-}
-
-void nodeRightShift2(Node **n, int begin, int end) {
-    int i;
-    for (i = end; i >= begin; i--) {
-        // shifiting
-        if (i+1 < TREE_ORDER - 1) {
-            (*n)->keys[i+1].value = (*n)->keys[i].value;
-            (*n)->keys[i+1].byteOffSet = (*n)->keys[i].byteOffSet;
-        }
-        
-        if (i+2 < TREE_ORDER) {
-            (*n)->pointers[i+2] = (*n)->pointers[i+1];
-        }
-
-        // setting the previous position to null values
-        (*n)->keys[i].value = -1;
-        (*n)->keys[i].byteOffSet = -1;
-        (*n)->pointers[i+1] = -1;
-    }
-    (*n)->pointers[i+2] = (*n)->pointers[i+1];
-    (*n)->pointers[i+1] = -1;
-}
-
-
+/*
+* Shifiting the keys and pointers to the right
+*/
 void nodeRightShift(Node *n, int begin, int end) {
     int i;
     for (i = end; i >= begin; i--) {
-        // shifiting
-        if (i+1 < TREE_ORDER - 1) {
+
+        if (i+1 < TREE_ORDER - 1) { // shifiting
             n->keys[i+1].value = n->keys[i].value;
             n->keys[i+1].byteOffSet = n->keys[i].byteOffSet;
         }
@@ -612,6 +450,8 @@ void nodeRightShift(Node *n, int begin, int end) {
         n->keys[i].byteOffSet = -1;
         n->pointers[i+1] = -1;
     }
+
+    // moving the last pointer
     n->pointers[i+2] = n->pointers[i+1];
     n->pointers[i+1] = -1;
 }
@@ -620,10 +460,9 @@ void setPointer(Node *n, int pointerValue, int pointerPos) {
     n->pointers[pointerPos] = pointerValue;
 }
 
-void setPointer2(Node **n, int pointerValue, int pointerPos) {
-    (*n)->pointers[pointerPos] = pointerValue;
-}
-
+/*
+* Function that appends a node in our array of nodes
+*/
 Node **appendArrayNode(Node **arr, Node *node, int newLen) {
     arr = (Node**)realloc(arr, HEADERSIZE * newLen);
     arr[newLen-1] = node;
@@ -631,35 +470,43 @@ Node **appendArrayNode(Node **arr, Node *node, int newLen) {
     return arr;
 }
 
+/*
+* Function that will make the split 1 to 2 when needed (splitting the root node)
+*/
 Node **split1to2(Node **arrayNode, TreeHeader *tHeader, int pageRoot, Node *root, int indexKey, PromotedKey *toInsert) {
+    // getting new nodes RRNs
     int pageSon = tHeader->nextRRN;
     int pageFather = tHeader->nextRRN + 1;
+
+    // updating the next RRN
     tHeader->nextRRN += 2;
         
-    Node *son = createNode();
+    // creating new nodes
+    Node *son = createNode(); // will be our new right node
     Node *father = createNode();
 
+    // setting nodes data
     son->level = tHeader->totalLevels - 1;
     father->level = tHeader->totalLevels;
     root->level = tHeader->totalLevels - 1;
     tHeader->root = pageFather;
     
+    // inserted key data
     int key = toInsert->value;
     long long int byteOffKey = toInsert->byteOffSet;
 
+    // array of possible keys to be promoted
     int *redis = (int *)malloc(sizeof(int) * TREE_ORDER);
-    for (int i=0; i<TREE_ORDER-1; i++)
+    for (int i = 0; i < TREE_ORDER-1; i++)
         redis[i] = arrayNode[pageRoot]->keys[i].value;
     redis[TREE_ORDER-1] = key;
 
+    // sorting
     bubbleSort(redis, TREE_ORDER);
 
     // the key to be inserted is going to be promoted
-    // printf("index key = %d\n", indexKey);
     if (key == redis[TREE_ORDER/2]) {
     
-        printf("promovendo: %d no split1-2\n", key);
-
         // getting mid
         int mid;
         if (TREE_ORDER % 2 == 1)
@@ -667,61 +514,68 @@ Node **split1to2(Node **arrayNode, TreeHeader *tHeader, int pageRoot, Node *root
         else
             mid = (TREE_ORDER/2)+1;
 
-        // promoting key
-        // inserting new key to father
+        // inserting new key to father (promoting key)
         setKey(father, key, byteOffKey);
         
-        // son receiving data from old root
+        // son receiving data from old root, making the tree balanced
         int newNodePos = 1;
         for (int i = mid; i < TREE_ORDER-1; i++) {
+
+            // setting values and pointers on the new node(son)
             setKey(son, root->keys[i].value, root->keys[i].byteOffSet);
             setPointer(son, root->pointers[i+1], newNodePos);
+            
             // removing data from old root
             removeKeyFromNode(root, i);
             newNodePos++;
         }
+
+        // setting the far left pointer
         setPointer(son, toInsert->pointerRRN, 0);
     }
     // the key is going to be on the new son or old root
     else {
-        // getting mid (key to be promoted)
+        // getting mid key (to be promoted)
         int mid;
         if (key > redis[TREE_ORDER/2]) mid = (TREE_ORDER/2);
         else mid = (TREE_ORDER/2)-1;
 
-        // promoting key
-        // father receiving the mid key from the old root
-        printf("promovendo: %d no split1-2\n", root->keys[mid].value);
+        // father receiving the mid key (promoted) from the old root
         setKey(father, root->keys[mid].value, root->keys[mid].byteOffSet);
         setPointer(son, root->pointers[mid+1], 0);
+        
         // removing mid key from old root
         removeKeyFromNode(root, mid);
-        //printNode(root);
 
         // son receiving data from old root
         int pointerPos = 1;
         for (int i = (mid+1); i < TREE_ORDER-1; i++) {
+            // setting values and pointers on the new node(son)
             setKey(son, root->keys[i].value, root->keys[i].byteOffSet);
             setPointer(son, root->pointers[i+1], pointerPos);
+
             // removing data from old root
             removeKeyFromNode(root, i);
             pointerPos++;
         }
 
-        // printf("index key == %d\n", indexKey);
         // deciding which page will receive the key
-        if (key > redis[TREE_ORDER/2]) {
-            // printf("inserindo chave no son : %d\n", key);
+        if (key > redis[TREE_ORDER/2]) { // the key we wanted to insert is going to be on right(son) node
+            // inserting key into son
             setKey(son, key, byteOffKey);
             int lixo; int lixo2;
             int pointerPosKey = binarySearchInNode(son, key, &lixo, &lixo2) + 1;
+            
+            // setting its pointer
             setPointer(son, toInsert->pointerRRN, pointerPosKey);
         }
-        else {
-            // printf("inserindo chave no root : %d\n", key);
+        else { // the key we wanted to insert is going to be on left(root) node
+            // inserting key into root
             setKey(root, key, byteOffKey);
             int lixo; int lixo2;
             int pointerPosKey = binarySearchInNode(root, key, &lixo, &lixo2) + 1;
+
+            // setting its pointer
             setPointer(root, toInsert->pointerRRN, pointerPosKey);
         }
     }
@@ -731,17 +585,18 @@ Node **split1to2(Node **arrayNode, TreeHeader *tHeader, int pageRoot, Node *root
     father->pointers[1] = pageSon;
 
     // appending new nodes to arrayNode
-    arrayNode[pageRoot] = root;
-    printf("nextRRN: %d\n", tHeader->nextRRN);
     arrayNode = (Node **)realloc(arrayNode, HEADERSIZE * (tHeader->nextRRN));
-    printf("sobrevivi\n");
+    arrayNode[pageRoot] = root;
     arrayNode[pageSon] = son;
     arrayNode[pageFather] = father;
 
     return arrayNode;
 }
 
-
+/*
+* Function that creates an array with the values of the left and right nodes, aswell as the key we want
+* to insert and the father
+*/
 int *createRedistribArr(Node *left, Node *right, int fatherKey, int key, int lenArr) {
     int *arr = (int *)malloc(sizeof(int) * lenArr);
     int count = 0;
@@ -760,45 +615,60 @@ int *createRedistribArr(Node *left, Node *right, int fatherKey, int key, int len
     return arr;
 }
 
-PromotedKey *split2to3(FILE *treeFile, Node ***arrNode, int pageFather, int indexFather, PromotedKey *toInsert, TreeHeader *tHeader) {
-    // checking which page to split
-    int pageLeft = (*arrNode)[pageFather]->pointers[indexFather];
-    int pageRight = -1;
-    if (indexFather+1 <= TREE_ORDER-1) { // checking if there is space to the right
-        pageRight = (*arrNode)[pageFather]->pointers[indexFather+1];
+/*
+* Function that will insert a pointer if its not -1
+*/
+void insertPointerIfValid(PromotedKey *toInsert, Node *n) {
+    if (toInsert->pointerRRN != -1) {
+        // finding the right spot
+        int garbage, garbage2;
+        int pos = binarySearchInNode(n, toInsert->value, &garbage, &garbage2);
+
+        // setting the pointer and then making it null
+        setPointer(n, toInsert->pointerRRN, pos + 1);
+        toInsert->pointerRRN = -1;
     }
-    if (pageRight == -1 || indexFather+1 > TREE_ORDER-1) {
-        printf("split pra esquerda\n");
-        // call split2-3 changing father to -1
-        // printf("page in father %d\n", indexFather);
-        indexFather--;
-        pageLeft = (*arrNode)[pageFather]->pointers[indexFather];
-        pageRight = (*arrNode)[pageFather]->pointers[indexFather+1];
+}
+
+/*
+* Function that will deal with the 2 to 3 split, and will return a new key to be inserted(2nd promoted)
+*/
+PromotedKey *split2to3(FILE *treeFile, Node **arrNode, int pageFather, int indexFather, PromotedKey *toInsert, TreeHeader *tHeader) {
+    // checking which page to split
+    int pageLeft = arrNode[pageFather]->pointers[indexFather];
+    int pageRight = -1;
+
+    // trying to make the split with the right sister
+    if (indexFather+1 <= TREE_ORDER-1) { // checking if there is space to the right
+        pageRight = arrNode[pageFather]->pointers[indexFather+1];
     }
 
-    // reading pages
-    if ((*arrNode)[pageLeft] == NULL) {
+    // if theres not space on right or it doesnt exist, we will make the split with the left page
+    if (pageRight == -1 || indexFather+1 > TREE_ORDER-1) {
+        indexFather--; // changing the value to make up for the changes in the split
+
+        // the right page will become the left page
+        pageLeft = arrNode[pageFather]->pointers[indexFather];
+        pageRight = arrNode[pageFather]->pointers[indexFather+1];
+    }
+
+    // reading pages if needed
+    if (arrNode[pageLeft] == NULL) {
          fseek(treeFile, HEADERSIZE * (pageLeft + 1), SEEK_SET);
          Node *n = readTreeNode(treeFile);
-         (*arrNode)[pageLeft] = n;
+         arrNode[pageLeft] = n;
     }
-    if ((*arrNode)[pageRight] == NULL) {
+    if (arrNode[pageRight] == NULL) {
         fseek(treeFile, HEADERSIZE *  (pageRight + 1), SEEK_SET);
         Node *n = readTreeNode(treeFile);
-        (*arrNode)[pageRight] = n;
+        arrNode[pageRight] = n;
     }
 
     // putting keys into a array
     int lenRedis = TREE_ORDER * 2;
-    int *arrRedis = createRedistribArr((*arrNode)[pageLeft], (*arrNode)[pageRight], 
-                    (*arrNode)[pageFather]->keys[indexFather].value, toInsert->value, lenRedis);
+    int *arrRedis = createRedistribArr(arrNode[pageLeft], arrNode[pageRight], 
+                    arrNode[pageFather]->keys[indexFather].value, toInsert->value, lenRedis);
     bubbleSort(arrRedis, lenRedis);
-
-    if (toInsert->value == 1438)
-        for (int i = 0; i < lenRedis; i++)
-            printf("%d ", arrRedis[i]);
-        printf("\n");
-
 
     // getting promoted keys positions
     int firstPromo = lenRedis / 3;
@@ -806,130 +676,120 @@ PromotedKey *split2to3(FILE *treeFile, Node ***arrNode, int pageFather, int inde
 
     // getting promoted values
     int firstPromoVal = arrRedis[firstPromo];
-    printf("first promo val: %d\n", firstPromoVal);
     int secondPromoVal = arrRedis[secondPromo];
 
     // creating the new node far right
     Node *newNode = createNode();
     int newNodeRRN = tHeader->nextRRN++;
-    newNode->level = (*arrNode)[pageLeft]->level;
+    newNode->level = arrNode[pageLeft]->level;
     
     // running right page
-    int pos = (*arrNode)[pageRight]->numKeys - 1;
-    int auxKeyValue = (*arrNode)[pageRight]->keys[pos].value;
+    int pos = arrNode[pageRight]->numKeys - 1;
+    int auxKeyValue = arrNode[pageRight]->keys[pos].value;
     while (auxKeyValue > secondPromoVal) {
         // moving the right pointer of the key that is greater than second promoted to the new node
-        setPointer2(&newNode, (*arrNode)[pageRight]->pointers[pos+1], newNode->numKeys + 1);
+        setPointer(newNode, arrNode[pageRight]->pointers[pos+1], newNode->numKeys + 1);
 
         // inserting the key that is greater than second promoted into new node
-        setKey2(&newNode, auxKeyValue, (*arrNode)[pageRight]->keys[pos].byteOffSet);
+        setKey(newNode, auxKeyValue, arrNode[pageRight]->keys[pos].byteOffSet);
 
         //removing the key from the old node (right)
-        removeKeyFromNode2(&(*arrNode)[pageRight], pos);
+        removeKeyFromNode(arrNode[pageRight], pos);
 
         // updating 'while' variables
         pos -= 1;
-        auxKeyValue = (*arrNode)[pageRight]->keys[pos].value;
+        auxKeyValue = arrNode[pageRight]->keys[pos].value;
     }
     
     // checking secondPromoted
     long long int secPromotedValOffset;
     if (secondPromoVal != toInsert->value) {
         // new node gets last pointer from right
-        setPointer2(&newNode, (*arrNode)[pageRight]->pointers[pos+1], 0);
+        setPointer(newNode, arrNode[pageRight]->pointers[pos+1], 0);
+
         // saving second promo offset
-        secPromotedValOffset = (*arrNode)[pageRight]->keys[pos].byteOffSet;
+        secPromotedValOffset = arrNode[pageRight]->keys[pos].byteOffSet;
+
         // removing second promo from right node
-        removeKeyFromNode2(&(*arrNode)[pageRight], pos);
+        removeKeyFromNode(arrNode[pageRight], pos);
     }
     else { // secondPromo == toInsert
         if (toInsert->pointerRRN != -1) {
             // new node gets to insert pointer
-            setPointer2(&newNode, toInsert->pointerRRN, 0);
-            toInsert->pointerRRN = -1;
+            setPointer(newNode, toInsert->pointerRRN, 0);
+
+            // updating the pointer to null to not mess with futures insertions
+            // when going up the treee
+            toInsert->pointerRRN = -1; 
         }
         // saving second promo offset
         secPromotedValOffset = toInsert->byteOffSet;
     }
 
-    // dealing with old father
-    nodeRightShift2(&(*arrNode)[pageRight], 0, (*arrNode)[pageRight]->numKeys - 1);
-    setKey2(&(*arrNode)[pageRight], (*arrNode)[pageFather]->keys[indexFather].value,
-            (*arrNode)[pageFather]->keys[indexFather].byteOffSet);
-    // removing father
-    removeWithoutChangingPointer2(&(*arrNode)[pageFather], indexFather);
+    // dealing with old father, inserting it in the right node
+    nodeRightShift(arrNode[pageRight], 0, arrNode[pageRight]->numKeys - 1);
+    setKey(arrNode[pageRight], arrNode[pageFather]->keys[indexFather].value,
+            arrNode[pageFather]->keys[indexFather].byteOffSet);
+    // removing the old father
+    removeWithoutChangingPointer(arrNode[pageFather], indexFather);
 
     // running left page
-    pos = (*arrNode)[pageLeft]->numKeys - 1;
-    auxKeyValue = (*arrNode)[pageLeft]->keys[pos].value;
+    pos = arrNode[pageLeft]->numKeys - 1;
+    auxKeyValue = arrNode[pageLeft]->keys[pos].value;
     while (auxKeyValue > firstPromoVal) {
         // shifting right node
-        nodeRightShift2(&(*arrNode)[pageRight], 0, (*arrNode)[pageRight]->numKeys - 1);
+        nodeRightShift(arrNode[pageRight], 0, arrNode[pageRight]->numKeys - 1);
 
         // setting the pointer of the key greater than 1st promoted val
-        setPointer2(&(*arrNode)[pageRight], (*arrNode)[pageLeft]->pointers[pos+1], 1);
+        setPointer(arrNode[pageRight], arrNode[pageLeft]->pointers[pos+1], 1);
         
         // inserting key from left node to right node
-        setKey2(&(*arrNode)[pageRight], auxKeyValue, (*arrNode)[pageLeft]->keys[pos].byteOffSet);
+        setKey(arrNode[pageRight], auxKeyValue, arrNode[pageLeft]->keys[pos].byteOffSet);
 
         // removing key from left node
-        removeKeyFromNode2(&(*arrNode)[pageLeft], pos);
+        removeKeyFromNode(arrNode[pageLeft], pos);
 
+        // updating 'while' variables
         pos -= 1;
-        auxKeyValue = (*arrNode)[pageLeft]->keys[pos].value;
+        auxKeyValue = arrNode[pageLeft]->keys[pos].value;
     }
 
     if (firstPromoVal != toInsert->value) {
         // promoting the 1st new father
-        setKey2(&(*arrNode)[pageFather], firstPromoVal, (*arrNode)[pageLeft]->keys[pos].byteOffSet);
+        setKey(arrNode[pageFather], firstPromoVal, arrNode[pageLeft]->keys[pos].byteOffSet);
 
         // setting the pointer from the new father to the right node
-        setPointer2(&(*arrNode)[pageRight], (*arrNode)[pageLeft]->pointers[pos+1], 0);
-        removeKeyFromNode2(&(*arrNode)[pageLeft], pos);
+        setPointer(arrNode[pageRight], arrNode[pageLeft]->pointers[pos+1], 0);
+        removeKeyFromNode(arrNode[pageLeft], pos);
 
         // inserting the key 'toInsert'
+        // insert into left node
         if (toInsert->value < firstPromoVal) {
-            // insert into left node
-            setKey2(&(*arrNode)[pageLeft], toInsert->value, toInsert->byteOffSet);
-            if (toInsert->pointerRRN != -1) {
-                int garbage, garbage2;
-                int pos = binarySearchInNode((*arrNode)[pageLeft], toInsert->value, &garbage, &garbage2);
-                setPointer2(&(*arrNode)[pageLeft], toInsert->pointerRRN, pos + 1);
-                toInsert->pointerRRN = -1;
-            }
+            setKey(arrNode[pageLeft], toInsert->value, toInsert->byteOffSet);
+            insertPointerIfValid(toInsert, arrNode[pageLeft]);
         }
+        // inserting into right node
         else if (toInsert->value > firstPromoVal && toInsert->value < secondPromoVal) {
-            // inserting into right node
-            setKey2(&(*arrNode)[pageRight], toInsert->value, toInsert->byteOffSet);
-            if (toInsert->pointerRRN != -1) {
-                int garbage, garbage2;
-                int pos = binarySearchInNode((*arrNode)[pageRight], toInsert->value, &garbage, &garbage2);
-                setPointer2(&(*arrNode)[pageRight], toInsert->pointerRRN, pos + 1);
-                toInsert->pointerRRN = -1;
-            }
+            setKey(arrNode[pageRight], toInsert->value, toInsert->byteOffSet);
+            insertPointerIfValid(toInsert, arrNode[pageRight]);
         }
-        else {
-            // inserting into new node
-            setKey2(&newNode, toInsert->value, toInsert->byteOffSet);
-            if (toInsert->pointerRRN != -1) {
-                int garbage, garbage2;
-                int pos = binarySearchInNode(newNode, toInsert->value, &garbage, &garbage2);
-                setPointer2(&newNode, toInsert->pointerRRN, pos + 1);
-                toInsert->pointerRRN = -1;
-            }
+        // inserting into new node
+        else if (toInsert->value > secondPromoVal) {
+            setKey(newNode, toInsert->value, toInsert->byteOffSet);
+            insertPointerIfValid(toInsert, newNode);
         }
     }
     else { // firstPromoVal == toInsert
         // inserting toInsert into father
-        setKey2(&(*arrNode)[pageFather], toInsert->value, toInsert->byteOffSet);
+        setKey(arrNode[pageFather], toInsert->value, toInsert->byteOffSet);
         if (toInsert->pointerRRN != -1) {
-            setPointer2(&(*arrNode)[pageRight], toInsert->pointerRRN, 0);
+            setPointer(arrNode[pageRight], toInsert->pointerRRN, 0);
             toInsert->pointerRRN = -1;
         }
     }
 
     // appending new node
-    (*arrNode)[newNodeRRN] = newNode;
+    arrNode[newNodeRRN] = newNode;
 
     // updating toInsert
     toInsert->value = secondPromoVal;
@@ -939,16 +799,20 @@ PromotedKey *split2to3(FILE *treeFile, Node ***arrNode, int pageFather, int inde
     return toInsert;
 }
 
+/*
+* Functiong that will make the redistribution if needed between 2 nodes, it will return a new promoted key
+* that will be inserted in the next iteration
+*/
 PromotedKey *redistribution(FILE *treeFile, Node **arrayNode, int indexInFather, int pageFather, PromotedKey *toInsert, int *flagSucess) {
-    // getting RRNs
-    int son = arrayNode[pageFather]->pointers[indexInFather];
     int left = -1; 
     int right = -1;
     Node *n = NULL;
 
+    // getting RRNs
+    int son = arrayNode[pageFather]->pointers[indexInFather];
+
     // reading the left page
     if (indexInFather >= 1) {
-        // reading left node
         left = arrayNode[pageFather]->pointers[indexInFather-1];
         if (arrayNode[left] == NULL) {
             fseek(treeFile, HEADERSIZE * (left + 1), SEEK_SET);
@@ -978,7 +842,6 @@ PromotedKey *redistribution(FILE *treeFile, Node **arrayNode, int indexInFather,
 
     // has space in left
     if (left != -1 && arrayNode[left]->numKeys < TREE_ORDER-1) {
-        printf("shift para esq\n");
 
         int lenRedis = TREE_ORDER + arrayNode[left]->numKeys + 1;
 
@@ -999,11 +862,6 @@ PromotedKey *redistribution(FILE *treeFile, Node **arrayNode, int indexInFather,
 
         // removing father key, does not change pointers
         removeWithoutChangingPointer(arrayNode[pageFather], indexInFather - 1);
-        
-        if (toInsert->value == 1133) {
-            printf("antes do while\n");
-            printNode2(arrayNode[son]);
-        }
 
         int pos = 0;
         int auxKey = arrayNode[son]->keys[pos].value;
@@ -1026,30 +884,28 @@ PromotedKey *redistribution(FILE *treeFile, Node **arrayNode, int indexInFather,
         // inserting the first pointer from the son node to the left node, where we moved, or not, 
         // the last key on the son node and deleting it after
         setPointer(arrayNode[left], arrayNode[son]->pointers[0], arrayNode[left]->numKeys);
-
         setPointer(arrayNode[son], -1, 0);
     
         if (val_promoted == toInsert->value) {
-            printf("promoted = toInsert \n");
-            // pode dar ruim
+            
+            // check if has 'promoted' pointer
             if (toInsert->pointerRRN != -1) {
+                // sets 'promoted' pointer
                 setPointer(arrayNode[son], toInsert->pointerRRN, 0);
-                toInsert->pointerRRN = -1;
+                toInsert->pointerRRN = -1; // null
             }
+            
             return toInsert;
         }
         else if (val_promoted > toInsert->value) {
-            printf("promoted > toInsert \n");
+            
             // the key we want to insert must be on the left node
             // setting the key on the left node
             setKey(arrayNode[left], toInsert->value, toInsert->byteOffSet);
-            if (toInsert->pointerRRN != -1) {
-                int garbage; int garbage2;
-                int pos = binarySearchInNode(arrayNode[left], toInsert->value, &garbage, &garbage2);
-                setPointer(arrayNode[left], toInsert->pointerRRN, pos + 1);
-            }
-            // updating the to insert value, we will have to insert the first key of the son node
-            // on the father node
+            insertPointerIfValid(toInsert, arrayNode[left]);
+            
+            // updating the to insert value, we will have to insert the first key
+            // of the son node on the father node
             toInsert->value = arrayNode[son]->keys[0].value;
             toInsert->byteOffSet = arrayNode[son]->keys[0].byteOffSet;
             toInsert->pointerRRN = -1;
@@ -1059,7 +915,6 @@ PromotedKey *redistribution(FILE *treeFile, Node **arrayNode, int indexInFather,
             nodeLeftShift(arrayNode[son], 0, arrayNode[son]->numKeys);
         }
         else { // val_promoted < toInsert->value
-            printf("promoted < toInsert \n");
             // the key we want to insert must be on the right(son) node
 
             // saving values to promote later
@@ -1072,22 +927,19 @@ PromotedKey *redistribution(FILE *treeFile, Node **arrayNode, int indexInFather,
     
             // setting the insert value in the son node
             setKey(arrayNode[son], toInsert->value, toInsert->byteOffSet);
-            if (toInsert->pointerRRN != -1) {
-                int garbage; int garbage2;
-                int pos = binarySearchInNode(arrayNode[son], toInsert->value, &garbage, &garbage2);
-                setPointer(arrayNode[son], toInsert->pointerRRN, pos + 1);
-            }
+            insertPointerIfValid(toInsert, arrayNode[son]);
 
             // updating the new to insert value, the promoved key
             toInsert->value = tmpValue;
             toInsert->byteOffSet = tmpByteOff;
             toInsert->pointerRRN = -1;
         }
-
         return toInsert;
+        
     }
     else { // has space in right
-        printf("shift para dir\n");
+        
+        // creating a large array with key values to find the new promoted father key
         int lenRedis = TREE_ORDER + arrayNode[right]->numKeys + 1;
 
         int *redis = createRedistribArr(arrayNode[son], arrayNode[right], 
@@ -1111,10 +963,13 @@ PromotedKey *redistribution(FILE *treeFile, Node **arrayNode, int indexInFather,
         removeWithoutChangingPointer(arrayNode[pageFather], indexInFather);
 
         if (val_promoted == toInsert->value) {
+            // inserted value will be promoted
             if (toInsert->pointerRRN != -1) {
+                // setting 'promoted' pointer
                 setPointer(arrayNode[right], toInsert->pointerRRN, 0);
                 toInsert->pointerRRN = -1;
             }
+
             return toInsert;
         }
 
@@ -1130,11 +985,7 @@ PromotedKey *redistribution(FILE *treeFile, Node **arrayNode, int indexInFather,
 
         // inserting key in son
         setKey(arrayNode[son], toInsert->value, toInsert->byteOffSet);
-        if (toInsert->pointerRRN != -1) {
-            int garbage; int garbage2;
-            int pos = binarySearchInNode(arrayNode[son], toInsert->value, &garbage, &garbage2);
-            setPointer(arrayNode[son], toInsert->pointerRRN, pos + 1);
-        }
+        insertPointerIfValid(toInsert, arrayNode[son]);
 
         // returning new promoted key
         toInsert->value = val_promoted;
@@ -1145,8 +996,12 @@ PromotedKey *redistribution(FILE *treeFile, Node **arrayNode, int indexInFather,
     }
 }
 
+/*
+* Function that will insert a node in the tree, and will return an array of the nodes that will have non
+* NULL values in the indexes(RRN) we had to read or modify
+*/
 Node **insertTree(FILE *dataFile, FILE *treeFile, int key, long long int byteOffkey, TreeHeader *tHeader, Node **arrayNode) {
-    int numLevels = tHeader->totalLevels; // manter atualizado
+    int numLevels = tHeader->totalLevels;
     int numNodes = tHeader->nextRRN;
 
     InsertUtils *IUtils = creteInsertUtils(tHeader->totalLevels);
@@ -1155,20 +1010,17 @@ Node **insertTree(FILE *dataFile, FILE *treeFile, int key, long long int byteOff
     Result *r = ultraTreeSearch(dataFile, treeFile, key, tHeader, IUtils, arrayNode);
     if (getFoundFlag(r)) return arrayNode;
 
+    // creating the key we want to insert
     PromotedKey *toInsert = createPromotedKey(key, byteOffkey, -1);
 
+    // flag for controlling if insertion ended
     int promotionFlag = 0;
     for (int i = numLevels-1; i >= 0; i--) {
-
-        printf("-------i: %d\n", i);
-        
         int currentNode = IUtils->arrayRRN[i];
-        
         int redistributionSuccess = 0; // flag
     
-        printf("inserindo a chave: %d no nó: %d\n", toInsert->value, IUtils->arrayRRN[i]);
         // reading node and updating array
-        Node *n;
+        Node *n = NULL;
         if (arrayNode[currentNode] == NULL) {
             fseek(treeFile, HEADERSIZE * (currentNode+1), SEEK_SET);
             n = readTreeNode(treeFile);
@@ -1177,63 +1029,33 @@ Node **insertTree(FILE *dataFile, FILE *treeFile, int key, long long int byteOff
         else {
             n = arrayNode[currentNode];
         }
-        printf("estou no nivel %d\n", arrayNode[currentNode]->level);
-
-        // if (toInsert->value == 1127) {
-        //     printf("=============Antes do split=============\n");
-        //     printArvore3(arrayNode, tHeader);
-        //     // exit(0);
-        //     // printf("****************************presta atencao\n");
-        // }
-
-        if (toInsert->value == 1395) {
-            // printf("inserindo 1153 no %d\n", currentNode);
-            printArvore3(arrayNode, tHeader);
-            // exit(0);
-            // printNode2(arrayNode[currentNode]);
-        }
         
         // checking if has space to insert
         if (arrayNode[currentNode]->numKeys < 4) { // has space
             // inserting key
             setKey(arrayNode[currentNode], toInsert->value, toInsert->byteOffSet);
-            printf("tem espaco\n");
-            if (toInsert->pointerRRN != -1) {
-                int RRNLixo = 0; int flagLixo = 0; 
-                // setting the non NULL pointer into the node, 
-                // will only be useful in the split 2-3 scenario
-                int pos = binarySearchInNode(arrayNode[currentNode], toInsert->value, &flagLixo, &RRNLixo)+1;
-                setPointer(arrayNode[currentNode], toInsert->pointerRRN, pos);
-                printf("inserindo RRN: %d, na posicao: %d\n", toInsert->pointerRRN, pos);
-                toInsert->pointerRRN = -1;
-                // printNode(arrayNode[currentNode]);
-            }
+
+            // setting 'promoted' pointer
+            insertPointerIfValid(toInsert, arrayNode[currentNode]);
+
+            // ends insertion
             promotionFlag = 0;
-
         }
-        else if (i == 0) { // root node split 1->2
-            printf("split 1 to 2\n");
+        else if (i == 0) { 
+            // root node split 1 to 2
             tHeader->totalLevels += 1;
-
+            // calls split1to2
             arrayNode = split1to2(arrayNode, tHeader, currentNode, n, IUtils->arrayPos[i], toInsert);
         }
         else { // no space
-            printf("redistribuicao\n");
             promotionFlag = 1; // will keep looping in higher levels
             toInsert = redistribution(treeFile, arrayNode, IUtils->arrayPos[i-1], IUtils->arrayRRN[i-1], toInsert, &redistributionSuccess);
 
-            if (!redistributionSuccess) {
-                printf("split 2 to 3\n");
-
+            if (!redistributionSuccess) { // does split 2 to 3
                 arrayNode = (Node **)realloc(arrayNode, HEADERSIZE * (tHeader->nextRRN + 1));
-                toInsert = split2to3(treeFile, &arrayNode, IUtils->arrayRRN[i-1], IUtils->arrayPos[i-1], toInsert, tHeader);
+                toInsert = split2to3(treeFile, arrayNode, IUtils->arrayRRN[i-1], IUtils->arrayPos[i-1], toInsert, tHeader);
             }
-
         }
-
-        if (toInsert->value == 1130 && arrayNode[59] != NULL) printNode2(arrayNode[59]);
-
-        // if (arrayNode[7] != NULL)(arrayNode[7]);
 
         // no key to be promoted
         if (promotionFlag == 0) break;
@@ -1242,6 +1064,9 @@ Node **insertTree(FILE *dataFile, FILE *treeFile, int key, long long int byteOff
     return arrayNode;
 }
 
+/* 
+* Function that writes a node into treeFile
+*/
 void writeNode(FILE *treeFile, Node *node) {
     int aux;
     long long int llAux;
@@ -1266,22 +1091,23 @@ void writeNode(FILE *treeFile, Node *node) {
     }
 }
 
+/* 
+* Function that overwrites treeFile using arrayNode data
+*/
 void overwriteTreeFile(FILE *treeFile, Node **arrayNode, TreeHeader *tHeader) {
     for (int i=0; i < tHeader->nextRRN; i++) {
         if (arrayNode[i] != NULL) {
+            // fseeking to position and writing node
             fseek(treeFile, HEADERSIZE * (i + 1), SEEK_SET);
-            // printf("escrevendo o node :\n");
-            // printNode(arrayNode[i]);
             Node *n = arrayNode[i];
             writeNode(treeFile, n);
         }
     }
 }
 
+/* 
+* Function that returns treeHeader next RRN
+*/
 int getNextRRN(TreeHeader *t) {
     return t->nextRRN;
-}
-
-void treeHeaderSetStatus(TreeHeader *tHeader, char status) {
-    tHeader->status = status;
 }

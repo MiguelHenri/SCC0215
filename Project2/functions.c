@@ -3,26 +3,84 @@
 #include <string.h>
 #include "functions.h"
 
-// func 9
+/*
+* Functionality 8: receives a binary 'dataFile' with registers and creates a 
+* binary index file 'treeFile' indexed by 'idCrime' using a B* tree
+*/
+void createTree(FILE *dataFile, FILE *treeFile) {
+    // reading the data header and verifying if it is consistent
+    Header *dataFileHeader = readHeaderBinary(dataFile);
+
+    // creating index tree header 
+    TreeHeader *tHeader = createTreeHeader();
+    Node **arrayNode;
+
+    // writing new index header file data
+    treeHeaderSetStatus(tHeader, '0');
+    writeTreeHeader(treeFile, tHeader);
+
+    // search in data file to put in tree file
+    long long int byteOff = bytesHeader;
+    for (int i = 0; i < getNumFileRegisters(dataFileHeader); i++) {
+
+        Data *reg = readBinaryRegister(dataFile);
+
+        // checking if register was removed
+        if (getDataRemoved(reg) == '1') continue;
+        if (getDataCrimeId(reg) == -1) continue;
+
+        // crating the first root node
+        if (getNextRRN(tHeader) == 0) {
+
+            addNextRRN(tHeader);
+            addTotalLevels(tHeader);
+            setRoot(tHeader, 0);
+            
+            Node *node = createNode();
+            setNodeLevel(node, 1);
+            setKey(node, getDataCrimeId(reg), byteOff);
+            
+            arrayNode = (Node **)malloc(sizeof(Node *) * 1);
+            arrayNode[0] = node;
+            
+        }
+        else {
+            arrayNode = insertTree(dataFile, treeFile, getDataCrimeId(reg), byteOff, tHeader, arrayNode);
+
+            // updates tree file
+            overwriteTreeFile(treeFile, arrayNode, tHeader);
+        }
+        
+        addTotalKeys(tHeader);
+        byteOff += registerSize(reg);
+    }
+
+    // marking as consistent
+    treeHeaderSetStatus(tHeader, '1');
+
+    // writing new index header data
+    writeTreeHeader(treeFile, tHeader);
+
+}
+
+/*
+* Functionality 9: receives a binary 'dataFile' with registers and a 
+* binary index file 'treeFile' indexed by 'dataMemberName', it gets
+* searches data from stdin, searches and prints registers found
+*/
 void searchInTree(FILE *dataFile, FILE *treeFile, char *dataMemberName, int numberSearches) {
     // reading the data header and verifying if it is consistent
     Header *dataFileHeader = readHeaderBinary(dataFile);
 
-
     // reading index tree header data and verifying consistency
     TreeHeader *tHeader = readTreeHeader(treeFile);
-    
-    //printTreeHeader(tHeader);
-    // printArvore(treeFile);
 
     for (int i = 0; i < numberSearches; i++) {
         Result *r = NULL;
 
-        printTreeHeader(tHeader);
         Search *wanted = createSearchArr();
 
-        // if tree is indexed by idCrime, and we are searching idCrime,
-        // search in tree
+        // if tree is indexed by idCrime, and we are searching idCrime, search in tree:
         int key;
         if (strncmp(dataMemberName, "idCrime", 7) == 0 && searchingCrimeId(wanted, &key)) {
             r = ultraTreeSearch(dataFile, treeFile, key, tHeader, NULL, NULL);
@@ -39,8 +97,12 @@ void searchInTree(FILE *dataFile, FILE *treeFile, char *dataMemberName, int numb
 
 }
 
-// func 10
-void insertIntoTree(FILE *dataFile, FILE *treeFile, char *memberName, int numInsertions) {
+/*
+* Functionality 10: receives a binary 'dataFile' with registers and a 
+* binary index file 'treeFile' indexed by 'dataMemberName', it gets
+* to be inserted registers data from stdin and inserts to both files
+*/
+void insertIntoTree(FILE *dataFile, FILE *treeFile, char *dataMemberName, int numInsertions) {
     // reading the data header and verifying if it is consistent
     Header *dataFileHeader = readHeaderBinary(dataFile);
 
@@ -51,97 +113,38 @@ void insertIntoTree(FILE *dataFile, FILE *treeFile, char *memberName, int numIns
     Node **arrayNode = (Node **)malloc(sizeof(Node *) * getNextRRN(tHeader));
     for (int i = 0; i < getNextRRN(tHeader); i++) arrayNode[i] = NULL;
 
+    long long int byteOffset = getNextByteOffset(dataFileHeader);
+
     // looping insertions
     for (int i=0; i<numInsertions; i++) {
+
         // reading register
         Data *reg = readRegisterStdin2();
 
-        // inserting into reg file
-        // fseek and write
+        if (strncmp(dataMemberName, "idCrime", 7) == 0) { 
 
-        if (strncmp(memberName, "idCrime", 7) == 0) { 
             int key = getDataCrimeId(reg);
 
             // will insert into array with tree nodes
-            // arrayNode = insertTree(dataFile, treeFile, key, tHeader, arrayNode);
+            arrayNode = insertTree(dataFile, treeFile, key, byteOffset, tHeader, arrayNode);
+
+            // add byteoff to header
+            addTotalKeys(tHeader);
+            byteOffset += registerSize(reg);
+
+            // inserting into data file
+            insertRegisterInBinFile(dataFile, reg, dataFileHeader);
         }
-        // add byteoff to header
+        
     }
+
+    // overwriting data header
+    writeHeader(dataFile, dataFileHeader);
 
     // writing new index file data
     overwriteTreeFile(treeFile, arrayNode, tHeader);
-    // writing new index header file data
-    writeTreeHeader(treeFile, tHeader);
-}
-
-// func 8
-void createTree(FILE *dataFile, FILE *treeFile, char *dataMemberName) {
-    // reading the data header and verifying if it is consistent
-    Header *dataFileHeader = readHeaderBinary(dataFile);
-
-    // creating index tree header 
-    TreeHeader *tHeader = createTreeHeader();
-    Node **arrayNode;
 
     // writing new index header file data
-    treeHeaderSetStatus(tHeader, '0');
     writeTreeHeader(treeFile, tHeader);
 
-    // search in data file to put in tree file
-    long long int byteOff = bytesHeader;
-    for (int i = 0; i < getNumFileRegisters(dataFileHeader); i++) {
-        Data *reg = readBinaryRegister(dataFile);
-
-        // checking if register was removed
-        if (getDataRemoved(reg) == '1') continue;
-        if (getDataCrimeId(reg) == -1) continue;
-
-        // crating the first root node
-        if (getNextRRN(tHeader) == 0) {
-            addNextRRN(tHeader);
-            addTotalLevels(tHeader);
-            setRoot(tHeader, 0);
-            
-            Node *node = createNode();
-            setNodeLevel(node, 1);
-            setKey(node, getDataCrimeId(reg), byteOff);
-            printf("primeira insercao %d\n", getDataCrimeId(reg));
-            arrayNode = (Node **)malloc(sizeof(Node *) * 1);
-            arrayNode[0] = node;
-            // printNode(node);
-        }
-        else {
-            // printf("inserindo nao raiz\n");
-            //printData(reg);
-            // printf("inserindo %d\n", getDataCrimeId(reg));
-            arrayNode = insertTree(dataFile, treeFile, getDataCrimeId(reg), byteOff, tHeader, arrayNode);
-            overwriteTreeFile(treeFile, arrayNode, tHeader);
-        }
-        
-        addTotalKeys(tHeader);
-        byteOff += registerSize(reg);
-    }
-
-    // writing new index file data
-    // marking as consistent
-    printTreeHeader(tHeader);
-    printArvore3(arrayNode, tHeader);
-    treeHeaderSetStatus(tHeader, '1');
-    writeTreeHeader(treeFile, tHeader);
-    // printArvore2(arrayNode, tHeader);
-}
-
-void createMiniBin(FILE *newDataFile, FILE *input, int numReg) {
-    Header *h = createHeader();
-    //updateHeader(newDataFile, h);
-    writeHeader(newDataFile, h);
-
-    for (int i = 0; i < numReg; i++) {
-        Data *reg = readRegister(input);
-
-        writeRegister(newDataFile, reg);
-        add1FileReg(h);
-    }
-    fseek(newDataFile, 0, SEEK_SET);
-    writeHeader(newDataFile, h);
 }

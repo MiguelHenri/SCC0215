@@ -61,6 +61,7 @@ void updateHeaderStatus(Header *h) {
 int writeHeader(FILE *output, Header *h) {
     if (output == NULL || h == NULL) return 0;
 
+    fseek(output, 0, SEEK_SET);
     fwrite(&(h->status), sizeof(char), 1, output);
     fwrite(&(h->nextByteOffset), sizeof(long long int), 1, output);
     fwrite(&(h->numFileRegisters),sizeof(int), 1, output);
@@ -132,6 +133,6 @@ int getNumFileRegisters(Header *h) {
     return h == NULL ? 0 : h->numFileRegisters; 
 }
 
-long long int getNexByteOffset(Header *h) {
+long long int getNextByteOffset(Header *h) {
     return h->nextByteOffset;
 }

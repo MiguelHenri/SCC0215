@@ -14,13 +14,9 @@ typedef struct insertUtils InsertUtils;
 typedef struct promotedKey PromotedKey;
 typedef struct fila Fila;
 
-void initKey(Key *k);
-void initPointers(int *p);
+
 TreeHeader *readTreeHeader(FILE *treeFile);
 Result *ultraTreeSearch(FILE *dataFile, FILE *treeFile, int key, TreeHeader *tHeader, InsertUtils *IUtils, Node **arrNode);
-void printNode(Node *n);
-void printTreeHeader(TreeHeader *t);
-void printArvore(FILE *treeFile);
 Node **insertTree(FILE *dataFile, FILE *treeFile, int key, long long int byteOffKey, TreeHeader *tHeader, Node **arrayNode);
 void writeTreeHeader(FILE *treeFile, TreeHeader *t);
 void overwriteTreeFile(FILE *treeFile, Node **arrayNode, TreeHeader *tHeader);
@@ -34,8 +30,6 @@ void addNextRRN(TreeHeader *tHeader);
 void setKey(Node *n, int value, long long int offset);
 Node *createNode();
 void setNodeLevel(Node *n, int level);
-void printArvore2(Node **arrNode, TreeHeader *tHeader);
 void treeHeaderSetStatus(TreeHeader *tHeader, char status);
-void printArvore3(Node **arr, TreeHeader *tHeader);
 
 #endif

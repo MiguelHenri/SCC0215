@@ -3,10 +3,6 @@
 #include <string.h>
 #include "registers.h"
 
-/*
-    [ TO-DO ]
-*/
-
 struct data {
     char removed;
     int crimeID;
@@ -17,11 +13,11 @@ struct data {
     char *crimeDescription;
 };
 
-
 /*
 * Function used to read one register 
 */
 Data *readRegister(FILE *input) {
+
     // allocating memory for temporary register variable
     Data *tmpRegister = (Data *)malloc(sizeof(Data));
     if (tmpRegister == NULL) {
@@ -33,7 +29,6 @@ Data *readRegister(FILE *input) {
     char delimiter = ',';
 
     // reading register members one by one
-
     tmpData = readMember(input, delimiter);
     if (tmpData == NULL) return NULL;
     tmpRegister->crimeID = atoi(tmpData); // converts string into integer
@@ -44,7 +39,7 @@ Data *readRegister(FILE *input) {
     tmpData = readMember(input, delimiter);
     if (tmpData == NULL) { // dealing with missing data
         tmpRegister->articleNumber = -1;
-    } 
+    }
     else {
         tmpRegister->articleNumber = atoi(tmpData); // converts string into integer
     }
@@ -75,19 +70,29 @@ int writeRegister(FILE *output, Data *tmpRegister) {
         
     char stringDelimiter = '|';
     char registerDelimiter = '#';
+    int intAux;
+    long long int llintAux;
+    char charAux;
+    char *strAux;
 
-    fwrite(&(tmpRegister->removed), sizeof(char), 1, output);
-    fwrite(&(tmpRegister->crimeID), sizeof(int), 1, output);
+    charAux = tmpRegister->removed;
+    fwrite(&charAux, sizeof(char), 1, output);
+    
+    intAux = tmpRegister->crimeID;
+    fwrite(&intAux, sizeof(int), 1, output);
 
     // verifying if crimeDate needs to be completed with '$' 
     tmpRegister->crimeDate = completeSetString(tmpRegister->crimeDate, crimeDateLen);
-    fwrite(tmpRegister->crimeDate, crimeDateLen, 1, output);
+    strAux = tmpRegister->crimeDate;
+    fwrite(strAux, crimeDateLen, 1, output);
 
-    fwrite(&(tmpRegister->articleNumber), sizeof(int), 1, output);
+    intAux = tmpRegister->articleNumber;
+    fwrite(&intAux, sizeof(int), 1, output);
     
     // verifying if telephoneBrand needs to be completed with '$' 
     tmpRegister->telephoneBrand = completeSetString(tmpRegister->telephoneBrand, telephoneBrandLen);
-    fwrite(tmpRegister->telephoneBrand, telephoneBrandLen, 1, output);
+    strAux = tmpRegister->telephoneBrand;
+    fwrite(strAux, telephoneBrandLen, 1, output);
 
     // flag utilized to verify the need to write, or not, the '|' at the end of 
     // the data with unset size
@@ -98,8 +103,9 @@ int writeRegister(FILE *output, Data *tmpRegister) {
 
     // verifying unset size data
     tmpRegister->crimePlace = completeUnsetString(tmpRegister->crimePlace, &writeStrDelimiter);
-    fwrite(tmpRegister->crimePlace, strlen(tmpRegister->crimePlace), 1, output);
-    variableSize += strlen(tmpRegister->crimePlace);
+    strAux = tmpRegister->crimePlace;
+    fwrite(strAux, strlen(strAux), 1, output);
+    variableSize += strlen(strAux);
     if (writeStrDelimiter) {
         fwrite(&stringDelimiter, 1, 1, output);
         variableSize++;
@@ -110,8 +116,9 @@ int writeRegister(FILE *output, Data *tmpRegister) {
 
     // verifying unset size data
     tmpRegister->crimeDescription = completeUnsetString(tmpRegister->crimeDescription, &writeStrDelimiter);
-    fwrite(tmpRegister->crimeDescription, strlen(tmpRegister->crimeDescription), 1, output);
-    variableSize += strlen(tmpRegister->crimeDescription);
+    strAux = tmpRegister->crimeDescription;
+    fwrite(strAux, strlen(strAux), 1, output);
+    variableSize += strlen(strAux);
     if (writeStrDelimiter) {
         fwrite(&stringDelimiter, 1, 1, output);
         variableSize++;
@@ -234,17 +241,6 @@ int isIntegerMember(char *memberName) {
     }
 }
 
-int stringCompareWithLen(char *str1, char *str2, int len) {
-    if (str1 == NULL || str2 == NULL) return -1;
-    
-    for (int i = 0; i < len; i++) {
-        if (str1[i] != str2[i])
-            return -1;
-    }
-
-    return 0;
-}
-
 /*
 * Function that is used for comparing a member from the data struct and its value to
 * a register that was read
@@ -346,7 +342,6 @@ char *getDataCrimeDescription(Data *d) {
     return d->crimeDescription;
 }
 
-
 int regMissingData(Data *d) {
     return d == NULL || d->crimeDate[0] == '\0';
 }
@@ -359,7 +354,7 @@ int regMissingData(Data *d) {
 int insertRegisterInBinFile(FILE *binFile, Data *reg, Header *h) {
     
     //calculating the byteoffset and setting the file to the end
-    long long int currentOffset = getNexByteOffset(h);
+    long long int currentOffset = getNextByteOffset(h);
     fseek(binFile, currentOffset, SEEK_SET);
 
     //adding the byteoffset to the header
@@ -404,7 +399,7 @@ Data *readRegisterStdin2() {
         getc(stdin); // reading the space character
     }
     else { // string read == NULO
-        d->crimeDate = NULL;
+        d->crimeDate = completeSetString(NULL, crimeDateLen);
         char garbage[60];
         scanf("%s", garbage);
         getc(stdin); // reading the space character
@@ -438,7 +433,7 @@ Data *readRegisterStdin2() {
         getc(stdin);
     }
 
-    //reading description
+    // reading description
     // using the logic of scanquote from before
     isQuote = getc(stdin);
     if (isQuote == quote) {
@@ -457,7 +452,7 @@ Data *readRegisterStdin2() {
         getc(stdin);
     }
 
-    //reading telephone brand
+    // reading telephone brand
     // using the logic of scanquote from before
     isQuote = getc(stdin);
     if (isQuote == quote) {
@@ -470,7 +465,7 @@ Data *readRegisterStdin2() {
         getc(stdin);
     }
     else { // string read == NULO
-        d->telephoneBrand = NULL;
+        d->telephoneBrand = completeSetString(NULL, telephoneBrandLen);
         char *garbage = readMember(stdin, '\n');
         free(garbage);
     }
@@ -565,6 +560,9 @@ void updateReg(Data *reg, char *memberName, char *newStr, int newInt) {
     }
 }
 
+/*
+* Function that returns register 'reg' size in bytes
+*/
 int registerSize(Data *reg) {
     return bytesFixedMember + stringLenght(reg->crimeDescription) + stringLenght(reg->crimePlace) + 2;
 }
