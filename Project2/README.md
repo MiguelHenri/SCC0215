@@ -1,6 +1,6 @@
-# Project 1
+# Project 2
 
-Implementing B* tree functions - CREATE TABLE, SELECT, INSERT INTO.
+Implementing B* tree functions - CREATE INDEX, SELECT, INSERT INTO.
 
 ## Running the code
 
@@ -18,4 +18,4 @@ You may compare with any test case output:
 ```bash
 $ diff in/1.in out/1.out
 ```
-They should be the same.
+> They should be the same.
